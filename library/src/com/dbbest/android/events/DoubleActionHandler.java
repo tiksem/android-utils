@@ -6,7 +6,7 @@ package com.dbbest.android.events;
  * Time: 16:05
  */
 public abstract class DoubleActionHandler {
-    private long maxDoubleActionDuration = 1000;
+    private long maxDoubleActionDuration = 2000;
     private long lastActionTime = 0;
 
     protected DoubleActionHandler(long maxDoubleActionDuration) {
