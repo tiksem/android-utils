@@ -59,9 +59,7 @@ public class UiLoopEvent {
     }
 
     public void run(Runnable runnable){
-        if(onUi != null){
-            handler.removeCallbacks(onUi);
-        }
+        stop();
 
         this.runnable = runnable;
         if (runnable != null) {
@@ -76,6 +74,7 @@ public class UiLoopEvent {
 
         onUi = null;
         runnable = null;
+        isPaused = false;
     }
 
     public void pause(){
