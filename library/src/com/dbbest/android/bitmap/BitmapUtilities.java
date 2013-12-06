@@ -3,11 +3,14 @@ package com.dbbest.android.bitmap;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
+import android.media.ExifInterface;
 import android.net.Uri;
 import android.util.DisplayMetrics;
 import android.util.Log;
 
 import java.io.File;
+import java.io.IOException;
 
 /**
  * User: mda
@@ -87,6 +90,35 @@ public class BitmapUtilities {
         return BitmapFactory.decodeFile(imageUri.getPath(), opt);
     }
 
+    public static Bitmap resizeExistingBitmap(Bitmap bm, int newHeight, int newWidth) {
+
+        int width = bm.getWidth();
+        int height = bm.getHeight();
+
+        float currentRatio = ((float) width) / height;
+        float scaleWidth = 1;
+        float scaleHeight = 1;
+
+        if(newHeight > newWidth)
+        {
+                scaleWidth = ((float) newWidth) / width;
+                scaleHeight = scaleWidth;
+        }
+        else
+        {
+                scaleHeight = (((float)newHeight) / height);
+                scaleWidth = scaleHeight;
+        }
+
+        Matrix matrix = new Matrix();
+        matrix.postScale(scaleWidth, scaleHeight);
+
+        Bitmap resizedBitmap = Bitmap.createBitmap(bm, 0, 0, width, height, matrix, false);
+        return resizedBitmap;
+    }
+
+
+
     public static Bitmap decodeFile(Uri imageUri, boolean quickAndDirty, DisplayMetrics displayMetrics) {
         return decodeFile(new File(imageUri.getPath()), quickAndDirty, displayMetrics);
     }
@@ -112,7 +144,8 @@ public class BitmapUtilities {
                 bitmapDecodeOptions.inPreferredConfig = quickAndDirty ? Bitmap.Config.RGB_565 : Bitmap.Config.ARGB_8888;
                 Bitmap decodedBitmap = BitmapFactory.decodeFile(bitmapFile.getAbsolutePath(), bitmapDecodeOptions);
 
-                return decodedBitmap;
+                Bitmap resultBitmap = getRotatedBitmap(bitmapFile.getAbsolutePath(),decodedBitmap);
+                return resultBitmap;
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
@@ -146,7 +179,10 @@ public class BitmapUtilities {
                 tmpHeight /= 2;
                 inSampleSize *= 2;
             }
-        } else {
+        }
+        else
+
+        {
             // Calculate ratios of height and width to requested height and width
             final int heightRatio = Math.round((float) srcHeight / (float) dstHeight);
             final int widthRatio = Math.round((float) srcWidth / (float) dstWidth);
@@ -159,4 +195,47 @@ public class BitmapUtilities {
 
         return inSampleSize;
     }
+
+    public static Bitmap getRotatedBitmap(String path, Bitmap bitmap){
+        Bitmap rotatedBitmap = null;
+        Matrix matrix = new Matrix();
+
+        ExifInterface exif = null;
+        int orientation = 1;
+
+        try {
+            if(path!=null)
+            {
+                // Getting Exif information of the file
+                exif = new ExifInterface(path);
+
+            }
+            if(exif!=null)
+            {
+                orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, 0);
+                switch(orientation)
+                {
+                    case ExifInterface.ORIENTATION_ROTATE_270:
+                        matrix.preRotate(270);
+                        break;
+
+                    case ExifInterface.ORIENTATION_ROTATE_90:
+                        matrix.preRotate(90);
+                        break;
+                    case ExifInterface.ORIENTATION_ROTATE_180:
+                        matrix.preRotate(180);
+                        break;
+                }
+                // Rotates the image according to the orientation
+                rotatedBitmap = Bitmap.createBitmap(bitmap,0,0,bitmap.getWidth(),bitmap.getHeight(),matrix,true);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return rotatedBitmap;
+    }
+
+
+
 }
