@@ -5,7 +5,10 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.util.Log;
 
+import android.view.View;
 import com.dbbest.android.BuildConfig;
+
+import java.util.Arrays;
 
 /**
  * Created by Tikhonenko.S on 19.09.13.
@@ -32,4 +35,13 @@ public class GuiUtilities {
 		return activeInfo.isAvailable() && activeInfo.isConnected();
 	}
 
+    public static void setVisibility(Iterable<View> views, int visibility){
+        for(View view : views){
+            view.setVisibility(visibility);
+        }
+    }
+
+    public static void setVisibility(View[] views, int visibility){
+        setVisibility(Arrays.asList(views), visibility);
+    }
 }
