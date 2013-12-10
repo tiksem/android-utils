@@ -101,14 +101,28 @@ public class BitmapUtilities {
 
         if(newHeight > newWidth)
         {
-                scaleWidth = ((float) newWidth) / width;
-                scaleHeight = scaleWidth;
+            scaleWidth = ((float) newWidth) / width;
+            scaleHeight = scaleWidth;
         }
         else
         {
-                scaleHeight = (((float)newHeight) / height);
-                scaleWidth = scaleHeight;
+            scaleHeight = (((float)newHeight) / height);
+            scaleWidth = scaleHeight;
         }
+
+        Matrix matrix = new Matrix();
+        matrix.postScale(scaleWidth, scaleHeight);
+
+        Bitmap resizedBitmap = Bitmap.createBitmap(bm, 0, 0, width, height, matrix, false);
+        return resizedBitmap;
+    }
+
+
+    public static Bitmap scaleExistingBitmap(Bitmap bm, float scaleWidth, float scaleHeight)
+    {
+
+        int width = bm.getWidth();
+        int height = bm.getHeight();
 
         Matrix matrix = new Matrix();
         matrix.postScale(scaleWidth, scaleHeight);
