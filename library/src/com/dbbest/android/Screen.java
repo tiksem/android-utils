@@ -7,7 +7,6 @@ import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.Window;
 import android.view.WindowManager;
-
 import com.dbbest.framework.MathUtils;
 
 /**
@@ -16,13 +15,21 @@ import com.dbbest.framework.MathUtils;
  * Time: 13:46
  */
 public final class Screen {
-
     public static DisplayMetrics getAspectRatio(Context context){
         DisplayMetrics size = getDisplayMetrics(context);
         int gcd = MathUtils.getGreatestCommonDivisor(size.widthPixels, size.heightPixels);
         size.widthPixels /= gcd;
         size.heightPixels /= gcd;
         return size;
+    }
+
+    public static boolean isAspectRatioOfTheScreen(Context context, int width, int height){
+        int gcd = MathUtils.getGreatestCommonDivisor(width, height);
+        width /= gcd;
+        height /= gcd;
+
+        DisplayMetrics displayMetrics = getAspectRatio(context);
+        return width == displayMetrics.widthPixels && height == displayMetrics.heightPixels;
     }
 
     public static int getWidthFromHeight(Context activity, int height){
