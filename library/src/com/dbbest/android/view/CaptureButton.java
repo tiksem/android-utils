@@ -5,6 +5,7 @@ import android.os.Handler;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
+import android.util.Log;
 import android.widget.ImageButton;
 
 /**
@@ -22,27 +23,43 @@ public class CaptureButton extends ImageButton implements View.OnTouchListener, 
     private boolean actionDownExecuted = false;
     private long downActionTime;
     private Handler downActionHandler = new Handler();
+    private boolean downActionEnabled = true;
+    private int lastTouchAction = Integer.MAX_VALUE;
 
     private OnPressStateListener onPressStateListener;
 
     private Runnable actionDown = new Runnable() {
         @Override
         public void run() {
+            if(lastTouchAction == MotionEvent.ACTION_DOWN){
+                return;
+            }
+
+            Log.i("CaptureButton","actionDown");
+
             actionDownExecuted = true;
             downActionTime = System.currentTimeMillis();
             if(onPressStateListener != null){
                 onPressStateListener.onButtonDown();
             }
+            lastTouchAction = MotionEvent.ACTION_DOWN;
         }
     };
 
     private Runnable actionUp = new Runnable() {
         @Override
         public void run() {
+            if(lastTouchAction == MotionEvent.ACTION_UP){
+                return;
+            }
+
+            Log.i("CaptureButton","actionUp");
+
             touchDown = false;
             if (onPressStateListener != null) {
                 onPressStateListener.onButtonUp();
             }
+            lastTouchAction = MotionEvent.ACTION_UP;
         }
     };
 
@@ -65,11 +82,19 @@ public class CaptureButton extends ImageButton implements View.OnTouchListener, 
         init();
     }
 
+    public boolean isTouchDown() {
+        return touchDown;
+    }
+
     @Override
     public boolean onTouch(View view, MotionEvent motionEvent) {
         int type = motionEvent.getAction();
         switch (type) {
             case MotionEvent.ACTION_DOWN:
+                if(!downActionEnabled){
+                    return true;
+                }
+
                 if(touchDown){
                     return true;
                 }
@@ -123,4 +148,11 @@ public class CaptureButton extends ImageButton implements View.OnTouchListener, 
         this.onPressStateListener = onPressStateListener;
     }
 
+    public boolean isDownActionEnabled() {
+        return downActionEnabled;
+    }
+
+    public void setDownActionEnabled(boolean downActionEnabled) {
+        this.downActionEnabled = downActionEnabled;
+    }
 }
