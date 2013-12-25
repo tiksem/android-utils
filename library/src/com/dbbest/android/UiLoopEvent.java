@@ -8,7 +8,7 @@ import java.lang.ref.WeakReference;
 /**
  * Created by Tikhonenko.S on 31.10.13.
  */
-public class UiLoopEvent {
+public class UiLoopEvent implements LoopEvent{
     private static final long DEFAULT_DELAY = 30;
 
     private Runnable runnable;
@@ -46,10 +46,12 @@ public class UiLoopEvent {
         this(context, DEFAULT_DELAY);
     }
 
+    @Override
     public long getDelay() {
         return delay;
     }
 
+    @Override
     public void setDelay(long delay) {
         if(delay < 0){
             throw new IllegalArgumentException();
@@ -58,6 +60,7 @@ public class UiLoopEvent {
         this.delay = delay;
     }
 
+    @Override
     public void run(Runnable runnable){
         stop();
 
@@ -67,6 +70,7 @@ public class UiLoopEvent {
         }
     }
 
+    @Override
     public void stop(){
        if(onUi != null){
            handler.removeCallbacks(onUi);
@@ -77,18 +81,22 @@ public class UiLoopEvent {
         isPaused = false;
     }
 
+    @Override
     public void pause(){
         isPaused = true;
     }
 
+    @Override
     public void resume(){
         isPaused = false;
     }
 
+    @Override
     public boolean isPaused() {
         return isPaused;
     }
 
+    @Override
     public boolean isRunning(){
         return runnable != null;
     }

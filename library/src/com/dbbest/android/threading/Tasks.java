@@ -1,6 +1,7 @@
 package com.dbbest.android.threading;
 
 import android.os.AsyncTask;
+import android.os.Handler;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -12,6 +13,8 @@ import java.util.List;
  * Created by Tikhonenko.S on 27.09.13.
  */
 public class Tasks {
+    private static Handler handler = new Handler();
+
     public static <Result> void executeSequentially(final Iterable<Task<Result>> tasks,
                                                     final OnFinish<List<Result>> onFinish){
         new AsyncTask<Void,Void,List<Result>>(){
@@ -147,5 +150,39 @@ public class Tasks {
                 });
             }
         };
+    }
+
+    public static <T>
+    BackgroundLoopEvent waitForResult(final ResultLoop<T> resultLoop){
+        final BackgroundLoopEvent backgroundLoopEvent = new BackgroundLoopEvent();
+        backgroundLoopEvent.setOnStop(new BackgroundLoopEvent.OnStop() {
+            @Override
+            public void onStop(boolean timeIsUp) {
+                resultLoop.onTimeIsUp();
+            }
+        });
+
+        backgroundLoopEvent.run(new Runnable() {
+            @Override
+            public void run() {
+                if (resultLoop.resultIsReady()) {
+                    backgroundLoopEvent.setOnStop(new BackgroundLoopEvent.OnStop() {
+                        @Override
+                        public void onStop(boolean timeIsUp) {
+                            final T result = resultLoop.getResult();
+                            handler.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    resultLoop.handleResult(result);
+                                }
+                            });
+                        }
+                    });
+                    backgroundLoopEvent.stop();
+                }
+            }
+        });
+
+        return backgroundLoopEvent;
     }
 }

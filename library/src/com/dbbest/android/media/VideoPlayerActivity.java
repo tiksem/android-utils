@@ -43,6 +43,12 @@ public class VideoPlayerActivity extends Activity{
         VideoPlayerView videoPlayerView = new VideoPlayerView(this);
         final VideoView videoView = videoPlayerView.getVideoView();
         videoView.setVideoPath(uri);
+        videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+            @Override
+            public void onPrepared(MediaPlayer mp) {
+                mp.getDuration();
+            }
+        });
         videoView.start();
         setContentView(videoPlayerView);
     }
