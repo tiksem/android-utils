@@ -39,6 +39,7 @@ public class MediaUtils {
 
             @Override
             public void handleResult(Integer result) {
+                mediaPlayer.release();
                 onFinish.onResult(true, result);
             }
 
