@@ -88,4 +88,8 @@ public class GuiUtilities {
     public static void setVisibility(View[] views, int visibility){
         setVisibility(Arrays.asList(views), visibility);
     }
+
+    public static View getContentView(Activity activity){
+        return activity.getWindow().getDecorView().getRootView();
+    }
 }
