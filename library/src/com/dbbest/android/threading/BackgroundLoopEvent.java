@@ -1,5 +1,6 @@
 package com.dbbest.android.threading;
 
+import android.os.Handler;
 import com.dbbest.android.LoopEvent;
 
 import java.util.concurrent.*;
@@ -18,6 +19,7 @@ public class BackgroundLoopEvent implements LoopEvent{
     private Runnable internalOnStop;
     private long maxRunningTime = Long.MAX_VALUE;
     private long startTime;
+    private static Handler handler = new Handler();
 
     public static interface OnStop{
         void onStop(boolean timeIsUp);
@@ -43,11 +45,16 @@ public class BackgroundLoopEvent implements LoopEvent{
         this.onStop = onStop;
     }
 
-    private void onStop(boolean timeIsUp){
+    private void onStop(final boolean timeIsUp){
         if(internalOnStop != null){
-            internalOnStop.run();
+            handler.post(internalOnStop);
         } else if(onStop != null) {
-            onStop.onStop(timeIsUp);
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    onStop.onStop(timeIsUp);
+                }
+            });
         }
     }
 
