@@ -1,9 +1,6 @@
 package com.dbbest.android.file;
 
-import java.io.Closeable;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 
 /**
  * Provides I/O operations
@@ -26,6 +23,10 @@ public final class IoUtils {
 			os.write(bytes, 0, count);
 		}
 	}
+
+    public static void copyFile(String source, String destination) throws IOException {
+        copyStream(new FileInputStream(source), new FileOutputStream(destination));
+    }
 
 	public static final void closeSilently(Closeable closeable) {
 		try {
