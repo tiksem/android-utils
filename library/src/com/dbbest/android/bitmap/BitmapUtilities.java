@@ -6,6 +6,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.media.ExifInterface;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.util.DisplayMetrics;
 import android.util.Log;
 
@@ -250,6 +251,39 @@ public class BitmapUtilities {
         return rotatedBitmap;
     }
 
+    public interface OnBitmapReady {
+        void onBitmapReady(Bitmap bitmap);
+    }
 
+    public static void decodeBitmapArrayAsync(final byte[] array, final OnBitmapReady onBitmapReady){
+        new AsyncTask<Void, Void, Bitmap>(){
+            @Override
+            protected Bitmap doInBackground(Void... params) {
+                return BitmapFactory.decodeByteArray(array, 0, array.length);
+            }
 
+            @Override
+            protected void onPostExecute(Bitmap bitmap) {
+                onBitmapReady.onBitmapReady(bitmap);
+            }
+        }.execute();
+    }
+
+    public static Bitmap getBitmapPart(Bitmap bitmap, float x, float y, float width, float height){
+        if(width > 1.0f || width <= 0.0f || height > 1.0f || height <= 0.0f || x < 0.0f
+                || x >= 1.0f || y < 0.0f || y >= 1.0f){
+            throw new IllegalArgumentException("width > 1.0f || width <= 0.0f " +
+                    "|| height > 1.0f || height <= 0.0f || x < 0.0f " +
+                    "|| x >= 1.0f || y < 0.0f || y >= 1.0f");
+        }
+
+        int pixelWidth = bitmap.getWidth();
+        int pixelHeight = bitmap.getHeight();
+        int newWidth = Math.round(pixelWidth * width);
+        int newHeight = Math.round(pixelHeight * height);
+        int pixelX = Math.round(x * pixelWidth);
+        int pixelY = Math.round(y * pixelWidth);
+
+        return Bitmap.createBitmap(bitmap, pixelX, pixelY, pixelWidth, pixelHeight);
+    }
 }
