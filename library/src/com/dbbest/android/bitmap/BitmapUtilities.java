@@ -284,6 +284,25 @@ public class BitmapUtilities {
         int pixelX = Math.round(x * pixelWidth);
         int pixelY = Math.round(y * pixelWidth);
 
-        return Bitmap.createBitmap(bitmap, pixelX, pixelY, pixelWidth, pixelHeight);
+        return Bitmap.createBitmap(bitmap, pixelX, pixelY, newWidth, newHeight);
+    }
+
+    public static void getBitmapPartAsync(final Bitmap bitmap,
+                                          final float x,
+                                          final float y,
+                                          final float width,
+                                          final float height,
+                                          final OnBitmapReady onBitmapReady){
+        new AsyncTask<Void, Void, Bitmap>(){
+            @Override
+            protected Bitmap doInBackground(Void... params) {
+                return getBitmapPart(bitmap, x, y, width, height);
+            }
+
+            @Override
+            protected void onPostExecute(Bitmap bitmap) {
+                onBitmapReady.onBitmapReady(bitmap);
+            }
+        }.execute();
     }
 }
