@@ -15,6 +15,10 @@ import com.dbbest.framework.MathUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * User: mda
@@ -340,6 +344,10 @@ public class BitmapUtilities {
             result = 31 * result + (int) (temp ^ (temp >>> 32));
             return result;
         }
+
+        public int toColor(){
+            return Color.HSVToColor(new float[]{(float) hue, (float) saturation, (float) value});
+        }
     }
 
     public static HSV rgb2hsv(byte red, byte green, byte blue){
@@ -347,7 +355,14 @@ public class BitmapUtilities {
     }
 
     public static HSV rgb2hsv(int color){
-        return rgb2hsv(Color.red(color), Color.green(color), Color.blue(color));
+        float[] result = new float[3];
+        Color.colorToHSV(color, result);
+        HSV hsv = new HSV();
+        hsv.hue = result[0];
+        hsv.saturation = result[1];
+        hsv.value = result[2];
+
+        return hsv;
     }
 
     public static HSV rgb2hsv(double red, double green, double blue)
@@ -387,7 +402,81 @@ public class BitmapUtilities {
     }
 
     public static int getAverageColor(int[] pixels){
-        return MathUtils.getAverage(pixels);
+        long sumBlue = 0;
+        long sumRed = 0;
+        long sumGreen = 0;
+
+        for(int pixel : pixels){
+            sumBlue += Color.blue(pixel);
+            sumGreen += Color.green(pixel);
+            sumRed += Color.red(pixel);
+        }
+
+        int length = pixels.length;
+        return Color.rgb((int)Math.round((double)sumRed / length), (int)Math.round((double)sumGreen / length),
+                (int)Math.round((double)sumBlue / length));
+    }
+
+    public static int getDominantColor(Bitmap bitmap) {
+        if (bitmap == null)
+            throw new NullPointerException();
+
+        int width = bitmap.getWidth();
+        int height = bitmap.getHeight();
+        int size = width * height;
+        int pixels[] = new int[size];
+
+        Bitmap bitmap2 = bitmap.copy(Bitmap.Config.ARGB_4444, false);
+
+        bitmap2.getPixels(pixels, 0, width, 0, 0, width, height);
+
+        final List<Map<Integer, Integer>> colorMap = new ArrayList<Map<Integer, Integer>>();
+        colorMap.add(new HashMap<Integer, Integer>());
+        colorMap.add(new HashMap<Integer, Integer>());
+        colorMap.add(new HashMap<Integer, Integer>());
+
+        int color = 0;
+        int r = 0;
+        int g = 0;
+        int b = 0;
+        Integer rC, gC, bC;
+        for (int i = 0; i < pixels.length; i++) {
+            color = pixels[i];
+
+            r = Color.red(color);
+            g = Color.green(color);
+            b = Color.blue(color);
+
+            rC = colorMap.get(0).get(r);
+            if (rC == null)
+                rC = 0;
+            colorMap.get(0).put(r, ++rC);
+
+            gC = colorMap.get(1).get(g);
+            if (gC == null)
+                gC = 0;
+            colorMap.get(1).put(g, ++gC);
+
+            bC = colorMap.get(2).get(b);
+            if (bC == null)
+                bC = 0;
+            colorMap.get(2).put(b, ++bC);
+        }
+
+        int[] rgb = new int[3];
+        for (int i = 0; i < 3; i++) {
+            int max = 0;
+            int val = 0;
+            for (Map.Entry<Integer, Integer> entry : colorMap.get(i).entrySet()) {
+                if (entry.getValue() > max) {
+                    max = entry.getValue();
+                    val = entry.getKey();
+                }
+            }
+            rgb[i] = val;
+        }
+
+        return Color.rgb(rgb[0], rgb[1], rgb[2]);
     }
 
     public static int[] getPixels(Bitmap bitmap){
@@ -407,13 +496,8 @@ public class BitmapUtilities {
 
     public static HSV getAverageHSV(Bitmap bitmap){
         int color = getAverageColor(bitmap);
-        HSV hsv = new HSV();
-        float[] hsvFloat = new float[3];
-        Color.colorToHSV(color, hsvFloat);
-        hsv.hue = hsvFloat[0];
-        hsv.saturation = hsvFloat[1];
-        hsv.value = hsvFloat[2];
-        return hsv;
+        HSV hsv = rgb2hsv(Color.rgb(230, 200, 146));
+        return rgb2hsv(color);
     }
 
     public static void getAverageHSVAsync(final Bitmap bitmap, final OnFinish<HSV> onFinish){
@@ -428,5 +512,11 @@ public class BitmapUtilities {
                 onFinish.onFinish(hsv);
             }
         }.execute();
+    }
+
+    public static Bitmap rotateBitmap(Bitmap bitmap, int degrees){
+        Matrix matrix = new Matrix();
+        matrix.postRotate(degrees);
+        return Bitmap.createBitmap(bitmap , 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
     }
 }
