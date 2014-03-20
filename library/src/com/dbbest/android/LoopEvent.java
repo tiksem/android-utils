@@ -5,20 +5,7 @@ package com.dbbest.android;
  * Date: 24.12.13
  * Time: 17:15
  */
-public interface LoopEvent {
+public interface LoopEvent extends RunningLoopEvent{
     void run(Runnable runnable);
-
     void stop();
-
-    void pause();
-
-    void resume();
-
-    boolean isPaused();
-
-    boolean isRunning();
-
-    long getDelay();
-
-    void setDelay(long delay);
 }

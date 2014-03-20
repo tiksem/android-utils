@@ -3,12 +3,15 @@ package com.dbbest.android.bitmap;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.Matrix;
 import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import com.dbbest.android.threading.OnFinish;
+import com.dbbest.framework.MathUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -302,6 +305,127 @@ public class BitmapUtilities {
             @Override
             protected void onPostExecute(Bitmap bitmap) {
                 onBitmapReady.onBitmapReady(bitmap);
+            }
+        }.execute();
+    }
+
+    public static class HSV {
+        public double hue;
+        public double saturation;
+        public double value;
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+
+            HSV hsv = (HSV) o;
+
+            if (Double.compare(hsv.hue, hue) != 0) return false;
+            if (Double.compare(hsv.saturation, saturation) != 0) return false;
+            if (Double.compare(hsv.value, value) != 0) return false;
+
+            return true;
+        }
+
+        @Override
+        public int hashCode() {
+            int result;
+            long temp;
+            temp = Double.doubleToLongBits(hue);
+            result = (int) (temp ^ (temp >>> 32));
+            temp = Double.doubleToLongBits(saturation);
+            result = 31 * result + (int) (temp ^ (temp >>> 32));
+            temp = Double.doubleToLongBits(value);
+            result = 31 * result + (int) (temp ^ (temp >>> 32));
+            return result;
+        }
+    }
+
+    public static HSV rgb2hsv(byte red, byte green, byte blue){
+        return rgb2hsv((double)red / 255.0, (double)green / 255.0, (double)blue / 255.0);
+    }
+
+    public static HSV rgb2hsv(int color){
+        return rgb2hsv(Color.red(color), Color.green(color), Color.blue(color));
+    }
+
+    public static HSV rgb2hsv(double red, double green, double blue)
+    {
+        HSV out = new HSV();
+        double min, max, delta;
+
+        min = red < green ? red : green;
+        min = min  < blue ? min  : blue;
+
+        max = red > green ? red : green;
+        max = max  > blue ? max  : blue;
+
+        out.value = max;
+        delta = max - min;
+        if( max > 0.0 ) {
+            out.saturation = (delta / max);
+        } else {
+            out.saturation = 0.0;
+            out.hue = Double.NaN;
+            return out;
+        }
+        if(red >= max)
+            out.hue = (green - blue) / delta;
+        else
+        if(green >= max)
+            out.hue = 2.0 + (blue - red) / delta;
+        else
+            out.hue = 4.0 + (red - green) / delta;
+
+        out.hue *= 60.0;
+
+        if(out.hue < 0.0)
+            out.hue += 360.0;
+
+        return out;
+    }
+
+    public static int getAverageColor(int[] pixels){
+        return MathUtils.getAverage(pixels);
+    }
+
+    public static int[] getPixels(Bitmap bitmap){
+        int width = bitmap.getWidth();
+        int height = bitmap.getHeight();
+
+        int[] pixels = new int[width * height];
+        bitmap.getPixels(pixels, 0, width, 0, 0, width, height);
+
+        return pixels;
+    }
+    
+    public static int getAverageColor(Bitmap bitmap){
+        int[] pixels = getPixels(bitmap);
+        return getAverageColor(pixels);
+    }
+
+    public static HSV getAverageHSV(Bitmap bitmap){
+        int color = getAverageColor(bitmap);
+        HSV hsv = new HSV();
+        float[] hsvFloat = new float[3];
+        Color.colorToHSV(color, hsvFloat);
+        hsv.hue = hsvFloat[0];
+        hsv.saturation = hsvFloat[1];
+        hsv.value = hsvFloat[2];
+        return hsv;
+    }
+
+    public static void getAverageHSVAsync(final Bitmap bitmap, final OnFinish<HSV> onFinish){
+        new AsyncTask<Void, Void, HSV>(){
+            @Override
+            protected HSV doInBackground(Void... params) {
+                return getAverageHSV(bitmap);
+            }
+
+            @Override
+            protected void onPostExecute(HSV hsv) {
+                onFinish.onFinish(hsv);
             }
         }.execute();
     }
