@@ -1,17 +1,22 @@
 package com.dbbest.android.media;
 
 import android.content.Context;
-import android.content.res.AssetManager;
-import android.media.*;
+import android.media.MediaCodec;
+import android.media.MediaExtractor;
+import android.media.MediaFormat;
+import android.media.MediaMuxer;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
-import com.dbbest.android.threading.*;
+
+import com.dbbest.android.threading.BackgroundLoopEvent;
+import com.dbbest.android.threading.Cancelable;
+import com.dbbest.android.threading.ResultLoop;
+import com.dbbest.android.threading.Tasks;
 
 import java.io.File;
-import java.io.FileDescriptor;
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.util.HashMap;
 
 /**
  * User: Tikhonenko.S
