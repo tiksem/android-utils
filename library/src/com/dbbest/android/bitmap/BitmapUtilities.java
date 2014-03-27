@@ -351,7 +351,7 @@ public class BitmapUtilities {
 
         @Override
         public String toString() {
-            return hue + " " + saturation + " " + value;
+            return Math.round(hue) + " " + Math.round(saturation * 100) + " " + Math.round(value * 100);
         }
     }
 
