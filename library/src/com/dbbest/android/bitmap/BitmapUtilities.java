@@ -348,6 +348,11 @@ public class BitmapUtilities {
         public int toColor(){
             return Color.HSVToColor(new float[]{(float) hue, (float) saturation, (float) value});
         }
+
+        @Override
+        public String toString() {
+            return hue + " " + saturation + " " + value;
+        }
     }
 
     public static HSV rgb2hsv(byte red, byte green, byte blue){
