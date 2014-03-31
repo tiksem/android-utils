@@ -4,16 +4,19 @@ import android.content.Context;
 import android.media.MediaPlayer;
 import android.util.AttributeSet;
 import android.widget.VideoView;
+import com.dbbest.android.Pauseable;
 import com.dbbest.android.media.MediaPlayerProvider;
 
 /**
+ *
  * User: Tikhonenko.S
  * Date: 26.03.14
  * Time: 18:52
  */
-public class ExtendedVideoView extends VideoView implements MediaPlayerProvider{
+public class ExtendedVideoView extends VideoView implements MediaPlayerProvider, Pauseable{
     private MediaPlayer.OnPreparedListener onPreparedListener;
     private MediaPlayer mediaPlayer;
+    private boolean paused = false;
 
     public ExtendedVideoView(Context context) {
         super(context);
@@ -51,5 +54,25 @@ public class ExtendedVideoView extends VideoView implements MediaPlayerProvider{
     @Override
     public MediaPlayer getMediaPlayer() {
         return mediaPlayer;
+    }
+
+    @Override
+    public void pause() {
+        super.pause();
+        paused = true;
+    }
+
+    @Override
+    public boolean isPaused() {
+        return paused;
+    }
+
+    @Override
+    public void resume() {
+        if (isPaused()) {
+            super.start();
+        }
+
+        paused = false;
     }
 }
