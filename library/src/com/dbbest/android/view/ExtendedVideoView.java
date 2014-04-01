@@ -69,10 +69,7 @@ public class ExtendedVideoView extends VideoView implements MediaPlayerProvider,
 
     @Override
     public void resume() {
-        if (isPaused()) {
-            super.start();
-        }
-
+        super.start();
         paused = false;
     }
 }
