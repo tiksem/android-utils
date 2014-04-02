@@ -3,11 +3,7 @@ package com.dbbest.android.threading;
 import android.os.AsyncTask;
 import android.os.Handler;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by Tikhonenko.S on 27.09.13.
@@ -184,5 +180,16 @@ public class Tasks {
         });
 
         return backgroundLoopEvent;
+    }
+
+    public static void executeRunnableQueue(Iterable<Runnable> runnables){
+        for(Runnable runnable : runnables){
+            runnable.run();
+        }
+    }
+
+    public static void executeAndClearQueue(Collection<Runnable> runnables){
+        executeRunnableQueue(runnables);
+        runnables.clear();
     }
 }
