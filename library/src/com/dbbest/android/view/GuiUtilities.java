@@ -68,9 +68,9 @@ public class GuiUtilities {
         return CollectionUtils.findAll(views, predicate);
     }
 
-    public static List<View> getAllChildrenRecursive(Activity activity, Class<? extends View> aClass){
+    public static <T extends View> List<T> getAllChildrenRecursive(Activity activity, Class<T> aClass){
         InstanceOfPredicate<View> predicate = new InstanceOfPredicate<View>(aClass);
-        return getAllChildrenRecursive(activity, predicate);
+        return (List<T>) getAllChildrenRecursive(activity, predicate);
     }
 
     public static List<View> getNonViewGroupChildrenRecursive(View view){
