@@ -30,7 +30,9 @@ public class TextureVideoView extends TextureView implements Pauseable, MediaPla
     private SurfaceTextureListener surfaceTextureListener = new SurfaceTextureListener() {
         @Override
         public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
-            mediaPlayer = new MediaPlayer();
+            if (mediaPlayer == null) {
+                mediaPlayer = new MediaPlayer();
+            }
 
             Tasks.executeAndClearQueue(onSurfaceTextureAvailableTasks);
             onSurfaceTextureAvailableTasks = null;
@@ -45,6 +47,7 @@ public class TextureVideoView extends TextureView implements Pauseable, MediaPla
 
         @Override
         public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
+            onSurfaceTextureAvailableTasks = new ArrayDeque<Runnable>();
             return true;
         }
 
@@ -183,9 +186,11 @@ public class TextureVideoView extends TextureView implements Pauseable, MediaPla
 
     @Override
     protected void onDetachedFromWindow() {
+
         super.onDetachedFromWindow();
         if(mediaPlayer != null){
             mediaPlayer.release();
+            mediaPlayer = null;
         }
     }
 
