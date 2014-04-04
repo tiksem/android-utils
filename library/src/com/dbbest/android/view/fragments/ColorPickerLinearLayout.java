@@ -31,7 +31,8 @@ public class ColorPickerLinearLayout extends StaticFragmentsView{
 
     @Override
     public void setAdapter(FragmentsAdapter fragmentsAdapter) {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("fragments adapter should be an instance " +
+                "of ColorPickerFragmentsAdapter");
     }
 
     public void setAdapter(ColorPickerFragmentsAdapter colorPickerFragmentsAdapter) {

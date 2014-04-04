@@ -83,17 +83,24 @@ public class StaticFragmentsView extends LinearLayout{
             return;
         }
 
+        boolean isHorizontal = getOrientation() == HORIZONTAL;
+
         int parentWidth = View.MeasureSpec.getSize(widthMeasureSpec);
         int parentHeight = View.MeasureSpec.getSize(heightMeasureSpec);
+
+        int parentOrientationSize = parentWidth;
+        if(!isHorizontal){
+            parentOrientationSize = parentHeight;
+        }
 
         float sum = (float) CollectionUtils.sum(lastFragments);
         float k = 1.0f;
         boolean sumIsNil = false;
         if(sum != 0){
-            k = parentWidth / sum;
+            k = parentOrientationSize / sum;
         } else {
             sumIsNil = true;
-            k = parentWidth / lastFragments.size();
+            k = parentOrientationSize / lastFragments.size();
         }
 
         int index = 0;
@@ -105,9 +112,19 @@ public class StaticFragmentsView extends LinearLayout{
             }
 
             View view = getChildAt(index);
-            int childWidth = View.MeasureSpec.makeMeasureSpec(Math.round(fragment), View.MeasureSpec.EXACTLY);
-            int childHeight = View.MeasureSpec.makeMeasureSpec(parentHeight,
-                    View.MeasureSpec.EXACTLY);
+
+            int childWidth;
+            int childHeight;
+
+            if (isHorizontal) {
+                childWidth = MeasureSpec.makeMeasureSpec(Math.round(fragment), MeasureSpec.EXACTLY);
+                childHeight = MeasureSpec.makeMeasureSpec(parentHeight,
+                        MeasureSpec.EXACTLY);
+            } else {
+                childHeight = MeasureSpec.makeMeasureSpec(Math.round(fragment), MeasureSpec.EXACTLY);
+                childWidth = MeasureSpec.makeMeasureSpec(parentWidth,
+                        MeasureSpec.EXACTLY);
+            }
 
             view.measure(childWidth, childHeight);
 

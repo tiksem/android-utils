@@ -11,7 +11,7 @@ import java.util.List;
  * Time: 15:03
  */
 public abstract class ColorPickerFragmentsAdapter implements FragmentsAdapter{
-    private int[] colors;
+    private int[] colors = new int[0];
 
     void setColors(int[] colors) {
         this.colors = colors;
