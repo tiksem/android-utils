@@ -315,7 +315,7 @@ public class BitmapUtilities {
         }.execute();
     }
 
-    public static class HSV implements Parcelable{
+    public static class HSV implements Parcelable, Cloneable{
         public double hue;
         public double saturation;
         public double value;
@@ -393,6 +393,11 @@ public class BitmapUtilities {
             this.hue = hue;
             this.saturation = saturation;
             this.value = value;
+        }
+
+        @Override
+        public HSV clone() {
+            return new HSV(hue, saturation, value);
         }
     }
 
