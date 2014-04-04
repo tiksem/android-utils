@@ -8,6 +8,8 @@ import android.graphics.Matrix;
 import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import com.dbbest.android.threading.OnFinish;
@@ -313,7 +315,7 @@ public class BitmapUtilities {
         }.execute();
     }
 
-    public static class HSV {
+    public static class HSV implements Parcelable{
         public double hue;
         public double saturation;
         public double value;
@@ -352,6 +354,45 @@ public class BitmapUtilities {
         @Override
         public String toString() {
             return Math.round(hue) + " " + Math.round(saturation * 100) + " " + Math.round(value * 100);
+        }
+
+        @Override
+        public int describeContents() {
+            return 0;
+        }
+
+        @Override
+        public void writeToParcel(Parcel dest, int flags) {
+            dest.writeDouble(hue);
+            dest.writeDouble(saturation);
+            dest.writeDouble(value);
+        }
+
+        public static final Parcelable.Creator<HSV> CREATOR
+                = new Parcelable.Creator<HSV>() {
+            public HSV createFromParcel(Parcel in) {
+                return new HSV(in);
+            }
+
+            public HSV[] newArray(int size) {
+                return new HSV[size];
+            }
+        };
+
+        private HSV(Parcel in) {
+            hue = in.readDouble();
+            saturation = in.readDouble();
+            value = in.readDouble();
+        }
+
+        public HSV() {
+
+        }
+
+        public HSV(double hue, double saturation, double value) {
+            this.hue = hue;
+            this.saturation = saturation;
+            this.value = value;
         }
     }
 
