@@ -1,5 +1,6 @@
 package com.dbbest.android.bitmap;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -13,7 +14,6 @@ import android.os.Parcelable;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import com.dbbest.android.threading.OnFinish;
-import com.dbbest.framework.MathUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -28,7 +28,10 @@ import java.util.Map;
  * Time: 3:02 PM
  */
 public class BitmapUtilities {
-    public static boolean bitmapCompare(Bitmap bmp1, Bitmap bmp2) {
+    private static final int DOMINANT_CALCULATION_COLOR_STEP = 10;
+
+    @SuppressLint("NewApi")
+	public static boolean bitmapCompare(Bitmap bmp1, Bitmap bmp2) {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.HONEYCOMB_MR1) {
             return bmp1.sameAs(bmp2);
         }
@@ -491,7 +494,7 @@ public class BitmapUtilities {
         int g = 0;
         int b = 0;
         Integer rC, gC, bC;
-        for (int i = 0; i < pixels.length; i++) {
+        for (int i = 0; i < pixels.length; i += DOMINANT_CALCULATION_COLOR_STEP) {
             color = pixels[i];
 
             r = Color.red(color);
@@ -545,17 +548,18 @@ public class BitmapUtilities {
         return getAverageColor(pixels);
     }
 
-    public static HSV getAverageHSV(Bitmap bitmap){
-        int color = getAverageColor(bitmap);
+    public static HSV getDominantHSV(Bitmap bitmap){
+        int color = getDominantColor(bitmap);
+        //int color = getAverageColor(bitmap);
         HSV hsv = rgb2hsv(Color.rgb(230, 200, 146));
         return rgb2hsv(color);
     }
 
-    public static void getAverageHSVAsync(final Bitmap bitmap, final OnFinish<HSV> onFinish){
+    public static void getDominantHSVAsync(final Bitmap bitmap, final OnFinish<HSV> onFinish){
         new AsyncTask<Void, Void, HSV>(){
             @Override
             protected HSV doInBackground(Void... params) {
-                return getAverageHSV(bitmap);
+                return getDominantHSV(bitmap);
             }
 
             @Override
