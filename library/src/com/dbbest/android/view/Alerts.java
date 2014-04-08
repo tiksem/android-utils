@@ -3,6 +3,7 @@ package com.dbbest.android.view;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.view.View;
 
 /**
  * User: Tikhonenko.S
@@ -75,5 +76,16 @@ public final class Alerts {
         OkAlertSettings okAlertSettings = new OkAlertSettings();
         okAlertSettings.message = message;
         showOkButtonAlert(context, okAlertSettings);
+    }
+
+    public static AlertDialog showAlertWithCustomView(Context context, View view, CharSequence message){
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+
+        builder.setView(view);
+        builder.setMessage(message);
+
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+        return alertDialog;
     }
 }

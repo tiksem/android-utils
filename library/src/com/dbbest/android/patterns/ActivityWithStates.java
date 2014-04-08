@@ -50,7 +50,9 @@ public abstract class ActivityWithStates extends Activity {
 
     @Override
     public void onBackPressed() {
-        activityStateManager.onBackPressed();
+        if(!activityStateManager.onBackPressed()){
+            super.onBackPressed();
+        }
     }
 
     protected abstract ActivityState getFirstState();

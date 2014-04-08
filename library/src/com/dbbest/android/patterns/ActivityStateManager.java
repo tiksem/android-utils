@@ -49,14 +49,15 @@ public class ActivityStateManager implements StateChanger{
         state.onActivityDestroy(activity);
     }
 
-    public void onBackPressed() {
+    public boolean onBackPressed() {
         if(backStack.empty()){
-            activity.onBackPressed();
+            return false;
         } else {
             ActivityState newState = backStack.pop();
             state.onMoveToAnotherState(activity, newState, this);
             state = newState;
             state.onStateCreate(activity, this);
+            return true;
         }
     }
 
