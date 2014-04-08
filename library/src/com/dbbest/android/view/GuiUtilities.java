@@ -92,4 +92,15 @@ public class GuiUtilities {
     public static View getContentView(Activity activity){
         return activity.getWindow().getDecorView().getRootView();
     }
+
+    public static View[] resourceIdArrayToViewArray(Activity activity, int... ides) {
+        View[] result = new View[ides.length];
+
+        int index = 0;
+        for(int id : ides){
+            result[index++] = activity.findViewById(id);
+        }
+
+        return result;
+    }
 }

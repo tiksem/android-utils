@@ -6,6 +6,8 @@ import com.dbbest.framework.patterns.StateChanger;
 import com.dbbest.framework.patterns.StateProvider;
 import com.dbbest.framework.patterns.StateRestorer;
 
+import java.util.Arrays;
+
 /**
  * User: Tikhonenko.S
  * Date: 26.12.13
@@ -21,6 +23,10 @@ public class ViewsVisibilityToggle {
 
     public ViewsVisibilityToggle(Iterable<View> views) {
         this.views = views;
+    }
+
+    public ViewsVisibilityToggle(View... views) {
+        this(Arrays.asList(views));
     }
 
     public void setVisibility(final int visibility){
