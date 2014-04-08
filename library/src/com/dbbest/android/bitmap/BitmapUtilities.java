@@ -17,10 +17,7 @@ import com.dbbest.android.threading.OnFinish;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * User: mda
@@ -484,16 +481,23 @@ public class BitmapUtilities {
 
         bitmap2.getPixels(pixels, 0, width, 0, 0, width, height);
 
-        final List<Map<Integer, Integer>> colorMap = new ArrayList<Map<Integer, Integer>>();
-        colorMap.add(new HashMap<Integer, Integer>());
-        colorMap.add(new HashMap<Integer, Integer>());
-        colorMap.add(new HashMap<Integer, Integer>());
+        final int[][] colorMap = new int[][]{
+                new int[256],
+                new int[256],
+                new int[256]
+        };
+
+        List<Integer>[] keys = new List[]{
+                new ArrayList<Integer>(256),
+                new ArrayList<Integer>(256),
+                new ArrayList<Integer>(256)
+        };
 
         int color = 0;
         int r = 0;
         int g = 0;
         int b = 0;
-        Integer rC, gC, bC;
+
         for (int i = 0; i < pixels.length; i += DOMINANT_CALCULATION_COLOR_STEP) {
             color = pixels[i];
 
@@ -501,33 +505,34 @@ public class BitmapUtilities {
             g = Color.green(color);
             b = Color.blue(color);
 
-            rC = colorMap.get(0).get(r);
-            if (rC == null)
-                rC = 0;
-            colorMap.get(0).put(r, ++rC);
+            if(colorMap[0][r]++ == 0){
+                keys[0].add(r);
+            }
 
-            gC = colorMap.get(1).get(g);
-            if (gC == null)
-                gC = 0;
-            colorMap.get(1).put(g, ++gC);
+            if(colorMap[1][g]++ == 0){
+                keys[1].add(g);
+            }
 
-            bC = colorMap.get(2).get(b);
-            if (bC == null)
-                bC = 0;
-            colorMap.get(2).put(b, ++bC);
+            if(colorMap[2][b]++ == 0){
+                keys[2].add(b);
+            }
         }
 
         int[] rgb = new int[3];
         for (int i = 0; i < 3; i++) {
             int max = 0;
-            int val = 0;
-            for (Map.Entry<Integer, Integer> entry : colorMap.get(i).entrySet()) {
-                if (entry.getValue() > max) {
-                    max = entry.getValue();
-                    val = entry.getKey();
+            int keyOfMax = 0;
+
+            int[] map = colorMap[i];
+            for (int key : keys[i]) {
+                int value = map[key];
+                if (value > max) {
+                    max = value;
+                    keyOfMax = key;
                 }
             }
-            rgb[i] = val;
+
+            rgb[i] = keyOfMax;
         }
 
         return Color.rgb(rgb[0], rgb[1], rgb[2]);
