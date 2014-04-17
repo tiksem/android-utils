@@ -59,6 +59,16 @@ public class GuiUtilities {
         return result;
     }
 
+    public static List<View> getAllChildrenRecursive(View view, Predicate<View> predicate){
+        List<View> views = getAllChildrenRecursive(view);
+        return CollectionUtils.findAll(views, predicate);
+    }
+
+    public static <T extends View> List<T> getAllChildrenRecursive(View view, Class<T> aClass){
+        InstanceOfPredicate<View> predicate = new InstanceOfPredicate<View>(aClass);
+        return (List<T>) getAllChildrenRecursive(view, predicate);
+    }
+
     public static List<View> getAllChildrenRecursive(Activity activity){
         return getAllChildrenRecursive(activity.getWindow().getDecorView().getRootView());
     }
