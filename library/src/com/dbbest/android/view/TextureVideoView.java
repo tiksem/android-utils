@@ -4,8 +4,10 @@ import android.content.Context;
 import android.graphics.SurfaceTexture;
 import android.media.MediaPlayer;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.Surface;
 import android.view.TextureView;
+import com.dbbest.android.ExecuteTimeLogger;
 import com.dbbest.android.IOErrorListener;
 import com.dbbest.android.Pauseable;
 import com.dbbest.android.media.MediaPlayerProvider;
@@ -26,6 +28,7 @@ public class TextureVideoView extends TextureView implements Pauseable, MediaPla
     private Deque<Runnable> onSurfaceTextureAvailableTasks = new ArrayDeque<Runnable>();
     private String videoPath;
     private IOErrorListener ioErrorListener;
+    private boolean playBackCompleted = true;
 
     private SurfaceTextureListener surfaceTextureListener = new SurfaceTextureListener() {
         @Override
@@ -116,7 +119,10 @@ public class TextureVideoView extends TextureView implements Pauseable, MediaPla
     @Override
     public boolean canPause() {
         try {
-            return mediaPlayer != null && mediaPlayer.isPlaying();
+            long before = System.nanoTime();
+            boolean value =  mediaPlayer != null && !playBackCompleted && !paused;
+            Log.i("eeeeeeeeeeeeeeeeeeeeee", "" + (System.nanoTime() - before));
+            return value;
         } catch (Exception e) {
             return false;
         }
@@ -174,11 +180,13 @@ public class TextureVideoView extends TextureView implements Pauseable, MediaPla
                         @Override
                         public void onPrepared(MediaPlayer mp) {
                             mediaPlayer.start();
+                            playBackCompleted = false;
                         }
                     });
                     mediaPlayer.prepareAsync();
                 } catch (IllegalStateException e) {
                     mediaPlayer.start();
+                    playBackCompleted = false;
                 }
             }
         });
@@ -198,7 +206,16 @@ public class TextureVideoView extends TextureView implements Pauseable, MediaPla
         runWhenSurfaceTextureAvailable(new Runnable() {
             @Override
             public void run() {
-                mediaPlayer.setOnCompletionListener(onCompletionListener);
+                mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                    @Override
+                    public void onCompletion(MediaPlayer mp) {
+                        if(onCompletionListener != null){
+                            onCompletionListener.onCompletion(mp);
+                        }
+
+                        playBackCompleted = true;
+                    }
+                });
             }
         });
     }
