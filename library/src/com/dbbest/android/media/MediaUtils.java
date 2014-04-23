@@ -1,18 +1,12 @@
 package com.dbbest.android.media;
 
 import android.content.Context;
-import android.media.MediaCodec;
-import android.media.MediaExtractor;
-import android.media.MediaFormat;
-import android.media.MediaMuxer;
-import android.media.MediaPlayer;
+import android.media.*;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 
-import com.dbbest.android.threading.BackgroundLoopEvent;
-import com.dbbest.android.threading.Cancelable;
-import com.dbbest.android.threading.ResultLoop;
-import com.dbbest.android.threading.Tasks;
+import com.dbbest.android.threading.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -148,5 +142,40 @@ public class MediaUtils {
                 muxer.release();
             }
         }
+    }
+
+    public static class VideoSize {
+        public int width;
+        public int height;
+
+        public VideoSize() {
+        }
+
+        public VideoSize(int width, int height) {
+            this.width = width;
+            this.height = height;
+        }
+    }
+
+    public static VideoSize getVideoWidthAndHeight(String videoPath) {
+        MediaMetadataRetriever metaRetriever = new MediaMetadataRetriever();
+        metaRetriever.setDataSource(videoPath);
+        String height = metaRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT);
+        String width = metaRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH);
+        return new VideoSize(Integer.valueOf(width), Integer.valueOf(height));
+    }
+
+    public static void getVideoWidthAndHeightAsync(final String videoPath, final OnFinish<VideoSize> onFinish) {
+        new AsyncTask<Void, Void, VideoSize>(){
+            @Override
+            protected VideoSize doInBackground(Void... params) {
+                return getVideoWidthAndHeight(videoPath);
+            }
+
+            @Override
+            protected void onPostExecute(VideoSize videoSize) {
+                onFinish.onFinish(videoSize);
+            }
+        }.execute();
     }
 }
