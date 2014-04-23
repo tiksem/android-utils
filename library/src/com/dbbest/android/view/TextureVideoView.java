@@ -169,6 +169,8 @@ public class TextureVideoView extends TextureView implements Pauseable, MediaPla
 
     public void start(){
         runWhenSurfaceTextureAvailable(new Runnable() {
+            private boolean isPreparing = false;
+
             @Override
             public void run() {
                 if(videoPath == null){
@@ -176,17 +178,21 @@ public class TextureVideoView extends TextureView implements Pauseable, MediaPla
                 }
 
                 try {
+                    isPreparing = true;
                     mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
                         @Override
                         public void onPrepared(MediaPlayer mp) {
                             mediaPlayer.start();
                             playBackCompleted = false;
+                            isPreparing = false;
                         }
                     });
                     mediaPlayer.prepareAsync();
                 } catch (IllegalStateException e) {
-                    mediaPlayer.start();
-                    playBackCompleted = false;
+                    if (!isPreparing) {
+                        mediaPlayer.start();
+                        playBackCompleted = false;
+                    }
                 }
             }
         });
