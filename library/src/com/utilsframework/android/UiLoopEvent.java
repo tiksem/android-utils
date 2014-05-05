@@ -16,7 +16,7 @@ public class UiLoopEvent implements LoopEvent{
     private Runnable onUi;
     private boolean isPaused = false;
     private long delay;
-    private WeakReference<Context> context;
+    private WeakReference<Object> context;
 
     private void runOnUiThread(){
         onUi = new Runnable() {
@@ -35,14 +35,14 @@ public class UiLoopEvent implements LoopEvent{
     }
 
     // if context is null UiLoopEvent will work globally
-    public UiLoopEvent(Context context, long delay) {
+    public UiLoopEvent(Object context, long delay) {
         setDelay(delay);
         if (context != null) {
-            this.context = new WeakReference<Context>(context);
+            this.context = new WeakReference<Object>(context);
         }
     }
 
-    public UiLoopEvent(Context context) {
+    public UiLoopEvent(Object context) {
         this(context, DEFAULT_DELAY);
     }
 

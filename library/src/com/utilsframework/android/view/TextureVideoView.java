@@ -21,7 +21,7 @@ import java.util.Deque;
  * Date: 02.04.14
  * Time: 18:32
  */
-public class TextureVideoView extends TextureView implements Pauseable, MediaPlayerProvider{
+public class TextureVideoView extends TextureView implements IVideoView{
     private MediaPlayer mediaPlayer;
     private boolean paused = false;
     private Deque<Runnable> onSurfaceTextureAvailableTasks = new ArrayDeque<Runnable>();
@@ -118,9 +118,7 @@ public class TextureVideoView extends TextureView implements Pauseable, MediaPla
     @Override
     public boolean canPause() {
         try {
-            long before = System.nanoTime();
             boolean value =  mediaPlayer != null && !playBackCompleted && !paused;
-            Log.i("eeeeeeeeeeeeeeeeeeeeee", "" + (System.nanoTime() - before));
             return value;
         } catch (Exception e) {
             return false;
@@ -166,6 +164,7 @@ public class TextureVideoView extends TextureView implements Pauseable, MediaPla
         return videoPath;
     }
 
+    @Override
     public void start(){
         runWhenSurfaceTextureAvailable(new Runnable() {
             private boolean isPreparing = false;
@@ -207,6 +206,7 @@ public class TextureVideoView extends TextureView implements Pauseable, MediaPla
         }
     }
 
+    @Override
     public void setOnCompletionListener(final MediaPlayer.OnCompletionListener onCompletionListener){
         runWhenSurfaceTextureAvailable(new Runnable() {
             @Override

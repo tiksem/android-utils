@@ -2,6 +2,7 @@ package com.utilsframework.android.view;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Point;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.util.Log;
@@ -12,6 +13,7 @@ import com.utilsframework.android.BuildConfig;
 import com.dbbest.framework.CollectionUtils;
 import com.dbbest.framework.Predicate;
 import com.dbbest.framework.predicates.InstanceOfPredicate;
+import com.utilsframework.android.UiLoopEvent;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -111,5 +113,14 @@ public class GuiUtilities {
         }
 
         return result;
+    }
+
+    public static Point getViewCenter(View view) {
+        float x = view.getX();
+        float y = view.getY();
+        int width = view.getMeasuredWidth();
+        int height = view.getMeasuredHeight();
+
+        return new Point(Math.round(x + width / 2), Math.round(y + height / 2));
     }
 }

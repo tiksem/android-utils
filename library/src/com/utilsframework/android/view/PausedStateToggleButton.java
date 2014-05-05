@@ -29,7 +29,7 @@ public class PausedStateToggleButton extends ToggleButton{
 
     private void updateCheckedState(){
         if(pauseable == null){
-            throw new IllegalStateException("Broken logic. You can not toggle checked state while pausable is null");
+            return;
         }
 
         if(isChecked()){
@@ -63,7 +63,7 @@ public class PausedStateToggleButton extends ToggleButton{
             }
         });
 
-        enabledStateUpdater = new UiLoopEvent(getContext());
+        enabledStateUpdater = new UiLoopEvent(this);
         enabledStateUpdater.run(new Runnable() {
             @Override
             public void run() {
