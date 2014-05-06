@@ -178,4 +178,16 @@ public class MediaUtils {
             }
         }.execute();
     }
+
+    public static MediaPlayer.OnCompletionListener
+    combineMediaPlayerCompletionListeners(final Iterable<MediaPlayer.OnCompletionListener> listeners) {
+        return new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mp) {
+                for(MediaPlayer.OnCompletionListener listener : listeners){
+                    listener.onCompletion(mp);
+                }
+            }
+        };
+    }
 }

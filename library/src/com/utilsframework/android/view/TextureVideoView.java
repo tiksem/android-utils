@@ -15,6 +15,8 @@ import com.utilsframework.android.threading.Tasks;
 import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.Deque;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * User: Tikhonenko.S
@@ -28,6 +30,8 @@ public class TextureVideoView extends TextureView implements IVideoView{
     private String videoPath;
     private IOErrorListener ioErrorListener;
     private boolean playBackCompleted = true;
+    private Set<MediaPlayer.OnCompletionListener> onCompletionListeners =
+            new HashSet<MediaPlayer.OnCompletionListener>();
 
     private SurfaceTextureListener surfaceTextureListener = new SurfaceTextureListener() {
         @Override
@@ -35,6 +39,17 @@ public class TextureVideoView extends TextureView implements IVideoView{
             if (mediaPlayer == null) {
                 mediaPlayer = new MediaPlayer();
             }
+
+            mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                @Override
+                public void onCompletion(MediaPlayer mp) {
+                    for(MediaPlayer.OnCompletionListener listener : onCompletionListeners){
+                        listener.onCompletion(mp);
+                    }
+
+                    playBackCompleted = true;
+                }
+            });
 
             Tasks.executeAndClearQueue(onSurfaceTextureAvailableTasks);
             onSurfaceTextureAvailableTasks = null;
@@ -165,6 +180,16 @@ public class TextureVideoView extends TextureView implements IVideoView{
     }
 
     @Override
+    public void addOnCompletionListener(MediaPlayer.OnCompletionListener onCompleteListener) {
+        onCompletionListeners.add(onCompleteListener);
+    }
+
+    @Override
+    public void removeOnCompletionListener(MediaPlayer.OnCompletionListener onCompleteListener) {
+        onCompletionListeners.remove(onCompleteListener);
+    }
+
+    @Override
     public void start(){
         runWhenSurfaceTextureAvailable(new Runnable() {
             private boolean isPreparing = false;
@@ -204,24 +229,5 @@ public class TextureVideoView extends TextureView implements IVideoView{
             mediaPlayer.release();
             mediaPlayer = null;
         }
-    }
-
-    @Override
-    public void setOnCompletionListener(final MediaPlayer.OnCompletionListener onCompletionListener){
-        runWhenSurfaceTextureAvailable(new Runnable() {
-            @Override
-            public void run() {
-                mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                    @Override
-                    public void onCompletion(MediaPlayer mp) {
-                        if(onCompletionListener != null){
-                            onCompletionListener.onCompletion(mp);
-                        }
-
-                        playBackCompleted = true;
-                    }
-                });
-            }
-        });
     }
 }
