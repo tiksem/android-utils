@@ -1,6 +1,7 @@
 package com.utilsframework.android.view;
 
 import android.content.Context;
+import android.graphics.Matrix;
 import android.graphics.SurfaceTexture;
 import android.media.MediaPlayer;
 import android.util.AttributeSet;
@@ -24,6 +25,10 @@ import java.util.Set;
  * Time: 18:32
  */
 public class TextureVideoView extends TextureView implements IVideoView{
+    public enum ScaleType {
+        CENTER_CROP, TOP, BOTTOM
+    }
+
     private MediaPlayer mediaPlayer;
     private boolean paused = false;
     private Deque<Runnable> onSurfaceTextureAvailableTasks = new ArrayDeque<Runnable>();
@@ -32,6 +37,8 @@ public class TextureVideoView extends TextureView implements IVideoView{
     private boolean playBackCompleted = true;
     private Set<MediaPlayer.OnCompletionListener> onCompletionListeners =
             new HashSet<MediaPlayer.OnCompletionListener>();
+    private int videoHeight, videoWidth;
+    private ScaleType scaleType = ScaleType.CENTER_CROP;
 
     private SurfaceTextureListener surfaceTextureListener = new SurfaceTextureListener() {
         @Override
@@ -202,6 +209,7 @@ public class TextureVideoView extends TextureView implements IVideoView{
 
                 try {
                     isPreparing = true;
+
                     mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
                         @Override
                         public void onPrepared(MediaPlayer mp) {
@@ -210,6 +218,17 @@ public class TextureVideoView extends TextureView implements IVideoView{
                             isPreparing = false;
                         }
                     });
+                    mediaPlayer.setOnVideoSizeChangedListener(
+                            new MediaPlayer.OnVideoSizeChangedListener() {
+                                @Override
+                                public void onVideoSizeChanged(MediaPlayer mp, int width, int height) {
+                                    videoWidth = width;
+                                    videoHeight = height;
+                                    updateTextureViewSize();
+                                }
+                            }
+                    );
+
                     mediaPlayer.prepareAsync();
                 } catch (IllegalStateException e) {
                     if (!isPreparing) {
@@ -229,5 +248,53 @@ public class TextureVideoView extends TextureView implements IVideoView{
             mediaPlayer.release();
             mediaPlayer = null;
         }
+    }
+
+    private void updateTextureViewSize() {
+        float viewWidth = getWidth();
+        float viewHeight = getHeight();
+
+        float scaleX = 1.0f;
+        float scaleY = 1.0f;
+
+        if (videoWidth > viewWidth && videoHeight > viewHeight) {
+            scaleX = videoWidth / viewWidth;
+            scaleY = videoHeight / viewHeight;
+        } else if (videoWidth < viewWidth && videoHeight < viewHeight) {
+            scaleY = viewWidth / videoWidth;
+            scaleX = viewHeight / videoHeight;
+        } else if (viewWidth > videoWidth) {
+            scaleY = (viewWidth / videoWidth) / (viewHeight / videoHeight);
+        } else if (viewHeight > videoHeight) {
+            scaleX = (viewHeight / videoHeight) / (viewWidth / videoWidth);
+        }
+
+        // Calculate pivot points, in our case crop from center
+        int pivotPointX;
+        int pivotPointY;
+
+        switch (scaleType) {
+            case TOP:
+                pivotPointX = 0;
+                pivotPointY = 0;
+                break;
+            case BOTTOM:
+                pivotPointX = (int) (viewWidth);
+                pivotPointY = (int) (viewHeight);
+                break;
+            case CENTER_CROP:
+                pivotPointX = (int) (viewWidth / 2);
+                pivotPointY = (int) (viewHeight / 2);
+                break;
+            default:
+                pivotPointX = (int) (viewWidth / 2);
+                pivotPointY = (int) (viewHeight / 2);
+                break;
+        }
+
+        Matrix matrix = new Matrix();
+        matrix.setScale(scaleX, scaleY, pivotPointX, pivotPointY);
+
+        setTransform(matrix);
     }
 }
