@@ -199,7 +199,7 @@ public class TextureVideoView extends TextureView implements IVideoView{
     @Override
     public void start(){
         runWhenSurfaceTextureAvailable(new Runnable() {
-            private boolean isPreparing = false;
+                private boolean isPreparing = false;
 
             @Override
             public void run() {
@@ -268,6 +268,9 @@ public class TextureVideoView extends TextureView implements IVideoView{
         } else if (viewHeight > videoHeight) {
             scaleX = (viewHeight / videoHeight) / (viewWidth / videoWidth);
         }
+
+        scaleX *= viewWidth / videoWidth;
+        scaleY *= viewWidth / videoWidth;
 
         // Calculate pivot points, in our case crop from center
         int pivotPointX;
