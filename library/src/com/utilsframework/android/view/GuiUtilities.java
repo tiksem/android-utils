@@ -2,6 +2,8 @@ package com.utilsframework.android.view;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.pm.ActivityInfo;
+import android.content.res.Configuration;
 import android.graphics.Point;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -122,5 +124,16 @@ public class GuiUtilities {
         int height = view.getMeasuredHeight();
 
         return new Point(Math.round(x + width / 2), Math.round(y + height / 2));
+    }
+
+    public static void lockOrientation(Activity context) {
+        int orientation = context.getResources().getConfiguration().orientation;
+        orientation = orientation == Configuration.ORIENTATION_LANDSCAPE ? ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE :
+                ActivityInfo.SCREEN_ORIENTATION_PORTRAIT;
+        context.setRequestedOrientation(orientation);
+    }
+
+    public static void unlockOrientation(Activity context) {
+        context.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
     }
 }
