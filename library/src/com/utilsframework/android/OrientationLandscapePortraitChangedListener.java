@@ -13,9 +13,17 @@ public abstract class OrientationLandscapePortraitChangedListener {
     private int lastOrientation;
     private Context context;
 
-    protected OrientationLandscapePortraitChangedListener(final Context context) {
-        uiLoopEvent = new UiLoopEvent(context);
+    protected OrientationLandscapePortraitChangedListener(final Context context, Object parent) {
+        if(parent == null){
+            parent = context;
+        }
+
+        uiLoopEvent = new UiLoopEvent(parent);
         this.context = context;
+    }
+
+    protected OrientationLandscapePortraitChangedListener(final Context context) {
+        this(context, null);
     }
 
     public void start(){
