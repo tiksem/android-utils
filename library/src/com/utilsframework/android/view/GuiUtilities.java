@@ -11,6 +11,7 @@ import android.util.Log;
 
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewParent;
 import com.utilsframework.android.BuildConfig;
 import com.dbbest.framework.CollectionUtils;
 import com.dbbest.framework.Predicate;
@@ -135,5 +136,14 @@ public class GuiUtilities {
 
     public static void unlockOrientation(Activity context) {
         context.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
+    }
+
+    public static void removeView(View view) {
+        ViewParent parent = view.getParent();
+        if(parent == null || !(parent instanceof ViewGroup)){
+            return;
+        }
+
+        ((ViewGroup)parent).removeView(view);
     }
 }
