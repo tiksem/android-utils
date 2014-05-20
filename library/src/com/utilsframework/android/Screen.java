@@ -2,6 +2,7 @@ package com.utilsframework.android;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Point;
 import android.graphics.Rect;
 import android.util.DisplayMetrics;
 import android.view.Display;
@@ -66,5 +67,12 @@ public final class Screen {
         Display display = wm.getDefaultDisplay();
         display.getMetrics(displaymetrics);
         return displaymetrics;
+    }
+
+    public static Point getScreenCenter(Context context) {
+        Point result = new Point();
+        result.x = getScreenWidth(context) / 2;
+        result.y = getScreenHeight(context) / 2;
+        return result;
     }
 }
