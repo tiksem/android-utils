@@ -1,8 +1,14 @@
 package com.utilsframework.android.view.animation;
 
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationSet;
 import android.view.animation.TranslateAnimation;
+import com.dbbest.framework.CollectionUtils;
+import com.dbbest.framework.predicates.InstanceOfPredicate;
 import com.utilsframework.android.Screen;
+
+import java.util.List;
 
 /**
  * User: Tikhonenko.S
@@ -42,5 +48,10 @@ public class AnimationUtilities {
         view.setY(startY);
 
         return new TranslateAnimation(startX, endX, startY, endY);
+    }
+
+    public static <T extends Animation> T getAnimationSetChildByType(AnimationSet animationSet, Class<T> aClass) {
+        List<Animation> animations = animationSet.getAnimations();
+        return (T) CollectionUtils.find(animations, new InstanceOfPredicate<Animation>(aClass));
     }
 }
