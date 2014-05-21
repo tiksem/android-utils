@@ -125,4 +125,8 @@ public class FlippingCardView extends FrameLayout{
     protected View getBackView() {
         return getChildAt(1);
     }
+
+    public boolean frontSideIsShown() {
+        return getChildAt(0).getVisibility() == VISIBLE;
+    }
 }
