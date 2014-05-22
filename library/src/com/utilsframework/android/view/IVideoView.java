@@ -14,4 +14,5 @@ public interface IVideoView extends Pauseable, MediaPlayerProvider{
     void addOnCompletionListener(MediaPlayer.OnCompletionListener onCompleteListener);
     void removeOnCompletionListener(MediaPlayer.OnCompletionListener onCompleteListener);
     void start();
+    void stop();
 }

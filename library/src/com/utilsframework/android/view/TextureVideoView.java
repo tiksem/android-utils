@@ -112,9 +112,11 @@ public class TextureVideoView extends TextureView implements IVideoView{
 
     @Override
     public void pause() {
-        if(canPause()){
+        try {
             mediaPlayer.pause();
             paused = true;
+        } catch (IllegalStateException e) {
+
         }
     }
 
@@ -299,5 +301,12 @@ public class TextureVideoView extends TextureView implements IVideoView{
         matrix.setScale(scaleX, scaleY, pivotPointX, pivotPointY);
 
         setTransform(matrix);
+    }
+
+    @Override
+    public void stop() {
+        if(mediaPlayer != null){
+            mediaPlayer.stop();
+        }
     }
 }
