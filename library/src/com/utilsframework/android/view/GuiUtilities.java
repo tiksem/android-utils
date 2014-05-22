@@ -1,26 +1,26 @@
 package com.utilsframework.android.view;
 
-import android.app.Activity;
-import android.content.Context;
-import android.content.pm.ActivityInfo;
-import android.content.res.Configuration;
-import android.graphics.Point;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
-import android.util.Log;
-
-import android.view.View;
-import android.view.ViewGroup;
-import android.view.ViewParent;
-import com.utilsframework.android.BuildConfig;
-import com.dbbest.framework.CollectionUtils;
-import com.dbbest.framework.Predicate;
-import com.dbbest.framework.predicates.InstanceOfPredicate;
-import com.utilsframework.android.UiLoopEvent;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.content.Context;
+import android.content.pm.ActivityInfo;
+import android.graphics.Point;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.os.Build;
+import android.util.Log;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.ViewParent;
+
+import com.dbbest.framework.CollectionUtils;
+import com.dbbest.framework.Predicate;
+import com.dbbest.framework.predicates.InstanceOfPredicate;
+import com.utilsframework.android.BuildConfig;
 
 /**
  * Created by Tikhonenko.S on 19.09.13.
@@ -118,7 +118,8 @@ public class GuiUtilities {
         return result;
     }
 
-    public static Point getViewCenter(View view) {
+    @SuppressLint("NewApi")
+	public static Point getViewCenter(View view) {
         float x = view.getX();
         float y = view.getY();
         int width = view.getMeasuredWidth();
@@ -128,10 +129,16 @@ public class GuiUtilities {
     }
 
     public static void lockOrientation(Activity context) {
-        int orientation = context.getResources().getConfiguration().orientation;
-        orientation = orientation == Configuration.ORIENTATION_LANDSCAPE ? ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE :
-                ActivityInfo.SCREEN_ORIENTATION_PORTRAIT;
-        context.setRequestedOrientation(orientation);
+    	if (Build.VERSION.SDK_INT >= 18) {
+    		context.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LOCKED);
+		}
+    	else{
+            int orientation = context.getResources().getConfiguration().orientation;
+//          orientation = orientation == Configuration.ORIENTATION_LANDSCAPE ? ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE :
+//                  ActivityInfo.SCREEN_ORIENTATION_PORTRAIT;
+          context.setRequestedOrientation(orientation);
+    	}
+
     }
 
     public static void unlockOrientation(Activity context) {
