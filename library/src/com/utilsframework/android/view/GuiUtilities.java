@@ -73,6 +73,19 @@ public class GuiUtilities {
         return (List<T>) getAllChildrenRecursive(view, predicate);
     }
 
+    public static <T extends View> T getFirstChildWithTypeRecursive(View view, Class<T> aClass){
+        List<T> all = getAllChildrenRecursive(view, aClass);
+        if(all.isEmpty()){
+            return null;
+        }
+
+        if(all.size() > 1){
+            throw new RuntimeException("all.size() > 1");
+        }
+
+        return all.get(0);
+    }
+
     public static List<View> getAllChildrenRecursive(Activity activity){
         return getAllChildrenRecursive(activity.getWindow().getDecorView().getRootView());
     }

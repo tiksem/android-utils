@@ -113,8 +113,10 @@ public class TextureVideoView extends TextureView implements IVideoView{
     @Override
     public void pause() {
         try {
-            mediaPlayer.pause();
-            paused = true;
+            if (mediaPlayer != null) {
+                mediaPlayer.pause();
+                paused = true;
+            }
         } catch (IllegalStateException e) {
 
         }
