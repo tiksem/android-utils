@@ -2,6 +2,7 @@ package com.utilsframework.android.view;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 import android.annotation.SuppressLint;
@@ -165,5 +166,49 @@ public class GuiUtilities {
         }
 
         ((ViewGroup)parent).removeView(view);
+    }
+
+    public static Iterator<View> getChildrenIterator(final ViewGroup viewGroup) {
+        return new Iterator<View>() {
+            int index = 0;
+
+            @Override
+            public boolean hasNext() {
+                return index < viewGroup.getChildCount();
+            }
+
+            @Override
+            public View next() {
+                return viewGroup.getChildAt(index++);
+            }
+
+            @Override
+            public void remove() {
+                viewGroup.removeViewAt(index - 1);
+            }
+        };
+    }
+
+    public static Iterable<View> getChildren(final ViewGroup viewGroup) {
+        return new Iterable<View>() {
+            @Override
+            public Iterator<View> iterator() {
+                return getChildrenIterator(viewGroup);
+            }
+        };
+    }
+
+    public List<View> getChildrenAsList(final ViewGroup viewGroup) {
+        int childCount = viewGroup.getChildCount();
+        List<View> result = new ArrayList<View>(childCount);
+        for (int i = 0; i < childCount; i++) {
+            result.add(viewGroup.getChildAt(i));
+        }
+
+        return result;
+    }
+
+    public static List<View> findChildren(ViewGroup viewGroup, Predicate<View> predicate) {
+        return CollectionUtils.findAll(getChildren(viewGroup), predicate);
     }
 }
