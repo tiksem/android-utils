@@ -1,7 +1,8 @@
-package com.utilsframework.android;
+package com.utilsframework.android.listeners;
 
 import android.content.Context;
 import android.content.res.Configuration;
+import com.utilsframework.android.UiLoopEvent;
 
 /**
  * User: Tikhonenko.S

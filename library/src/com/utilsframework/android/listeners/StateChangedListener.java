@@ -1,6 +1,7 @@
-package com.utilsframework.android;
+package com.utilsframework.android.listeners;
 
 import com.dbbest.framework.patterns.StateProvider;
+import com.utilsframework.android.UiLoopEvent;
 
 import java.lang.ref.WeakReference;
 
@@ -38,7 +39,7 @@ public abstract class StateChangedListener<T, State> implements StateProvider<T,
     private void updateStats(T object){
         State state = getState(object);
         if(!stateEquals(state, lastState)){
-            onStateChanged(object, lastState);
+            onStateChanged(object, lastState, state);
             lastState = cloneState(state);
         }
     }
@@ -71,7 +72,7 @@ public abstract class StateChangedListener<T, State> implements StateProvider<T,
         uiLoopEvent.stop();
     }
 
-    protected abstract void onStateChanged(T object, State lastState);
+    protected abstract void onStateChanged(T object, State lastState, State currentState);
     protected boolean stateEquals(State a, State b){
         return a == null ? b == null : a.equals(b);
     }

@@ -1,7 +1,7 @@
-package com.utilsframework.android.view;
+package com.utilsframework.android.listeners;
 
 import android.view.ViewGroup;
-import com.utilsframework.android.StateChangedListener;
+import com.utilsframework.android.listeners.StateChangedListener;
 
 /**
  * User: Tikhonenko.S
@@ -18,7 +18,7 @@ public abstract class ChildCountChangedListener extends StateChangedListener<Vie
     }
 
     @Override
-    protected final void onStateChanged(ViewGroup viewGroup, Integer lastChildCount) {
+    protected final void onStateChanged(ViewGroup viewGroup, Integer lastChildCount, Integer currentChildCount) {
         if(lastChildCount == viewGroup.getChildCount()){
             throw new IllegalStateException();
         }

@@ -1,8 +1,8 @@
-package com.utilsframework.android.view;
+package com.utilsframework.android.listeners;
 
 import android.view.View;
 import android.view.ViewGroup;
-import com.utilsframework.android.StateChangedListener;
+import com.utilsframework.android.listeners.StateChangedListener;
 
 /**
  * User: Tikhonenko.S
@@ -15,7 +15,7 @@ public class AlwaysTopViewInViewGroupMaker extends StateChangedListener<View, Bo
     }
 
     @Override
-    protected void onStateChanged(View view, Boolean lastState) {
+    protected void onStateChanged(View view, Boolean lastState, Boolean currentState) {
         if(getState(view)){
             return;
         }

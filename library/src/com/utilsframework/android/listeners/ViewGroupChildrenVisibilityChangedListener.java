@@ -1,8 +1,8 @@
-package com.utilsframework.android.view;
+package com.utilsframework.android.listeners;
 
 import android.view.View;
 import android.view.ViewGroup;
-import com.utilsframework.android.StateChangedListener;
+import com.utilsframework.android.listeners.StateChangedListener;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -22,7 +22,7 @@ public class ViewGroupChildrenVisibilityChangedListener extends StateChangedList
     }
 
     @Override
-    protected void onStateChanged(ViewGroup object, Map<View, Integer> lastState) {
+    protected void onStateChanged(ViewGroup object, Map<View, Integer> lastState, Map<View, Integer> currentState) {
     }
 
     @Override
