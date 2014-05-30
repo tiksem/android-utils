@@ -287,6 +287,10 @@ public abstract class AbstractSQLiteDataStore<T> implements DataStore<T> {
         }
     }
 
+    public Class<T> getTableEntityClass() {
+        return tClass;
+    }
+
     protected abstract T createObject();
     protected abstract String getTableName();
 }
