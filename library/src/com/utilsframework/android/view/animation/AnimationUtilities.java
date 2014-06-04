@@ -3,10 +3,12 @@ package com.utilsframework.android.view.animation;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationSet;
+import android.view.animation.AnimationUtils;
 import android.view.animation.TranslateAnimation;
 import com.dbbest.framework.CollectionUtils;
 import com.dbbest.framework.predicates.InstanceOfPredicate;
 import com.utilsframework.android.Screen;
+import com.utilsframework.android.view.GuiUtilities;
 
 import java.util.List;
 
@@ -53,5 +55,37 @@ public class AnimationUtilities {
     public static <T extends Animation> T getAnimationSetChildByType(AnimationSet animationSet, Class<T> aClass) {
         List<Animation> animations = animationSet.getAnimations();
         return (T) CollectionUtils.find(animations, new InstanceOfPredicate<Animation>(aClass));
+    }
+
+    public interface OnAnimationFinished {
+        void onAnimationFinished();
+    }
+
+    public static void showAnimationAndRemoveView(final View view, int animationId,
+                                                  int duration,
+                                                  final OnAnimationFinished onAnimationFinished) {
+        Animation animation = AnimationUtils.loadAnimation(view.getContext(), animationId);
+        animation.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                if(onAnimationFinished != null){
+                    onAnimationFinished.onAnimationFinished();
+                }
+                GuiUtilities.removeView(view);
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+            }
+        });
+
+        view.setVisibility(View.VISIBLE);
+
+        animation.setDuration(duration);
+        view.startAnimation(animation);
     }
 }

@@ -17,13 +17,12 @@ import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.view.ViewParent;
+import android.view.*;
 
+import android.widget.AbsListView;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.ListAdapter;
 import com.dbbest.framework.CollectionUtils;
 import com.dbbest.framework.Predicate;
 import com.dbbest.framework.predicates.InstanceOfPredicate;
@@ -243,21 +242,22 @@ public class GuiUtilities {
         }.execute();
     }
 
+    public interface OnImageViewCreated {
+        void onFinish(Bitmap bitmap, ImageView imageView);
+    }
+
     // This method creates an ImageView representation of the given view, converting the view into bitmap,
     // and places the result ImageView in the same position with same width and height on the top
     // level of the current activity
     // *
     // Use GuiUtilities.removeView to delete this view from activity.
-    public static void createImageViewCloneOnView(final View view, final OnFinish<ImageView> onFinish){
+    public static void createImageViewCloneOnView(final View view, final OnImageViewCreated onFinish){
         createBitmapFromViewAsync(view, new OnFinish<Bitmap>() {
             @Override
-            public void onFinish(Bitmap bitmap) {
-                Activity activity = (Activity) view.getContext();
-                ViewGroup activityContent = (ViewGroup) GuiUtilities.getContentView(activity);
-                FrameLayout frameLayout = (FrameLayout) LayoutInflater.from(activity).inflate(
-                        R.layout.fill_frame_layout, activityContent);
+            public void onFinish(final Bitmap bitmap) {
+                FrameLayout frameLayout = (FrameLayout) view.getParent();
 
-                ImageView imageView = new ImageView(activity);
+                final ImageView imageView = new ImageView(view.getContext());
                 imageView.setImageBitmap(bitmap);
 
                 frameLayout.addView(imageView, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
@@ -266,7 +266,14 @@ public class GuiUtilities {
                 imageView.setX(view.getX());
                 imageView.setY(view.getY());
 
-                onFinish.onFinish(imageView);
+                imageView.getViewTreeObserver().
+                        addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+                            @Override
+                            public void onGlobalLayout() {
+                                onFinish.onFinish(bitmap, imageView);
+                                imageView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                            }
+                        });
             }
         });
     }
