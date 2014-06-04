@@ -9,19 +9,27 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.pm.ActivityInfo;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.graphics.Point;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
 
+import android.widget.FrameLayout;
+import android.widget.ImageView;
 import com.dbbest.framework.CollectionUtils;
 import com.dbbest.framework.Predicate;
 import com.dbbest.framework.predicates.InstanceOfPredicate;
 import com.utilsframework.android.BuildConfig;
+import com.utilsframework.android.R;
+import com.utilsframework.android.threading.OnFinish;
 
 /**
  * Created by Tikhonenko.S on 19.09.13.
@@ -210,5 +218,56 @@ public class GuiUtilities {
 
     public static List<View> findChildren(ViewGroup viewGroup, Predicate<View> predicate) {
         return CollectionUtils.findAll(getChildren(viewGroup), predicate);
+    }
+
+    public static Bitmap createBitmapFromView(View view) {
+        Bitmap bitmap = Bitmap.createBitmap(view.getWidth(), view.getHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        view.draw(canvas);
+        return bitmap;
+    }
+
+    public static void createBitmapFromViewAsync(final View view, final OnFinish<Bitmap> onFinish) {
+        new AsyncTask<Void, Void, Bitmap>(){
+            @Override
+            protected Bitmap doInBackground(Void... params) {
+                return createBitmapFromView(view);
+            }
+
+            @Override
+            protected void onPostExecute(Bitmap bitmap) {
+                if(onFinish != null){
+                    onFinish.onFinish(bitmap);
+                }
+            }
+        }.execute();
+    }
+
+    // This method creates an ImageView representation of the given view, converting the view into bitmap,
+    // and places the result ImageView in the same position with same width and height on the top
+    // level of the current activity
+    // *
+    // Use GuiUtilities.removeView to delete this view from activity.
+    public static void createImageViewCloneOnView(final View view, final OnFinish<ImageView> onFinish){
+        createBitmapFromViewAsync(view, new OnFinish<Bitmap>() {
+            @Override
+            public void onFinish(Bitmap bitmap) {
+                Activity activity = (Activity) view.getContext();
+                ViewGroup activityContent = (ViewGroup) GuiUtilities.getContentView(activity);
+                FrameLayout frameLayout = (FrameLayout) LayoutInflater.from(activity).inflate(
+                        R.layout.fill_frame_layout, activityContent);
+
+                ImageView imageView = new ImageView(activity);
+                imageView.setImageBitmap(bitmap);
+
+                frameLayout.addView(imageView, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+                        ViewGroup.LayoutParams.WRAP_CONTENT));
+
+                imageView.setX(view.getX());
+                imageView.setY(view.getY());
+
+                onFinish.onFinish(imageView);
+            }
+        });
     }
 }
