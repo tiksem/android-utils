@@ -230,11 +230,14 @@ public class GuiUtilities {
         new AsyncTask<Void, Void, Bitmap>(){
             @Override
             protected Bitmap doInBackground(Void... params) {
-                return createBitmapFromView(view);
+                return Bitmap.createBitmap(view.getWidth(), view.getHeight(), Bitmap.Config.ARGB_8888);
             }
 
             @Override
             protected void onPostExecute(Bitmap bitmap) {
+                Canvas canvas = new Canvas(bitmap);
+                view.draw(canvas);
+
                 if(onFinish != null){
                     onFinish.onFinish(bitmap);
                 }
