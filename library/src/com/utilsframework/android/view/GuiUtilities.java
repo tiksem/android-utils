@@ -175,6 +175,12 @@ public class GuiUtilities {
         ((ViewGroup)parent).removeView(view);
     }
 
+    public static void removeAllViews(Iterable<? extends View> views) {
+        for(View view : views){
+            removeView(view);
+        }
+    }
+
     public static Iterator<View> getChildrenIterator(final ViewGroup viewGroup) {
         return new Iterator<View>() {
             int index = 0;
