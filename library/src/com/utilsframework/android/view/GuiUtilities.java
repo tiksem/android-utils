@@ -233,10 +233,11 @@ public class GuiUtilities {
     }
 
     public static void createBitmapFromViewAsync(final View view, final OnFinish<Bitmap> onFinish) {
-        new AsyncTask<Void, Void, Bitmap>(){
+        final AsyncTask<Void, Void, Bitmap> asyncTask = new AsyncTask<Void, Void, Bitmap>(){
             @Override
             protected Bitmap doInBackground(Void... params) {
-                return Bitmap.createBitmap(view.getWidth(), view.getHeight(), Bitmap.Config.ARGB_8888);
+                return Bitmap.createBitmap(view.getMeasuredWidth(),
+                        view.getMeasuredHeight(), Bitmap.Config.ARGB_8888);
             }
 
             @Override
@@ -248,7 +249,19 @@ public class GuiUtilities {
                     onFinish.onFinish(bitmap);
                 }
             }
-        }.execute();
+        };
+
+        if(view.getMeasuredHeight() == 0 || view.getMeasuredWidth() == 0){
+            view.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+                @Override
+                public void onGlobalLayout() {
+                    asyncTask.execute();
+                    view.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                }
+            });
+        } else {
+            asyncTask.execute();
+        }
     }
 
     public interface OnImageViewCreated {
