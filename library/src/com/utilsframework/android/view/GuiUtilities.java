@@ -152,12 +152,26 @@ public class GuiUtilities {
     public static void lockOrientation(Activity context) {
     	if (Build.VERSION.SDK_INT >= 18) {
     		context.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LOCKED);
-		}
-    	else{
-            int orientation = context.getResources().getConfiguration().orientation;
-//          orientation = orientation == Configuration.ORIENTATION_LANDSCAPE ? ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE :
-//                  ActivityInfo.SCREEN_ORIENTATION_PORTRAIT;
-          context.setRequestedOrientation(orientation);
+		} else {
+            int orientation;
+            int rotation = ((WindowManager) context.getSystemService(
+                    Context.WINDOW_SERVICE)).getDefaultDisplay().getRotation();
+            switch (rotation) {
+                case Surface.ROTATION_0:
+                    orientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT;
+                    break;
+                case Surface.ROTATION_90:
+                    orientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE;
+                    break;
+                case Surface.ROTATION_180:
+                    orientation = ActivityInfo.SCREEN_ORIENTATION_REVERSE_PORTRAIT;
+                    break;
+                default:
+                    orientation = ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE;
+                    break;
+            }
+
+            context.setRequestedOrientation(orientation);
     	}
 
     }

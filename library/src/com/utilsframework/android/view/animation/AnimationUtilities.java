@@ -1,10 +1,8 @@
 package com.utilsframework.android.view.animation;
 
+import android.graphics.Point;
 import android.view.View;
-import android.view.animation.Animation;
-import android.view.animation.AnimationSet;
-import android.view.animation.AnimationUtils;
-import android.view.animation.TranslateAnimation;
+import android.view.animation.*;
 import com.dbbest.framework.CollectionUtils;
 import com.dbbest.framework.predicates.InstanceOfPredicate;
 import com.utilsframework.android.Screen;
@@ -87,5 +85,11 @@ public class AnimationUtilities {
 
         animation.setDuration(duration);
         view.startAnimation(animation);
+    }
+
+    public static RotateAnimation rotateAnimationAroundViewCenter(View view) {
+        Point viewCenter = GuiUtilities.getViewCenter(view);
+        RotateAnimation rotateAnimation = new RotateAnimation(0, 360, viewCenter.x, viewCenter.y);
+        return rotateAnimation;
     }
 }
