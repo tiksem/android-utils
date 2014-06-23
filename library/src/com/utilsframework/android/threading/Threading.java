@@ -35,4 +35,25 @@ public final class Threading {
     public static void runOnBackground(final ThrowingRunnable action){
         runOnBackground(action, null);
     }
+
+    public static void runOnBackground(final Runnable runnable, final OnComplete onFinish) {
+        new AsyncTask<Void, Void, Void>(){
+            @Override
+            protected Void doInBackground(Void... params) {
+                runnable.run();
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                if (onFinish != null) {
+                    onFinish.onFinish();
+                }
+            }
+        }.execute();
+    }
+
+    public static void runOnBackground(final Runnable runnable) {
+        runOnBackground(runnable, null);
+    }
 }
