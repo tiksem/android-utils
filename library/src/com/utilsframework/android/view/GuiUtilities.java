@@ -184,10 +184,6 @@ public class GuiUtilities {
 
     public static void removeView(View view) {
         ViewParent parent = view.getParent();
-        if(parent == null || !(parent instanceof ViewGroup)){
-            return;
-        }
-
         ((ViewGroup)parent).removeView(view);
     }
 
@@ -350,5 +346,11 @@ public class GuiUtilities {
                 }
             }
         });
+    }
+
+    public static void insertBefore(View viewToInsert, View view) {
+        ViewGroup viewGroup = (ViewGroup) view.getParent();
+        int index = viewGroup.indexOfChild(view);
+        viewGroup.addView(viewToInsert, index);
     }
 }
