@@ -16,6 +16,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Build;
+import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.*;
 
@@ -28,6 +29,7 @@ import com.dbbest.framework.Predicate;
 import com.dbbest.framework.predicates.InstanceOfPredicate;
 import com.utilsframework.android.BuildConfig;
 import com.utilsframework.android.R;
+import com.utilsframework.android.UiLoopEvent;
 import com.utilsframework.android.threading.OnFinish;
 
 /**
@@ -246,6 +248,20 @@ public class GuiUtilities {
         return bitmap;
     }
 
+    public static void executeWhenViewMeasured(final View view, final Runnable runnable) {
+        if(view.getMeasuredHeight() == 0 || view.getMeasuredWidth() == 0){
+            view.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+                @Override
+                public void onGlobalLayout() {
+                    runnable.run();
+                    view.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                }
+            });
+        } else {
+            runnable.run();
+        }
+    }
+
     public static void createBitmapFromViewAsync(final View view, final OnFinish<Bitmap> onFinish) {
         final AsyncTask<Void, Void, Bitmap> asyncTask = new AsyncTask<Void, Void, Bitmap>(){
             @Override
@@ -310,6 +326,28 @@ public class GuiUtilities {
                                 imageView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
                             }
                         });
+            }
+        });
+    }
+
+    public interface OnViewCreated {
+        void onViewCreated(View view);
+    }
+
+    public static void executeWhenViewCreated(final Fragment fragment, final OnViewCreated onViewCreated) {
+        if(fragment.getView() != null){
+            onViewCreated.onViewCreated(fragment.getView());
+            return;
+        }
+
+        final UiLoopEvent uiLoopEvent = new UiLoopEvent(fragment);
+        uiLoopEvent.run(new Runnable() {
+            @Override
+            public void run() {
+                if (fragment.getView() != null) {
+                    onViewCreated.onViewCreated(fragment.getView());
+                    uiLoopEvent.stop();
+                }
             }
         });
     }
