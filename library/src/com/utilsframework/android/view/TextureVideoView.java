@@ -39,6 +39,7 @@ public class TextureVideoView extends TextureView implements IVideoView{
             new HashSet<MediaPlayer.OnCompletionListener>();
     private int videoHeight, videoWidth;
     private ScaleType scaleType = ScaleType.CENTER_CROP;
+    private OnStart onStart;
 
     private SurfaceTextureListener surfaceTextureListener = new SurfaceTextureListener() {
         @Override
@@ -127,6 +128,9 @@ public class TextureVideoView extends TextureView implements IVideoView{
         if(mediaPlayer != null){
             try {
                 mediaPlayer.start();
+                if(onStart != null){
+                    onStart.onStart();
+                }
             } catch (IllegalStateException e) {
 
             }
@@ -218,6 +222,9 @@ public class TextureVideoView extends TextureView implements IVideoView{
                         @Override
                         public void onPrepared(MediaPlayer mp) {
                             mediaPlayer.start();
+                            if(onStart != null){
+                                onStart.onStart();
+                            }
                             playBackCompleted = false;
                             isPreparing = false;
                         }
@@ -237,6 +244,9 @@ public class TextureVideoView extends TextureView implements IVideoView{
                 } catch (IllegalStateException e) {
                     if (!isPreparing) {
                         mediaPlayer.start();
+                        if(onStart != null){
+                            onStart.onStart();
+                        }
                         playBackCompleted = false;
                     }
                 }
@@ -310,5 +320,10 @@ public class TextureVideoView extends TextureView implements IVideoView{
         if(mediaPlayer != null){
             mediaPlayer.stop();
         }
+    }
+
+    @Override
+    public void setOnStartListener(OnStart onStart) {
+        this.onStart = onStart;
     }
 }
