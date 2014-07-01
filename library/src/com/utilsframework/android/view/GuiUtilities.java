@@ -247,7 +247,11 @@ public class GuiUtilities {
                 @Override
                 public void onGlobalLayout() {
                     runnable.run();
-                    view.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                    try {
+                        view.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                    } catch (NoSuchFieldError e) {
+                        view.getViewTreeObserver().removeGlobalOnLayoutListener(this);
+                    }
                 }
             });
         } else {
