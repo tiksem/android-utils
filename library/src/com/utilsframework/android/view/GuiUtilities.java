@@ -249,7 +249,7 @@ public class GuiUtilities {
                     runnable.run();
                     try {
                         view.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-                    } catch (NoSuchFieldError e) {
+                    } catch (NoSuchMethodError e) {
                         view.getViewTreeObserver().removeGlobalOnLayoutListener(this);
                     }
                 }
