@@ -3,8 +3,8 @@ package com.utilsframework.android.view.animation;
 import android.graphics.Point;
 import android.view.View;
 import android.view.animation.*;
-import com.dbbest.framework.CollectionUtils;
-import com.dbbest.framework.predicates.InstanceOfPredicate;
+import com.utils.framework.CollectionUtils;
+import com.utils.framework.predicates.InstanceOfPredicate;
 import com.utilsframework.android.Screen;
 import com.utilsframework.android.view.GuiUtilities;
 

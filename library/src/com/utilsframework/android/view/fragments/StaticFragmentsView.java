@@ -5,7 +5,7 @@ import android.os.AsyncTask;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.LinearLayout;
-import com.dbbest.framework.CollectionUtils;
+import com.utils.framework.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.List;

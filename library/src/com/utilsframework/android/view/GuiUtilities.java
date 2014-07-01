@@ -20,15 +20,12 @@ import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.*;
 
-import android.widget.AbsListView;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.ListAdapter;
-import com.dbbest.framework.CollectionUtils;
-import com.dbbest.framework.Predicate;
-import com.dbbest.framework.predicates.InstanceOfPredicate;
+import com.utils.framework.CollectionUtils;
+import com.utils.framework.Predicate;
+import com.utils.framework.predicates.InstanceOfPredicate;
 import com.utilsframework.android.BuildConfig;
-import com.utilsframework.android.R;
 import com.utilsframework.android.UiLoopEvent;
 import com.utilsframework.android.threading.OnFinish;
 

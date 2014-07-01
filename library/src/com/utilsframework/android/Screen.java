@@ -8,7 +8,7 @@ import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.Window;
 import android.view.WindowManager;
-import com.dbbest.framework.MathUtils;
+import com.utils.framework.MathUtils;
 
 /**
  * User: Tikhonenko.S

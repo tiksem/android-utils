@@ -1,7 +1,7 @@
 package com.utilsframework.android.view;
 
 import android.view.View;
-import com.dbbest.framework.patterns.StateProvider;
+import com.utils.framework.patterns.StateProvider;
 
 /**
  * User: Tikhonenko.S

@@ -1,6 +1,6 @@
 package com.utilsframework.android.listeners;
 
-import com.dbbest.framework.patterns.StateProvider;
+import com.utils.framework.patterns.StateProvider;
 import com.utilsframework.android.UiLoopEvent;
 
 import java.lang.ref.WeakReference;

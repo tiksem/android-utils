@@ -1,6 +1,6 @@
 package com.utilsframework.android.view;
 
-import com.dbbest.framework.patterns.StateRestorer;
+import com.utils.framework.patterns.StateRestorer;
 
 /**
  * User: Tikhonenko.S

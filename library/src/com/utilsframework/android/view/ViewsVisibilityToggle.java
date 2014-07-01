@@ -1,9 +1,9 @@
 package com.utilsframework.android.view;
 
 import android.view.View;
-import com.dbbest.framework.patterns.ObjectsStatesManager;
-import com.dbbest.framework.patterns.StateChanger;
-import com.dbbest.framework.patterns.StateRestorer;
+import com.utils.framework.patterns.ObjectsStatesManager;
+import com.utils.framework.patterns.StateChanger;
+import com.utils.framework.patterns.StateRestorer;
 
 import java.util.Arrays;
 import java.util.Collection;
