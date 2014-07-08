@@ -67,6 +67,11 @@ public class MediaUtils {
         };
     }
 
+    public static int getMediaFileDuration(Context context, String path) {
+        MediaPlayer mediaPlayer = MediaPlayer.create(context, Uri.parse(path));
+        return mediaPlayer.getDuration();
+    }
+
     private static int[] generateMuxerIndexMap(MediaMuxer muxer, MediaExtractor extractor){
         int trackCount = extractor.getTrackCount();
 
