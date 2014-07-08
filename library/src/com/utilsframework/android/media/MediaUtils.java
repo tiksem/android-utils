@@ -144,6 +144,54 @@ public class MediaUtils {
         }
     }
 
+    public static void cutAudioAsync(final int startTime, final String source, final String destination,
+                                     final OnFinish<Throwable> onFinish) {
+        OnFinish<Throwable> finish = new OnFinish<Throwable>() {
+            @Override
+            public void onFinish(Throwable throwable) {
+                if(throwable != null && throwable instanceof RuntimeException){
+                    throw (RuntimeException) throwable;
+                }
+
+                onFinish.onFinish(throwable);
+            }
+        };
+
+        Threading.runOnBackground(new ThrowingRunnable() {
+            @Override
+            public void run() throws Throwable {
+                cutAudio(startTime, source, destination);
+            }
+        }, finish);
+    }
+
+    public static void cutAudio(int startTime, String source, String destination) throws IOException {
+        if(Build.VERSION.SDK_INT < MINIMUM_MUXER_SUPPORTED_SDK){
+            throw new UnsupportedOperationException("cutAudio is supported on Android 4.3 and higher");
+        }
+
+        // Set up MediaMuxer for the destination.
+        MediaMuxer muxer = null;
+        try {
+            muxer = new MediaMuxer(destination, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4);
+
+            MediaExtractor audioExtractor = new MediaExtractor();
+            audioExtractor.setDataSource(source);
+            audioExtractor.seekTo(startTime * 1000, MediaExtractor.SEEK_TO_NEXT_SYNC);
+
+            int[] audioIndexMap = generateMuxerIndexMap(muxer, audioExtractor);
+
+            muxer.start();
+
+            writeSampleData(muxer, audioExtractor, audioIndexMap);
+        } finally {
+            if (muxer != null) {
+                muxer.stop();
+                muxer.release();
+            }
+        }
+    }
+
     public static class VideoSize {
         public int width;
         public int height;
