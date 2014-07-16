@@ -2,10 +2,7 @@ package com.utilsframework.android.bitmap;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Color;
-import android.graphics.Matrix;
+import android.graphics.*;
 import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -578,5 +575,28 @@ public class BitmapUtilities {
         Matrix matrix = new Matrix();
         matrix.postRotate(degrees);
         return Bitmap.createBitmap(bitmap , 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+    }
+
+    public static void putBitmapInCenterAndMakeBlackStripes(Canvas canvas, Bitmap bitmap) {
+        Paint paint = new Paint();
+        paint.setAlpha(255);
+        paint.setColor(Color.argb(255, 0, 0, 0));
+        float width = canvas.getWidth();
+        float height = canvas.getHeight();
+        canvas.drawRect(0, 0, width, height, paint);
+        float left = (width - bitmap.getWidth()) / 2.0f;
+        float top = (height - bitmap.getHeight()) / 2.0f;
+        canvas.drawBitmap(bitmap, left, top, paint);
+    }
+
+    public static Bitmap putBitmapInCenterAndMakeBlackStripes(Bitmap bitmap, int width, int height) {
+        final Bitmap solidBitmap = Bitmap.createBitmap(
+                width,
+                height, Bitmap.Config.ARGB_8888);
+
+        Canvas canvas = new Canvas(solidBitmap);
+        putBitmapInCenterAndMakeBlackStripes(canvas, bitmap);
+
+        return solidBitmap;
     }
 }
