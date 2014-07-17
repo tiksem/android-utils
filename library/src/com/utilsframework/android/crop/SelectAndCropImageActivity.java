@@ -77,12 +77,11 @@ public class SelectAndCropImageActivity extends Activity {
             Intent intent = new Intent();
             intent.setData(Crop.getOutput(result));
             setResult(resultCode, intent);
-            finish();
         } else if (resultCode == Crop.RESULT_ERROR) {
             Toast.makeText(this, Crop.getError(result).getMessage(), Toast.LENGTH_SHORT).show();
             setResult(resultCode);
-            finish();
         }
+        finish();
     }
 
 }
