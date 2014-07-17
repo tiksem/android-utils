@@ -1,7 +1,9 @@
 package com.utilsframework.android.crop;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.graphics.Point;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.Menu;
@@ -13,15 +15,23 @@ import com.utilsframework.android.R;
 import java.io.File;
 
 public class SelectAndCropImageActivity extends Activity {
-    public static final String BITMAP_RESULT = "BITMAP_RESULT";
+    public static final String ASPECT_RATIO_KEY = "ASPECT_RATIO_KEY";
 
     private ImageView resultView;
+    private Point aspectRatio;
+
+    public static void start(Activity activity, Point aspectRatio, int requestCode) {
+        Intent intent = new Intent(activity, SelectAndCropImageActivity.class);
+        intent.putExtra(ASPECT_RATIO_KEY, aspectRatio);
+        activity.startActivityForResult(intent, requestCode);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.select_and_crop_image_activity);
         resultView = (ImageView) findViewById(R.id.result_image);
+        aspectRatio = getIntent().getParcelableExtra(ASPECT_RATIO_KEY);
         crop();
     }
 
@@ -56,7 +66,7 @@ public class SelectAndCropImageActivity extends Activity {
 
     private void beginCrop(Uri source) {
         Uri outputUri = Uri.fromFile(new File(getCacheDir(), "cropped"));
-        new Crop(source).output(outputUri).withAspect(16, 9).start(this);
+        new Crop(source).output(outputUri).withAspect(aspectRatio.x, aspectRatio.y).start(this);
     }
 
     private void handleCrop(int resultCode, Intent result) {
