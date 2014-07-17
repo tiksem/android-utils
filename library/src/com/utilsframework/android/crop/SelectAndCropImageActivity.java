@@ -62,7 +62,7 @@ public class SelectAndCropImageActivity extends Activity {
     private void handleCrop(int resultCode, Intent result) {
         if (resultCode == RESULT_OK) {
             Intent intent = new Intent();
-            intent.putExtra(BITMAP_RESULT, Crop.getOutput(result).getPath());
+            intent.setData(Crop.getOutput(result));
             setResult(resultCode, intent);
             finish();
         } else if (resultCode == Crop.RESULT_ERROR) {
