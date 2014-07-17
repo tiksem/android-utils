@@ -8,6 +8,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.Toast;
 import com.utilsframework.android.R;
@@ -29,8 +30,7 @@ public class SelectAndCropImageActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.select_and_crop_image_activity);
-        resultView = (ImageView) findViewById(R.id.result_image);
+        setContentView(new FrameLayout(this));
         aspectRatio = getIntent().getParcelableExtra(ASPECT_RATIO_KEY);
         crop();
     }
@@ -42,7 +42,6 @@ public class SelectAndCropImageActivity extends Activity {
     }
 
     private void crop() {
-        resultView.setImageDrawable(null);
         Crop.pickImage(this);
     }
 
@@ -57,8 +56,12 @@ public class SelectAndCropImageActivity extends Activity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent result) {
-        if (requestCode == Crop.REQUEST_PICK && resultCode == RESULT_OK) {
-            beginCrop(result.getData());
+        if (requestCode == Crop.REQUEST_PICK) {
+            if (resultCode == RESULT_OK) {
+                beginCrop(result.getData());
+            } else {
+                finish();
+            }
         } else if (requestCode == Crop.REQUEST_CROP) {
             handleCrop(resultCode, result);
         }
@@ -78,6 +81,7 @@ public class SelectAndCropImageActivity extends Activity {
         } else if (resultCode == Crop.RESULT_ERROR) {
             Toast.makeText(this, Crop.getError(result).getMessage(), Toast.LENGTH_SHORT).show();
             setResult(resultCode);
+            finish();
         }
     }
 
