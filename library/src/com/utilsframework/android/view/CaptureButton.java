@@ -25,6 +25,7 @@ public class CaptureButton extends ImageButton implements View.OnTouchListener, 
     private Handler downActionHandler = new Handler();
     private boolean downActionEnabled = true;
     private int lastTouchAction = Integer.MAX_VALUE;
+    private boolean upActionSuspended = false;
 
     private OnPressStateListener onPressStateListener;
 
@@ -86,6 +87,16 @@ public class CaptureButton extends ImageButton implements View.OnTouchListener, 
         return touchDown;
     }
 
+    private void executeUpAction() {
+        long currentTime = System.currentTimeMillis();
+        long timeDif = currentTime - downActionTime;
+        if(timeDif >= minUpActionDelay){
+            post(actionUp);
+        } else {
+            postDelayed(actionUp, minUpActionDelay - timeDif);
+        }
+    }
+
     @Override
     public boolean onTouch(View view, MotionEvent motionEvent) {
         int type = motionEvent.getAction();
@@ -106,14 +117,8 @@ public class CaptureButton extends ImageButton implements View.OnTouchListener, 
                 if(!actionDownExecuted){
                     downActionHandler.removeCallbacks(actionDown);
                     touchDown = false;
-                } else {
-                    long currentTime = System.currentTimeMillis();
-                    long timeDif = currentTime - downActionTime;
-                    if(timeDif >= minUpActionDelay){
-                        post(actionUp);
-                    } else {
-                        postDelayed(actionUp, minUpActionDelay - timeDif);
-                    }
+                } else if(!upActionSuspended) {
+                    executeUpAction();
                 }
 
                 return true;
@@ -154,5 +159,21 @@ public class CaptureButton extends ImageButton implements View.OnTouchListener, 
 
     public void setDownActionEnabled(boolean downActionEnabled) {
         this.downActionEnabled = downActionEnabled;
+    }
+
+    public boolean isUpActionSuspended() {
+        return upActionSuspended;
+    }
+
+    public void suspendUpAction() {
+        upActionSuspended = true;
+    }
+
+    public void releaseUpAction() {
+        if(upActionSuspended){
+
+        }
+
+        upActionSuspended = false;
     }
 }
