@@ -29,9 +29,11 @@ public class StatesExecutor<State> {
         this.currentState = currentState;
         Set<Runnable> tasks = tasksByStates.get(currentState);
         if (tasks != null) {
-            Tasks.executeRunnableQueue(tasks);
+            ArrayList<Runnable> tasksCopy = new ArrayList<Runnable>(tasks);
+            tasks.clear();
+            Tasks.executeRunnableQueue(tasksCopy);
             for(Set<Runnable> tasksOfState : tasksByStates.values()){
-                tasksOfState.removeAll(tasks);
+                tasksOfState.removeAll(tasksCopy);
             }
         }
     }
