@@ -3,10 +3,16 @@ package com.utilsframework.android.image;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v4.app.FragmentActivity;
 import android.widget.ImageView;
 import com.utilsframework.android.R;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 
 /**
  * User: Tikhonenko.S
@@ -18,7 +24,13 @@ public class ImagePreviewActivity extends FragmentActivity {
 
     public static void show(Context context, Bitmap bitmap){
         Intent intent = new Intent(context, ImagePreviewActivity.class);
-        intent.putExtra(BITMAP_KEY, bitmap);
+        File file = new File(context.getCacheDir(), "ImagePreviewActivity.png");
+        try {
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, new FileOutputStream(file));
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+        intent.putExtra(BITMAP_KEY, file.getAbsolutePath());
         context.startActivity(intent);
     }
 
@@ -26,8 +38,9 @@ public class ImagePreviewActivity extends FragmentActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.image_preview);
+        String path = getIntent().getStringExtra(BITMAP_KEY);
 
         ImageView imageView = (ImageView) findViewById(R.id.image_view);
-        imageView.setImageBitmap((Bitmap) getIntent().getParcelableExtra(BITMAP_KEY));
+        imageView.setImageBitmap(BitmapFactory.decodeFile(path));
     }
 }
