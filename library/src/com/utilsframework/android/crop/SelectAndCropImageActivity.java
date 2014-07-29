@@ -1,7 +1,6 @@
 package com.utilsframework.android.crop;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Point;
 import android.net.Uri;
@@ -37,7 +36,7 @@ public class SelectAndCropImageActivity extends Activity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.select_and_ctop_image_activity, menu);
+        getMenuInflater().inflate(R.menu.select_and_crop_image_activity, menu);
         return super.onCreateOptionsMenu(menu);
     }
 
