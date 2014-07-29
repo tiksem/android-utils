@@ -354,4 +354,36 @@ public class GuiUtilities {
         int index = viewGroup.indexOfChild(view);
         viewGroup.addView(viewToInsert, index);
     }
+
+    public static enum ViewOrientation {
+        SQUARE,
+        LANDSCAPE,
+        PORTRAIT
+    }
+
+    public static void getViewOrientation(final View view, final OnFinish<ViewOrientation> onFinish) {
+        executeWhenViewMeasured(view, new Runnable() {
+            @Override
+            public void run() {
+                int width = view.getMeasuredWidth();
+                int height = view.getMeasuredHeight();
+
+                if(width == height){
+                    onFinish.onFinish(ViewOrientation.SQUARE);
+                    return;
+                }
+
+                ViewOrientation result = ViewOrientation.SQUARE;
+
+                float floatWidth = width;
+                float floatHeight = height;
+
+                if (floatWidth / floatHeight > 1.0f) {
+                    onFinish.onFinish(ViewOrientation.LANDSCAPE);
+                } else {
+                    onFinish.onFinish(ViewOrientation.PORTRAIT);
+                }
+            }
+        });
+    }
 }
