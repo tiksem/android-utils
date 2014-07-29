@@ -81,4 +81,10 @@ public class StatesExecutor<State> {
             tasks.remove(task);
         }
     }
+
+    public void cancelAll() {
+        for(Set<Runnable> tasks : tasksByStates.values()){
+            tasks.clear();
+        }
+    }
 }
