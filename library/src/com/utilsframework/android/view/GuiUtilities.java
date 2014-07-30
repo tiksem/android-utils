@@ -9,6 +9,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.pm.ActivityInfo;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Point;
@@ -355,13 +356,13 @@ public class GuiUtilities {
         viewGroup.addView(viewToInsert, index);
     }
 
-    public static enum ViewOrientation {
+    public static enum Orientation {
         SQUARE,
         LANDSCAPE,
         PORTRAIT
     }
 
-    public static void getViewOrientation(final View view, final OnFinish<ViewOrientation> onFinish) {
+    public static void getViewOrientation(final View view, final OnFinish<Orientation> onFinish) {
         executeWhenViewMeasured(view, new Runnable() {
             @Override
             public void run() {
@@ -369,21 +370,43 @@ public class GuiUtilities {
                 int height = view.getMeasuredHeight();
 
                 if(width == height){
-                    onFinish.onFinish(ViewOrientation.SQUARE);
+                    onFinish.onFinish(Orientation.SQUARE);
                     return;
                 }
 
-                ViewOrientation result = ViewOrientation.SQUARE;
+                Orientation result = Orientation.SQUARE;
 
                 float floatWidth = width;
                 float floatHeight = height;
 
                 if (floatWidth / floatHeight > 1.0f) {
-                    onFinish.onFinish(ViewOrientation.LANDSCAPE);
+                    onFinish.onFinish(Orientation.LANDSCAPE);
                 } else {
-                    onFinish.onFinish(ViewOrientation.PORTRAIT);
+                    onFinish.onFinish(Orientation.PORTRAIT);
                 }
             }
         });
+    }
+
+    public static Orientation getScreenOrientation(Activity context)
+    {
+        Display display = context.getWindowManager().getDefaultDisplay();
+
+        Point size = new Point();
+        display.getSize(size);
+
+        Orientation orientation;
+
+        if (size.y == size.x) {
+            orientation = Orientation.SQUARE;
+        } else {
+            if(size.x > size.y){
+                orientation = Orientation.LANDSCAPE;
+            } else {
+                orientation = Orientation.PORTRAIT;
+            }
+        }
+
+        return orientation;
     }
 }
