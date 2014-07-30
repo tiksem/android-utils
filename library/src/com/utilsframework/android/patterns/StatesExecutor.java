@@ -12,6 +12,11 @@ import java.util.*;
 public class StatesExecutor<State> {
     private Map<State, Set<Runnable>> tasksByStates = new HashMap<State, Set<Runnable>>();
     private State currentState;
+    private OnStateChangedListener<State> stateChangedListener;
+
+    public interface OnStateChangedListener<State> {
+        void stateChanged(State previousState, State currentState);
+    }
 
     public State getCurrentState() {
         return currentState;
@@ -26,7 +31,12 @@ public class StatesExecutor<State> {
             return;
         }
 
+        if(stateChangedListener != null){
+            stateChangedListener.stateChanged(this.currentState, currentState);
+        }
+
         this.currentState = currentState;
+
         Set<Runnable> tasks = tasksByStates.get(currentState);
         if (tasks != null) {
             ArrayList<Runnable> tasksCopy = new ArrayList<Runnable>(tasks);
@@ -86,5 +96,13 @@ public class StatesExecutor<State> {
         for(Set<Runnable> tasks : tasksByStates.values()){
             tasks.clear();
         }
+    }
+
+    public OnStateChangedListener<State> getStateChangedListener() {
+        return stateChangedListener;
+    }
+
+    public void setStateChangedListener(OnStateChangedListener<State> stateChangedListener) {
+        this.stateChangedListener = stateChangedListener;
     }
 }
