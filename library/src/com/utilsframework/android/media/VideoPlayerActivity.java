@@ -18,6 +18,10 @@ import java.io.File;
 public class VideoPlayerActivity extends Activity{
     public static final String URI = "uri";
     public static final String SHOULD_FINISH_ACTIVITY = "SHOULD_FINISH_ACTIVITY";
+    private VideoPlayerView videoPlayerView;
+    private VideoView videoView;
+    private String uri;
+    private boolean shouldFinishActivityAfterPlay;
 
     public static void start(Context from, String uri, boolean shouldFinishActivityAfterPlay){
         Intent intent = new Intent(from, VideoPlayerActivity.class);
@@ -40,13 +44,22 @@ public class VideoPlayerActivity extends Activity{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Intent intent = getIntent();
-        String uri = intent.getStringExtra(URI);
+        uri = intent.getStringExtra(URI);
         if(uri == null){
             throw new IllegalArgumentException("VideoPlayerActivity starting intent should have " + URI + " param");
         }
 
-        VideoPlayerView videoPlayerView = new VideoPlayerView(this);
-        final VideoView videoView = videoPlayerView.getVideoView();
+        shouldFinishActivityAfterPlay = intent.getBooleanExtra(SHOULD_FINISH_ACTIVITY, false);
+
+        videoPlayerView = new VideoPlayerView(this);
+        setContentView(videoPlayerView);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        videoView = videoPlayerView.onStart();
         videoView.setVideoPath(uri);
         videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
             @Override
@@ -55,7 +68,7 @@ public class VideoPlayerActivity extends Activity{
             }
         });
 
-        if(intent.getBooleanExtra(SHOULD_FINISH_ACTIVITY, false)){
+        if(shouldFinishActivityAfterPlay){
             videoView.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                 @Override
                 public void onCompletion(MediaPlayer mp) {
@@ -64,7 +77,13 @@ public class VideoPlayerActivity extends Activity{
             });
         }
 
+        videoView.seekTo(videoPlayerView.getCurrentPosition());
         videoView.start();
-        setContentView(videoPlayerView);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        videoPlayerView.onStop();
     }
 }

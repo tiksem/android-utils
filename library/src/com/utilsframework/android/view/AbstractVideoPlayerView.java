@@ -4,6 +4,7 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.MediaController;
 import android.widget.VideoView;
@@ -16,31 +17,27 @@ import android.widget.VideoView;
 public abstract class AbstractVideoPlayerView extends FrameLayout{
     private VideoView videoView;
     private MediaController mediaController;
+    private ViewGroup containerLayout;
+    private int currentPosition = 0;
 
     public AbstractVideoPlayerView(Context context) {
         super(context);
-        init();
+        construct();
     }
 
     public AbstractVideoPlayerView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        init();
+        construct();
     }
 
     public AbstractVideoPlayerView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
-        init();
+        construct();
     }
 
     private void initViews(){
         LayoutInflater layoutInflater = LayoutInflater.from(getContext());
-        View root = layoutInflater.inflate(getLayoutId(), this);
-
-        int videoViewId = getVideoViewId();
-        videoView = (VideoView)root.findViewById(videoViewId);
-        if(videoView == null){
-            throw new RuntimeException("Could not find VideoView with id = " + videoViewId);
-        }
+        containerLayout = (ViewGroup) layoutInflater.inflate(getLayoutId(), this);
     }
 
     private void connectVideoViewAndMediaController(){
@@ -48,9 +45,26 @@ public abstract class AbstractVideoPlayerView extends FrameLayout{
         videoView.setMediaController(mediaController);
     }
 
-    private void init() {
+    private void construct() {
         initViews();
+    }
+
+    public VideoView onStart() {
+        videoView = new VideoView(getContext());
+        addView(videoView);
         connectVideoViewAndMediaController();
+        return videoView;
+    }
+
+    public void onStop() {
+        videoView.setOnCompletionListener(null);
+        currentPosition = videoView.getCurrentPosition();
+        videoView.stopPlayback();
+        containerLayout.removeView(videoView);
+    }
+
+    public int getCurrentPosition() {
+        return currentPosition;
     }
 
     public VideoView getVideoView() {
@@ -61,6 +75,5 @@ public abstract class AbstractVideoPlayerView extends FrameLayout{
         return mediaController;
     }
 
-    protected abstract int getVideoViewId();
     protected abstract int getLayoutId();
 }

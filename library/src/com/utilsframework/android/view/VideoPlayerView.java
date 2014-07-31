@@ -23,11 +23,6 @@ public class VideoPlayerView extends AbstractVideoPlayerView{
     }
 
     @Override
-    protected int getVideoViewId() {
-        return R.id.video_view;
-    }
-
-    @Override
     protected int getLayoutId() {
         return R.layout.video_player;
     }
