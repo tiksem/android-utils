@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.graphics.Point;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.FrameLayout;
@@ -26,11 +27,21 @@ public class SelectAndCropImageActivity extends Activity {
         activity.startActivityForResult(intent, requestCode);
     }
 
+    public static void start(Fragment fragment, Point aspectRatio, int requestCode) {
+        Intent intent = new Intent(fragment.getActivity(), SelectAndCropImageActivity.class);
+        intent.putExtra(ASPECT_RATIO_KEY, aspectRatio);
+        fragment.startActivityForResult(intent, requestCode);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(new FrameLayout(this));
         aspectRatio = getIntent().getParcelableExtra(ASPECT_RATIO_KEY);
+        if(aspectRatio == null){
+            aspectRatio = new Point(0, 0);
+        }
+
         crop();
     }
 
