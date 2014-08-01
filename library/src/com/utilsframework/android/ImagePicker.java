@@ -3,8 +3,14 @@ package com.utilsframework.android;
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
+import android.net.Uri;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.widget.Toast;
+
+import java.io.File;
+import java.io.IOException;
 
 /**
  * User: Tikhonenko.S
@@ -31,8 +37,20 @@ public final class ImagePicker {
         }
     }
 
-    public static void takeImageFromCamera(Activity activity) {
+    public static void takeImageFromCamera(Activity activity, String filePath, boolean portraitMode) {
         Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+        File file = new File(filePath);
+        file.getParentFile().mkdirs();
+        try {
+            file.createNewFile();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT,
+                Uri.fromFile(file));
+        if (portraitMode) {
+            cameraIntent.putExtra(MediaStore.EXTRA_SCREEN_ORIENTATION, ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        }
         activity.startActivityForResult(cameraIntent, REQUEST_CAMERA_PICK);
     }
 }

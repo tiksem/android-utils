@@ -1,19 +1,21 @@
 package com.utilsframework.android.crop;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Point;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v4.app.Fragment;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
 import android.widget.Toast;
 import com.utilsframework.android.ImagePicker;
 import com.utilsframework.android.R;
 import com.utilsframework.android.view.Alerts;
+import com.utilsframework.android.view.GuiUtilities;
 import com.utilsframework.android.view.OnNo;
 import com.utilsframework.android.view.OnYes;
 
@@ -21,12 +23,11 @@ import java.io.File;
 
 public class SelectAndCropImageActivity extends Activity {
     public static final String ASPECT_RATIO_KEY = "ASPECT_RATIO_KEY";
-    public static final String SHOULD_SHOW_GALLERY_CAMERA_ALERT = "SHOULD_SHOW_GALLERY_CAMERA_ALERT";
-    public static final String GALLERY_CAMERA_ALERT_TEXT = "GALLERY_CAMERA_ALERT_TEXT";
+    public static final String SHOULD_PICK_IMAGE_FROM_CAMERA = "SHOULD_PICK_IMAGE_FROM_CAMERA";
 
     private Point aspectRatio;
-    private boolean shouldShowGalleryCameraAlert;
-    private String galleryCameraAlertText;
+    private boolean shouldTakeImageFromCamera = false;
+    private String cameraPath;
 
     public static class Params {
         public Point aspectRatio = null;
@@ -34,24 +35,48 @@ public class SelectAndCropImageActivity extends Activity {
         public String galleryCameraAlertText = "Pick image using";
     }
 
-    private static Intent createIntent(Activity activity, Params params) {
-        Intent intent = new Intent(activity, SelectAndCropImageActivity.class);
+    private static void start(final Activity activity, final Fragment fragment,
+                              Params params, final int requestCode) {
+        Context context = activity != null ? activity : fragment.getActivity();
+
+        final Intent intent = new Intent(context, SelectAndCropImageActivity.class);
         intent.putExtra(ASPECT_RATIO_KEY, params.aspectRatio);
-        if (params.shouldShowGalleryCameraAlert) {
-            intent.putExtra(SHOULD_SHOW_GALLERY_CAMERA_ALERT, params.shouldShowGalleryCameraAlert);
-            intent.putExtra(GALLERY_CAMERA_ALERT_TEXT, params.galleryCameraAlertText);
+
+        if(params.shouldShowGalleryCameraAlert){
+            String galleryCameraAlertText = params.galleryCameraAlertText;
+            if(galleryCameraAlertText == null){
+                galleryCameraAlertText = "";
+            }
+
+            Alerts.YesNoAlertSettings settings = new Alerts.YesNoAlertSettings();
+            settings.yesButtonText = "Gallery";
+            settings.noButtonText = "Camera";
+            settings.onYes = new OnYes() {
+                @Override
+                public void onYes() {
+                    GuiUtilities.startActivityForResult(activity, fragment, intent, requestCode);
+                }
+            };
+            settings.onNo = new OnNo() {
+                @Override
+                public void onNo() {
+                    intent.putExtra(SHOULD_PICK_IMAGE_FROM_CAMERA, true);
+                    GuiUtilities.startActivityForResult(activity, fragment, intent, requestCode);
+                }
+            };
+            settings.title = galleryCameraAlertText;
+            Alerts.showYesNoAlert(context, settings);
+        } else {
+            GuiUtilities.startActivityForResult(activity, fragment, intent, requestCode);
         }
-        return intent;
     }
 
     public static void start(Activity activity, Params params, int requestCode) {
-        Intent intent = createIntent(activity, params);
-        activity.startActivityForResult(intent, requestCode);
+        start(activity, null, params, requestCode);
     }
 
     public static void start(Fragment fragment, Params params, int requestCode) {
-        Intent intent = createIntent(fragment.getActivity(), params);
-        fragment.startActivityForResult(intent, requestCode);
+        start(null, fragment, params, requestCode);
     }
 
     public static void start(Fragment fragment, Point aspectRatio, int requestCode) {
@@ -85,14 +110,7 @@ public class SelectAndCropImageActivity extends Activity {
             aspectRatio = new Point(0, 0);
         }
 
-        shouldShowGalleryCameraAlert = getIntent().getBooleanExtra(SHOULD_SHOW_GALLERY_CAMERA_ALERT, false);
-        if(shouldShowGalleryCameraAlert){
-            galleryCameraAlertText = getIntent().getStringExtra(GALLERY_CAMERA_ALERT_TEXT);
-            if(galleryCameraAlertText == null){
-                galleryCameraAlertText = "";
-            }
-        }
-
+        shouldTakeImageFromCamera = getIntent().getBooleanExtra(SHOULD_PICK_IMAGE_FROM_CAMERA, false);
         prepareCrop();
     }
 
@@ -102,27 +120,17 @@ public class SelectAndCropImageActivity extends Activity {
         return super.onCreateOptionsMenu(menu);
     }
 
+    private String generateCameraPhotoPath() {
+        return Environment.getExternalStorageDirectory().getAbsolutePath()
+                + "/camera" + System.currentTimeMillis() + ".jpg";
+    }
+
     private void prepareCrop() {
-        if (!shouldShowGalleryCameraAlert) {
+        if (!shouldTakeImageFromCamera) {
             ImagePicker.pickImage(this);
         } else {
-            Alerts.YesNoAlertSettings settings = new Alerts.YesNoAlertSettings();
-            settings.yesButtonText = "Gallery";
-            settings.noButtonText = "Camera";
-            settings.onYes = new OnYes() {
-                @Override
-                public void onYes() {
-                    ImagePicker.pickImage(SelectAndCropImageActivity.this);
-                }
-            };
-            settings.onNo = new OnNo() {
-                @Override
-                public void onNo() {
-                    ImagePicker.takeImageFromCamera(SelectAndCropImageActivity.this);
-                }
-            };
-            settings.message = galleryCameraAlertText;
-            Alerts.showYesNoAlert(this, settings);
+            cameraPath = generateCameraPhotoPath();
+            ImagePicker.takeImageFromCamera(this, cameraPath, true);
         }
     }
 
@@ -139,7 +147,11 @@ public class SelectAndCropImageActivity extends Activity {
     protected void onActivityResult(int requestCode, int resultCode, Intent result) {
         if (requestCode == ImagePicker.REQUEST_PICK || requestCode == ImagePicker.REQUEST_CAMERA_PICK) {
             if (resultCode == RESULT_OK) {
-                beginCrop(result.getData());
+                if (requestCode == ImagePicker.REQUEST_PICK) {
+                    beginCrop(result.getData());
+                } else {
+                    beginCrop(Uri.fromFile(new File(cameraPath)));
+                }
             } else {
                 finish();
             }

@@ -13,7 +13,7 @@ import android.view.View;
 public final class Alerts {
     public static class YesNoAlertSettings {
         public CharSequence title = "";
-        public CharSequence message = "";
+        public CharSequence message = null;
         public CharSequence yesButtonText = "Yes";
         public CharSequence noButtonText = "No";
         public OnYes onYes;
@@ -42,7 +42,9 @@ public final class Alerts {
         });
 
         builder.setTitle(settings.title);
-        builder.setMessage(settings.message);
+        if (settings.message != null) {
+            builder.setMessage(settings.message);
+        }
 
         builder.create().show();
     }
