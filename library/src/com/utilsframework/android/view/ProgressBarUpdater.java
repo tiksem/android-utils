@@ -16,7 +16,7 @@ public abstract class ProgressBarUpdater {
 
     public ProgressBarUpdater(final ProgressBar progressBar) {
         this.progressBar = progressBar;
-        updater = new UiLoopEventWithTimeTracking(progressBar.getContext(), UPDATE_DELAY);
+        updater = new UiLoopEventWithTimeTracking(progressBar, UPDATE_DELAY);
     }
 
     public void start(){

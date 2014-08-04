@@ -13,7 +13,7 @@ public class UiLoopEventWithTimeTracking extends UiLoopEvent{
     private long pauseTimeSum = 0;
     private long pauseTime = -1;
 
-    public UiLoopEventWithTimeTracking(Context context, long delay) {
+    public UiLoopEventWithTimeTracking(Object context, long delay) {
         super(context, delay);
     }
 
