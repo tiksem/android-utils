@@ -28,6 +28,7 @@ import android.provider.MediaStore;
 import android.view.View;
 import android.view.Window;
 import com.utilsframework.android.R;
+import com.utilsframework.android.bitmap.BitmapUtilities;
 import com.utilsframework.android.crop.util.Log;
 
 import java.io.IOException;
@@ -118,7 +119,7 @@ public class CropImageActivity extends MonitoredActivity {
 
         sourceUri = intent.getData();
         if (sourceUri != null) {
-            exifRotation = CropUtil.getExifRotation(CropUtil.getFromMediaUri(getContentResolver(), sourceUri));
+            exifRotation = BitmapUtilities.getExifRotation(CropUtil.getFromMediaUri(getContentResolver(), sourceUri));
 
             InputStream is = null;
             try {
@@ -405,6 +406,7 @@ public class CropImageActivity extends MonitoredActivity {
             try {
                 outputStream = getContentResolver().openOutputStream(saveUri);
                 if (outputStream != null) {
+                    //croppedImage = BitmapUtilities.rotateBitmap(croppedImage, exifRotation);
                     croppedImage.compress(Bitmap.CompressFormat.JPEG, 90, outputStream);
                 }
             } catch (IOException e) {
@@ -416,7 +418,7 @@ public class CropImageActivity extends MonitoredActivity {
 
             if (!IN_MEMORY_CROP) {
                 // In-memory crop negates the rotation
-                CropUtil.copyExifRotation(
+                BitmapUtilities.copyExifRotation(
                         CropUtil.getFromMediaUri(getContentResolver(), sourceUri),
                         CropUtil.getFromMediaUri(getContentResolver(), saveUri)
                 );

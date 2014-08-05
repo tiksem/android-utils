@@ -47,41 +47,6 @@ class CropUtil {
         }
     }
 
-    public static int getExifRotation(File imageFile) {
-        if (imageFile == null) return 0;
-        try {
-            ExifInterface exif = new ExifInterface(imageFile.getAbsolutePath());
-            // We only recognize a subset of orientation tag values
-            switch (exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_UNDEFINED)) {
-                case ExifInterface.ORIENTATION_ROTATE_90:
-                    return 90;
-                case ExifInterface.ORIENTATION_ROTATE_180:
-                    return 180;
-                case ExifInterface.ORIENTATION_ROTATE_270:
-                    return 270;
-                default:
-                    return ExifInterface.ORIENTATION_UNDEFINED;
-            }
-        } catch (IOException e) {
-            Log.e("Error getting Exif data", e);
-            return 0;
-        }
-    }
-
-    public static boolean copyExifRotation(File sourceFile, File destFile) {
-        if (sourceFile == null || destFile == null) return false;
-        try {
-            ExifInterface exifSource = new ExifInterface(sourceFile.getAbsolutePath());
-            ExifInterface exifDest = new ExifInterface(destFile.getAbsolutePath());
-            exifDest.setAttribute(ExifInterface.TAG_ORIENTATION, exifSource.getAttribute(ExifInterface.TAG_ORIENTATION));
-            exifDest.saveAttributes();
-            return true;
-        } catch (IOException e) {
-            Log.e("Error copying Exif data", e);
-            return false;
-        }
-    }
-
     public static File getFromMediaUri(ContentResolver resolver, Uri uri) {
         if (uri == null) return null;
 

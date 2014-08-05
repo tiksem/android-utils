@@ -54,38 +54,12 @@ public class BitmapUtilities {
     }
 
     public static Bitmap rotateBitmapUsingExif(Uri path, Bitmap bitmap) {
-        Bitmap rotatedBitmap = null;
         Matrix matrix = new Matrix();
 
-        ExifInterface exif = null;
-        int orientation = 1;
+        int rotation = getExifRotation(new File(path.getPath()));
+        matrix.preRotate(rotation);
 
-        try {
-            if (path != null) {
-                exif = new ExifInterface(path.toString());
-            }
-            if (exif != null) {
-                orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, 0);
-                switch (orientation) {
-                    case ExifInterface.ORIENTATION_ROTATE_270: {
-                        matrix.preRotate(270);
-                        break;
-                    }
-                    case ExifInterface.ORIENTATION_ROTATE_90: {
-                        matrix.preRotate(90);
-                        break;
-                    }
-                    case ExifInterface.ORIENTATION_ROTATE_180: {
-                        matrix.preRotate(180);
-                        break;
-                    }
-                }
-                rotatedBitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return rotatedBitmap;
+        return Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
     }
 
     public static Bitmap resizeBitmap(Context ctx, int resourceId, int reqWidth, int reqHeight) {
@@ -290,6 +264,41 @@ public class BitmapUtilities {
         }
 
         return rotatedBitmap;
+    }
+
+    public static int getExifRotation(File imageFile) {
+        if (imageFile == null) return 0;
+        try {
+            ExifInterface exif = new ExifInterface(imageFile.getAbsolutePath());
+            // We only recognize a subset of orientation tag values
+            switch (exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_UNDEFINED)) {
+                case ExifInterface.ORIENTATION_ROTATE_90:
+                    return 90;
+                case ExifInterface.ORIENTATION_ROTATE_180:
+                    return 180;
+                case ExifInterface.ORIENTATION_ROTATE_270:
+                    return 270;
+                default:
+                    return ExifInterface.ORIENTATION_UNDEFINED;
+            }
+        } catch (IOException e) {
+            com.utilsframework.android.crop.util.Log.e("Error getting Exif data", e);
+            return 0;
+        }
+    }
+
+    public static boolean copyExifRotation(File sourceFile, File destFile) {
+        if (sourceFile == null || destFile == null) return false;
+        try {
+            ExifInterface exifSource = new ExifInterface(sourceFile.getAbsolutePath());
+            ExifInterface exifDest = new ExifInterface(destFile.getAbsolutePath());
+            exifDest.setAttribute(ExifInterface.TAG_ORIENTATION, exifSource.getAttribute(ExifInterface.TAG_ORIENTATION));
+            exifDest.saveAttributes();
+            return true;
+        } catch (IOException e) {
+            com.utilsframework.android.crop.util.Log.e("Error copying Exif data", e);
+            return false;
+        }
     }
 
     public interface OnBitmapReady {
@@ -607,6 +616,10 @@ public class BitmapUtilities {
     }
 
     public static Bitmap rotateBitmap(Bitmap bitmap, int degrees){
+        if(degrees == 0){
+            return bitmap;
+        }
+
         Matrix matrix = new Matrix();
         matrix.postRotate(degrees);
         return Bitmap.createBitmap(bitmap , 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);

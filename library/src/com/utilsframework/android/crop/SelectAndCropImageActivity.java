@@ -10,6 +10,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.FrameLayout;
@@ -166,29 +167,6 @@ public class SelectAndCropImageActivity extends Activity {
                 if (requestCode == ImagePicker.REQUEST_PICK) {
                     beginCrop(result.getData());
                 } else {
-                    InputStream input = null;
-                    try {
-                        input = getContentResolver().openInputStream(Uri.fromFile(new File(cameraPath)));
-                    } catch (FileNotFoundException e) {
-                        e.printStackTrace();
-                    }
-                    if (input == null) throw new IllegalStateException("WTF!");
-                    Bitmap decodeBitmap = BitmapFactory.decodeStream(input);
-                    Bitmap rotatedBmp = BitmapUtilities.rotateBitmapUsingExif(Uri.fromFile(new File(cameraPath)), decodeBitmap);
-
-                    File file = new File(cameraPath);
-                    if (file.exists()) {
-                        file.delete();
-                    }
-                    try {
-                        FileOutputStream out = new FileOutputStream(file);
-                        rotatedBmp.compress(Bitmap.CompressFormat.JPEG, 100, out);
-                        out.flush();
-                        out.close();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-
                     beginCrop(Uri.fromFile(new File(cameraPath)));
                 }
             } else {
@@ -210,12 +188,15 @@ public class SelectAndCropImageActivity extends Activity {
     private void handleCrop(int resultCode, Intent result) {
         if (resultCode == RESULT_OK) {
             Intent intent = new Intent();
-            intent.setData(Crop.getOutput(result));
+            Uri output = Crop.getOutput(result);
+            intent.setData(output);
+
             setResult(resultCode, intent);
         } else if (resultCode == Crop.RESULT_ERROR) {
             Toast.makeText(this, Crop.getError(result).getMessage(), Toast.LENGTH_SHORT).show();
             setResult(resultCode);
         }
+
         finish();
     }
 
