@@ -53,6 +53,41 @@ public class BitmapUtilities {
         return true;
     }
 
+    public static Bitmap rotateBitmapUsingExif(Uri path, Bitmap bitmap) {
+        Bitmap rotatedBitmap = null;
+        Matrix matrix = new Matrix();
+
+        ExifInterface exif = null;
+        int orientation = 1;
+
+        try {
+            if (path != null) {
+                exif = new ExifInterface(path.toString());
+            }
+            if (exif != null) {
+                orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, 0);
+                switch (orientation) {
+                    case ExifInterface.ORIENTATION_ROTATE_270: {
+                        matrix.preRotate(270);
+                        break;
+                    }
+                    case ExifInterface.ORIENTATION_ROTATE_90: {
+                        matrix.preRotate(90);
+                        break;
+                    }
+                    case ExifInterface.ORIENTATION_ROTATE_180: {
+                        matrix.preRotate(180);
+                        break;
+                    }
+                }
+                rotatedBitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return rotatedBitmap;
+    }
+
     public static Bitmap resizeBitmap(Context ctx, int resourceId, int reqWidth, int reqHeight) {
         BitmapFactory.Options opt = new BitmapFactory.Options();
         opt.inJustDecodeBounds = true;

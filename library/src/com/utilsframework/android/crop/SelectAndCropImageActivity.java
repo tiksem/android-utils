@@ -3,6 +3,8 @@ package com.utilsframework.android.crop;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Point;
 import android.net.Uri;
 import android.os.Bundle;
@@ -14,12 +16,16 @@ import android.widget.FrameLayout;
 import android.widget.Toast;
 import com.utilsframework.android.ImagePicker;
 import com.utilsframework.android.R;
+import com.utilsframework.android.bitmap.BitmapUtilities;
 import com.utilsframework.android.view.Alerts;
 import com.utilsframework.android.view.GuiUtilities;
 import com.utilsframework.android.view.OnNo;
 import com.utilsframework.android.view.OnYes;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.InputStream;
 
 public class SelectAndCropImageActivity extends Activity {
     public static final String ASPECT_RATIO_KEY = "ASPECT_RATIO_KEY";
@@ -29,9 +35,15 @@ public class SelectAndCropImageActivity extends Activity {
     private boolean shouldTakeImageFromCamera = false;
     private String cameraPath;
 
+    public enum ImportPhotoMode {
+        FROM_GALLERY,
+        FROM_CAMERA,
+        SHOW_ALERT
+    }
+
     public static class Params {
         public Point aspectRatio = null;
-        public boolean shouldShowGalleryCameraAlert = false;
+        public ImportPhotoMode importPhotoMode;
         public String galleryCameraAlertText = "Pick image using";
     }
 
@@ -42,7 +54,7 @@ public class SelectAndCropImageActivity extends Activity {
         final Intent intent = new Intent(context, SelectAndCropImageActivity.class);
         intent.putExtra(ASPECT_RATIO_KEY, params.aspectRatio);
 
-        if(params.shouldShowGalleryCameraAlert){
+        if(params.importPhotoMode == ImportPhotoMode.SHOW_ALERT){
             String galleryCameraAlertText = params.galleryCameraAlertText;
             if(galleryCameraAlertText == null){
                 galleryCameraAlertText = "";
@@ -67,6 +79,10 @@ public class SelectAndCropImageActivity extends Activity {
             settings.title = galleryCameraAlertText;
             Alerts.showYesNoAlert(context, settings);
         } else {
+            if(params.importPhotoMode == ImportPhotoMode.FROM_CAMERA){
+                intent.putExtra(SHOULD_PICK_IMAGE_FROM_CAMERA, true);
+            }
+
             GuiUtilities.startActivityForResult(activity, fragment, intent, requestCode);
         }
     }
@@ -150,6 +166,29 @@ public class SelectAndCropImageActivity extends Activity {
                 if (requestCode == ImagePicker.REQUEST_PICK) {
                     beginCrop(result.getData());
                 } else {
+                    InputStream input = null;
+                    try {
+                        input = getContentResolver().openInputStream(Uri.fromFile(new File(cameraPath)));
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                    }
+                    if (input == null) throw new IllegalStateException("WTF!");
+                    Bitmap decodeBitmap = BitmapFactory.decodeStream(input);
+                    Bitmap rotatedBmp = BitmapUtilities.rotateBitmapUsingExif(Uri.fromFile(new File(cameraPath)), decodeBitmap);
+
+                    File file = new File(cameraPath);
+                    if (file.exists()) {
+                        file.delete();
+                    }
+                    try {
+                        FileOutputStream out = new FileOutputStream(file);
+                        rotatedBmp.compress(Bitmap.CompressFormat.JPEG, 100, out);
+                        out.flush();
+                        out.close();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
                     beginCrop(Uri.fromFile(new File(cameraPath)));
                 }
             } else {
@@ -160,8 +199,11 @@ public class SelectAndCropImageActivity extends Activity {
         }
     }
 
+
+
     private void beginCrop(Uri source) {
         Uri outputUri = Uri.fromFile(new File(getCacheDir(), "cropped"));
+
         new Crop(source).output(outputUri).withAspect(aspectRatio.x, aspectRatio.y).start(this);
     }
 
