@@ -25,6 +25,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.MediaStore;
+import android.view.Display;
 import android.view.View;
 import android.view.Window;
 import com.utilsframework.android.R;
@@ -151,12 +152,21 @@ public class CropImageActivity extends MonitoredActivity {
             CropUtil.closeSilently(is);
         }
 
-        int maxSize = getMaxImageSize();
+        int maxSize = getMaxImageSize2();
         int sampleSize = 1;
         while (options.outHeight / sampleSize > maxSize || options.outWidth / sampleSize > maxSize) {
             sampleSize = sampleSize << 1;
         }
         return sampleSize;
+    }
+
+    private int getMaxImageSize2() {
+        Display display = getWindowManager().getDefaultDisplay();
+        Point size = new Point();
+        display.getSize(size);
+        int width = size.x;
+        int height = size.y;
+        return Math.max(width, height);
     }
 
     private int getMaxImageSize() {
