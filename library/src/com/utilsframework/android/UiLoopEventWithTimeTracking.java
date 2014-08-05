@@ -81,4 +81,15 @@ public class UiLoopEventWithTimeTracking extends UiLoopEvent{
     public long getLastPauseTime() {
         return pauseTime;
     }
+
+    public void reset() {
+        if(endTime >= 0){
+            return;
+        }
+
+        startTime = System.currentTimeMillis();
+        endTime = -1;
+        pauseTimeSum = 0;
+        pauseTime = -1;
+    }
 }

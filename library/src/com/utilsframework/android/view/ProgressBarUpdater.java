@@ -50,5 +50,9 @@ public abstract class ProgressBarUpdater {
         updater.stop();
     }
 
+    public void reset() {
+        updater.reset();
+    }
+
     public abstract int getMax();
 }
