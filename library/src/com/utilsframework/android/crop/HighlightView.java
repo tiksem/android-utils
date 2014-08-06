@@ -83,7 +83,7 @@ class HighlightView {
             showThirds = attributes.getBoolean(R.styleable.CropImageView_showThirds, false);
             highlightColor = attributes.getColor(R.styleable.CropImageView_highlightColor,
                     DEFAULT_HIGHLIGHT_COLOR);
-            handleMode = HandleMode.values()[attributes.getInt(R.styleable.CropImageView_showHandles, 0)];
+            handleMode = HandleMode.Always;
         } finally {
             attributes.recycle();
         }
