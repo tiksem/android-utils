@@ -7,10 +7,10 @@ package com.utilsframework.android.view;
 * Time: 19:03
 * To change this template use File | Settings | File Templates.
 */
+
 public interface OnPressStateListener {
     public void onButtonDown();
     public void onButtonUp();
     public void onMoveButtonShow(boolean b);
     public void onMoveButtonHide();
-
 }

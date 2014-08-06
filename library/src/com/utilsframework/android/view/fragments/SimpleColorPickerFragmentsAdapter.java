@@ -17,7 +17,7 @@ public class SimpleColorPickerFragmentsAdapter extends ColorPickerFragmentsAdapt
     }
 
     @Override
-    public View getView(int index, double sizeInPercents) {
+    public View getView(int index, double sizeInPercents, int size) {
         int color = getColor(index);
         TextView result = new TextView(context);
         result.setBackgroundColor(color);

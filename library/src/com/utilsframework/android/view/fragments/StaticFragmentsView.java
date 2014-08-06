@@ -166,7 +166,7 @@ public class StaticFragmentsView extends LinearLayout{
             View view;
 
             if (fragmentsProvider == null) {
-                view = fragmentsAdapter.getView(index, fragment);
+                view = fragmentsAdapter.getView(index, fragment, fragments.size());
             } else {
                 view = getChildAt(index);
             }
@@ -229,7 +229,7 @@ public class StaticFragmentsView extends LinearLayout{
 
         fragmentsAdapter = new FragmentsAdapter() {
             @Override
-            public View getView(int index, double sizeInPercents) {
+            public View getView(int index, double sizeInPercents, int size) {
                 throw new UnsupportedOperationException();
             }
 

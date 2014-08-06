@@ -10,6 +10,6 @@ import java.util.List;
 * Time: 13:52
 */
 public interface FragmentsAdapter {
-    View getView(int index, double sizeInPercents);
+    View getView(int index, double sizeInPercents, int size);
     List<Float> getFragments();
 }

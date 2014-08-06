@@ -90,8 +90,8 @@ public abstract class FragmentedEntityProgressView extends FrameLayout{
 
     private class FragmentsAdapterWrapper implements FragmentsAdapter{
         @Override
-        public View getView(int index, double sizeInPercents) {
-            return fragmentsAdapter.getView(index, sizeInPercents);
+        public View getView(int index, double sizeInPercents, int size) {
+            return fragmentsAdapter.getView(index, sizeInPercents, size);
         }
 
         @Override
