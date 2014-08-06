@@ -9,6 +9,8 @@ package com.utilsframework.android.view;
 */
 public interface OnPressStateListener {
     public void onButtonDown();
-
     public void onButtonUp();
+    public void onMoveButtonShow(boolean b);
+    public void onMoveButtonHide();
+
 }
