@@ -95,6 +95,6 @@ public class PausedStateToggleButton extends ToggleButton{
     }
 
     protected void onCanPauseStateChanged(boolean value){
-        setVisibility(value ? View.VISIBLE : View.GONE);
+        //setVisibility(value ? View.VISIBLE : View.GONE);
     }
 }
