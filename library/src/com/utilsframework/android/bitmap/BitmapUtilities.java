@@ -647,4 +647,11 @@ public class BitmapUtilities {
 
         return solidBitmap;
     }
+
+    public static Bitmap decodeFileAndApplyExif(String path) {
+        Bitmap result =  BitmapFactory.decodeFile(path);
+        int rotation = BitmapUtilities.getExifRotation(new File(path));
+        result = BitmapUtilities.rotateBitmap(result, rotation);
+        return result;
+    }
 }
