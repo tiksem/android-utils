@@ -20,7 +20,7 @@ public final class MediaPicker {
         try {
             activity.startActivityForResult(intent, requestCode);
         } catch (ActivityNotFoundException e) {
-            Toast.makeText(activity, "Invalid video selected", Toast.LENGTH_SHORT).show();
+            Toast.makeText(activity, "Unsupported", Toast.LENGTH_SHORT).show();
         }
     }
 }
