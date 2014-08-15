@@ -243,4 +243,18 @@ public class MediaUtils {
             }
         };
     }
+
+    public static MediaFormat selectAudioTrack(MediaExtractor mediaExtractor) {
+        int audioTrackCount = mediaExtractor.getTrackCount();
+        MediaFormat format = null;
+        for (int i = 0; i < audioTrackCount; i++) {
+            format = mediaExtractor.getTrackFormat(i);
+            String mime = format.getString(MediaFormat.KEY_MIME);
+            if (mime.startsWith("audio/")){
+                mediaExtractor.selectTrack(i);
+            }
+        }
+
+        return format;
+    }
 }
