@@ -1,5 +1,7 @@
 <resources>
 
     <dimen name="crop__bar_height">48dp</dimen>
+    <dimen name="toast_padding">18dp</dimen>
+    <dimen name="toast_text">22sp</dimen>
 
 </resources>
