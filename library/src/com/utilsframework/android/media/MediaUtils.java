@@ -257,4 +257,14 @@ public class MediaUtils {
 
         return format;
     }
+
+    public static MediaFormat selectAudioTrackOrThrow(String trackPath,
+                                                      MediaExtractor mediaExtractor) throws IOException {
+        MediaFormat mediaFormat = selectAudioTrack(mediaExtractor);
+        if (mediaFormat == null) {
+            throw new IOException(trackPath + " track doesn't contain audio");
+        }
+
+        return mediaFormat;
+    }
 }
