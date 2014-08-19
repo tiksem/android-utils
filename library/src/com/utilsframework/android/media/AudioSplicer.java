@@ -15,13 +15,14 @@ import java.nio.ByteBuffer;
  * Time: 17:57
  */
 public class AudioSplicer {
+    private static final String TAG = "AudioSplicer";
     private MediaMuxer mediaMuxer;
 
     public AudioSplicer(MediaMuxer mediaMuxer) {
         this.mediaMuxer = mediaMuxer;
     }
 
-    public void writeTrack(String trackPath) throws IOException {
+    public void writeTrack(String trackPath, int trackStart, int maxTrackDurationUS) throws IOException {
         MediaExtractor mediaExtractor = new MediaExtractor();
         mediaExtractor.setDataSource(trackPath);
         MediaUtils.selectAudioTrackOrThrow(trackPath, mediaExtractor);
