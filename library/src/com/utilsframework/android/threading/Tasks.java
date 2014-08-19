@@ -188,8 +188,37 @@ public class Tasks {
         }
     }
 
+    public interface OnException<T extends Throwable> {
+        public boolean onException(T exception); //return true to stop execution
+    }
+
+    public static <T extends Throwable> void executeThrowingRunnableQueue(Iterable<ThrowingRunnable<T>> runnables,
+                                                                          OnException<T> onException) {
+        for(ThrowingRunnable<T> runnable : runnables){
+            try {
+                runnable.run();
+            } catch (Throwable throwable) {
+                if(throwable instanceof RuntimeException){
+                    throw (RuntimeException) throwable;
+                } else if(throwable instanceof Error) {
+                    throw (Error) throwable;
+                } else {
+                    if(onException.onException((T) throwable)) {
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
     public static void executeAndClearQueue(Collection<Runnable> runnables){
         executeRunnableQueue(runnables);
+        runnables.clear();
+    }
+
+    public static <T extends Throwable> void executeAndClearThrowingRunnableQueue(
+            Collection<ThrowingRunnable<T>> runnables, OnException<T> onException) {
+        executeThrowingRunnableQueue(runnables, onException);
         runnables.clear();
     }
 }

@@ -244,18 +244,27 @@ public class MediaUtils {
         };
     }
 
-    public static MediaFormat selectAudioTrack(MediaExtractor mediaExtractor) {
+    public static MediaFormat selectTrack(MediaExtractor mediaExtractor, String mimeType) {
         int audioTrackCount = mediaExtractor.getTrackCount();
         MediaFormat format = null;
         for (int i = 0; i < audioTrackCount; i++) {
             format = mediaExtractor.getTrackFormat(i);
             String mime = format.getString(MediaFormat.KEY_MIME);
-            if (mime.startsWith("audio/")){
+            if (mime.startsWith(mimeType)){
                 mediaExtractor.selectTrack(i);
+                break;
             }
         }
 
         return format;
+    }
+
+    public static MediaFormat selectAudioTrack(MediaExtractor mediaExtractor) {
+        return selectTrack(mediaExtractor, "audio/");
+    }
+
+    public static MediaFormat selectVideoTrack(MediaExtractor mediaExtractor) {
+        return selectTrack(mediaExtractor, "video/");
     }
 
     public static MediaFormat selectAudioTrackOrThrow(String trackPath,
@@ -263,6 +272,16 @@ public class MediaUtils {
         MediaFormat mediaFormat = selectAudioTrack(mediaExtractor);
         if (mediaFormat == null) {
             throw new IOException(trackPath + " track doesn't contain audio");
+        }
+
+        return mediaFormat;
+    }
+
+    public static MediaFormat selectVideoTrackOrThrow(String trackPath,
+                                                      MediaExtractor mediaExtractor) throws IOException {
+        MediaFormat mediaFormat = selectVideoTrack(mediaExtractor);
+        if (mediaFormat == null) {
+            throw new IOException(trackPath + " track doesn't contain video");
         }
 
         return mediaFormat;
