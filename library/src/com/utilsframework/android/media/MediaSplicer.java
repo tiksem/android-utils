@@ -76,8 +76,7 @@ public class MediaSplicer {
                 throw new NullPointerException();
             }
 
-            final MediaExtractor mediaExtractor = new MediaExtractor();
-            mediaExtractor.setDataSource(path);
+            final MediaExtractor mediaExtractor = getMediaExtractor(path);
 
             MediaFormat mediaFormat;
             if (trackType == TrackType.AUDIO) {
