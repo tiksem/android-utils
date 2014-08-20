@@ -24,6 +24,7 @@ import android.content.pm.PackageManager;
 import android.graphics.*;
 import android.net.Uri;
 import android.opengl.GLES10;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -32,6 +33,8 @@ import android.provider.MediaStore;
 import android.view.Display;
 import android.view.View;
 import android.view.Window;
+import android.widget.RelativeLayout;
+
 import com.utilsframework.android.R;
 import com.utilsframework.android.bitmap.BitmapUtilities;
 import com.utilsframework.android.crop.util.Log;
@@ -42,12 +45,13 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URI;
 import java.util.concurrent.CountDownLatch;
 
 /*
  * Modified from original in AOSP.
  */
-public class CropImageActivity extends MonitoredActivity {
+public class CropImageActivity extends MonitoredActivity{
 
     private static final boolean IN_MEMORY_CROP = Build.VERSION.SDK_INT < Build.VERSION_CODES.GINGERBREAD_MR1;
     private static final int SIZE_DEFAULT = 2048;
@@ -75,6 +79,9 @@ public class CropImageActivity extends MonitoredActivity {
     private CropImageView imageView;
     private HighlightView cropView;
 
+    private RelativeLayout mRLProgress;
+
+
     @Override
     public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
@@ -82,15 +89,36 @@ public class CropImageActivity extends MonitoredActivity {
         setContentView(R.layout.crop__activity_crop);
         initViews();
 
-        setupFromIntent();
-        if (rotateBitmap == null) {
-            finish();
-            return;
-        }
-        startCrop();
+        new AsyncSetup().execute(getIntent().getData());
     }
 
+
+
+    private class AsyncSetup extends AsyncTask<Uri, Void, Uri>{
+
+        @Override
+        protected Uri doInBackground(Uri... params) {
+            return copyCulc(params[0]);
+        }
+
+        @Override
+        protected void onPostExecute(Uri uri) {
+            sourceUri = copyCulc(uri);
+            setupFromIntent();
+            if (rotateBitmap == null) {
+                finish();
+                return;
+            }
+            startCrop();
+            mRLProgress.setVisibility(View.GONE);
+        }
+
+    }
+
+
+
     private void initViews() {
+        mRLProgress = (RelativeLayout) findViewById(R.id.RLProgress);
         imageView = (CropImageView) findViewById(R.id.crop_image);
         imageView.context = this;
         imageView.setRecycler(new ImageViewTouchBase.Recycler() {
@@ -141,7 +169,7 @@ public class CropImageActivity extends MonitoredActivity {
             saveUri = extras.getParcelable(MediaStore.EXTRA_OUTPUT);
         }
 
-        sourceUri = copyCulc(intent.getData());
+
 
         if (sourceUri != null) {
             exifRotation = BitmapUtilities.getExifRotation(CropUtil.getFromMediaUri(getContentResolver(), sourceUri));

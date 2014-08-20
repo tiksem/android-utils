@@ -5,5 +5,5 @@
     <color name="crop__selector_pressed">#1a000000</color>
     <color name="crop__selector_focused">#77000000</color>
     <color name="highlight">#f3f3f3</color>
-
+    <color name="transparent_grey">#32000000</color>
 </resources>
