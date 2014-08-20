@@ -17,12 +17,16 @@
 package com.utilsframework.android.crop;
 
 import android.annotation.TargetApi;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.graphics.*;
 import android.net.Uri;
 import android.opengl.GLES10;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.provider.MediaStore;
 import android.view.Display;
@@ -32,6 +36,9 @@ import com.utilsframework.android.R;
 import com.utilsframework.android.bitmap.BitmapUtilities;
 import com.utilsframework.android.crop.util.Log;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -58,6 +65,8 @@ public class CropImageActivity extends MonitoredActivity {
 
     private Uri sourceUri;
     private Uri saveUri;
+
+    private String mCopiedBitmapPath = null;
 
     private boolean isSaving;
 
@@ -106,9 +115,23 @@ public class CropImageActivity extends MonitoredActivity {
         });
     }
 
+
+    private static String createAppDirectory(Context context, String dirName) {
+        PackageManager m = context.getPackageManager();
+        String s = context.getPackageName();
+        try {
+            PackageInfo p = m.getPackageInfo(s, 0);
+            s = p.applicationInfo.dataDir;
+        } catch (PackageManager.NameNotFoundException e) {
+            android.util.Log.w("ERROR", "Error Package name not found ", e);
+        }
+        return s + dirName;
+    }
+
     private void setupFromIntent() {
         Intent intent = getIntent();
         Bundle extras = intent.getExtras();
+
 
         if (extras != null) {
             aspectX = extras.getInt(Crop.Extra.ASPECT_X);
@@ -118,7 +141,8 @@ public class CropImageActivity extends MonitoredActivity {
             saveUri = extras.getParcelable(MediaStore.EXTRA_OUTPUT);
         }
 
-        sourceUri = intent.getData();
+        sourceUri = copyCulc(intent.getData());
+
         if (sourceUri != null) {
             exifRotation = BitmapUtilities.getExifRotation(CropUtil.getFromMediaUri(getContentResolver(), sourceUri));
 
@@ -139,6 +163,149 @@ public class CropImageActivity extends MonitoredActivity {
                 CropUtil.closeSilently(is);
             }
         }
+    }
+
+
+    private static int MAX_ORIGIN_SIZE = 2048;
+
+    private Uri copyCulc(Uri bitmapUri) {
+        InputStream is = null;
+
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+
+        try{
+            is = getContentResolver().openInputStream(bitmapUri);
+            BitmapFactory.decodeStream(is, null, options);
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } finally {
+            CropUtil.closeSilently(is);
+        }
+
+        int imageHeight = options.outHeight;
+        int imageWidth = options.outWidth;
+
+
+        if(imageHeight > MAX_ORIGIN_SIZE || imageWidth > MAX_ORIGIN_SIZE){
+            options.inSampleSize = calculateInSampleSize(imageWidth, imageHeight);
+        }
+        else{
+            return bitmapUri;
+        }
+
+        options.inJustDecodeBounds = false;
+        is = null;
+        Bitmap bm = null;
+
+        try{
+            is = getContentResolver().openInputStream(bitmapUri);
+            bm = BitmapFactory.decodeStream(is, null, options);
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } finally {
+            CropUtil.closeSilently(is);
+        }
+
+        if((imageHeight > MAX_ORIGIN_SIZE || imageWidth > MAX_ORIGIN_SIZE) && bm != null){
+            double mult = culcMult(imageWidth, imageHeight);
+
+            Double newWidthDouble = imageWidth / mult;
+            Double newHeightDouble = imageHeight / mult;
+
+            int newWidth = newWidthDouble.intValue();
+            int newHeight = newHeightDouble.intValue();
+
+            bm = Bitmap.createScaledBitmap(bm, newWidth, newHeight, false);
+
+        }
+
+        if(bm != null) {
+            String copyPath = saveBitmapCopy(bm);
+
+            bm.recycle();
+
+            mCopiedBitmapPath = copyPath;
+            Uri copyUri = Uri.fromFile(new File(copyPath));
+
+            if (!IN_MEMORY_CROP) {
+                BitmapUtilities.copyExifRotation(
+                        CropUtil.getFromMediaUri(getContentResolver(), bitmapUri),
+                        CropUtil.getFromMediaUri(getContentResolver(), copyUri)
+                );
+            }
+
+            return copyUri;
+
+        }
+        else{
+            return null;
+        }
+
+    }
+
+    private String saveBitmapCopy(Bitmap bitmap){
+        String pathroot = createAppDirectory(this, File.separator + "image_cache");
+        File root = new File(pathroot);
+
+        if(!root.exists())
+            root.mkdirs();
+
+        String path = pathroot +  File.separator + "copy.png";
+        File dest = new File(path);
+
+        OutputStream out = null;
+
+        try {
+            out = new FileOutputStream(dest);
+            bitmap.compress(Bitmap.CompressFormat.PNG, 0, out);
+            out.flush();
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        finally {
+            if(out != null){
+                try {
+                    out.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        return path;
+    }
+
+    private int calculateInSampleSize(int width, int height) {
+        int inSampleSize = 1;
+
+
+        final int halfHeight = height;
+        final int halfWidth = width;
+
+        while ((halfHeight / inSampleSize) > MAX_ORIGIN_SIZE && (halfWidth / inSampleSize) > MAX_ORIGIN_SIZE) {
+            inSampleSize *= 2;
+        }
+
+        return inSampleSize;
+    }
+
+    private double culcMult(int width, int height){
+
+        double largest;
+        if(width > height){
+            largest = width;
+        }
+        else{
+            largest = height;
+        }
+
+        return largest / MAX_ORIGIN_SIZE;
     }
 
     private int calculateBitmapSampleSize(Uri bitmapUri) throws IOException {
@@ -432,6 +599,13 @@ public class CropImageActivity extends MonitoredActivity {
                         CropUtil.getFromMediaUri(getContentResolver(), sourceUri),
                         CropUtil.getFromMediaUri(getContentResolver(), saveUri)
                 );
+            }
+
+            if(mCopiedBitmapPath != null){
+                File file = new File(mCopiedBitmapPath);
+
+                if(file.exists())
+                    file.delete();
             }
 
             setResultUri(saveUri);
