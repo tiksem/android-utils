@@ -22,8 +22,9 @@ import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.*;
+import android.graphics.Matrix;
 import android.net.Uri;
-import android.opengl.GLES10;
+import android.opengl.*;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -103,7 +104,7 @@ public class CropImageActivity extends MonitoredActivity{
 
         @Override
         protected void onPostExecute(Uri uri) {
-            sourceUri = copyCulc(uri);
+            sourceUri = uri;
             setupFromIntent();
             if (rotateBitmap == null) {
                 finish();
@@ -172,6 +173,7 @@ public class CropImageActivity extends MonitoredActivity{
 
 
         if (sourceUri != null) {
+
             exifRotation = BitmapUtilities.getExifRotation(CropUtil.getFromMediaUri(getContentResolver(), sourceUri));
 
             InputStream is = null;
@@ -251,19 +253,19 @@ public class CropImageActivity extends MonitoredActivity{
         }
 
         if(bm != null) {
+
+            int exifRotate = BitmapUtilities.getExifRotation(CropUtil.getFromMediaUri(getContentResolver(), bitmapUri));
+
+            Matrix matrix = new Matrix();
+            matrix.postRotate(exifRotate);
+            bm = Bitmap.createBitmap(bm, 0, 0, bm.getWidth(), bm.getHeight(), matrix, true);
+
             String copyPath = saveBitmapCopy(bm);
 
             bm.recycle();
 
             mCopiedBitmapPath = copyPath;
             Uri copyUri = Uri.fromFile(new File(copyPath));
-
-            if (!IN_MEMORY_CROP) {
-                BitmapUtilities.copyExifRotation(
-                        CropUtil.getFromMediaUri(getContentResolver(), bitmapUri),
-                        CropUtil.getFromMediaUri(getContentResolver(), copyUri)
-                );
-            }
 
             return copyUri;
 
