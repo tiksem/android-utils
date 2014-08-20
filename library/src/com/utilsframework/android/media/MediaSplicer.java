@@ -34,6 +34,7 @@ public class MediaSplicer {
     private String outputPath;
     private volatile boolean cancelRequested = false;
     private volatile boolean muxerStarted = false;
+    private long duration = 0;
 
     private enum  TrackType {
         AUDIO,
@@ -69,13 +70,14 @@ public class MediaSplicer {
             return mediaExtractor;
         }
 
-        private void addTrack(String path, final long trackStart, long maxTrackDurationUS, TrackType trackType)
+        private long addTrack(String path, final long trackStart, long maxTrackDurationUS, final TrackType trackType)
                 throws IOException {
             if(trackType == null){
                 throw new NullPointerException();
             }
 
-            final MediaExtractor mediaExtractor = getMediaExtractor(path);
+            final MediaExtractor mediaExtractor = new MediaExtractor();
+            mediaExtractor.setDataSource(path);
 
             MediaFormat mediaFormat;
             if (trackType == TrackType.AUDIO) {
@@ -109,18 +111,22 @@ public class MediaSplicer {
             splicingQueue.add(new ThrowingRunnable<IOException>() {
                 @Override
                 public void run() throws IOException {
-                    mediaExtractor.seekTo(trackStart, MediaExtractor.SEEK_TO_NEXT_SYNC);
+                    if (trackType == TrackType.AUDIO) {
+                        mediaExtractor.seekTo(trackStart, MediaExtractor.SEEK_TO_NEXT_SYNC);
+                    }
                     writeTrack(mediaExtractor, trackIndex, presentationTimeOffset, finalMaxTrackDurationUS);
                 }
             });
+
+            return finalMaxTrackDurationUS;
         }
 
-        public void addAudioTrack(String path, long trackStart, long maxTrackDurationUS) throws IOException {
-            addTrack(path, trackStart, maxTrackDurationUS, TrackType.AUDIO);
+        public long addAudioTrack(String path, long trackStart, long maxTrackDurationUS) throws IOException {
+            return addTrack(path, trackStart, maxTrackDurationUS, TrackType.AUDIO);
         }
 
-        public void addVideoTrack(String path, long trackStart, long maxTrackDurationUS) throws IOException {
-            addTrack(path, trackStart, maxTrackDurationUS, TrackType.VIDEO);
+        public long addVideoTrack(String path, long maxTrackDurationUS) throws IOException {
+            return addTrack(path, 0, maxTrackDurationUS, TrackType.VIDEO);
         }
     }
 
@@ -133,6 +139,13 @@ public class MediaSplicer {
     public void startSplicing(Builder builder, Tasks.OnException<IOException> onIoException) {
         if(builder.splicingQueue.isEmpty()){
             throw new IllegalStateException("Nothing has been set up for slicing");
+        }
+
+        duration = Math.max(builder.totalAudioDuration, builder.totalVideoDuration);
+        maxProgress = builder.totalAudioDuration + builder.totalVideoDuration;
+
+        if  (progressChangedListener != null) {
+            progressChangedListener.onProgressChanged(0, maxProgress);
         }
 
         mediaMuxer.start();
@@ -168,9 +181,11 @@ public class MediaSplicer {
 
         boolean sawEOS = false;
         int bufferSize = MAX_SAMPLE_SIZE;
-        int offset = 100;
+        int offset = 0;
         ByteBuffer dstBuf = ByteBuffer.allocate(bufferSize);
         MediaCodec.BufferInfo bufferInfo = new MediaCodec.BufferInfo();
+
+        long firstSampleTime = mediaExtractor.getSampleTime();
 
         while (!sawEOS) {
             if(cancelRequested){
@@ -185,7 +200,7 @@ public class MediaSplicer {
                 sawEOS = true;
                 bufferInfo.size = 0;
                 //increase total presentation time to total presentation time of last media file + 1 millisecond
-            } else if (mediaExtractor.getSampleTime() > maxTrackDurationUS) {
+            } else if (mediaExtractor.getSampleTime() - firstSampleTime > maxTrackDurationUS) {
                 //create fake EOS, because video total presentation time is over
                 Log.d(TAG, "fake input EOS.");
                 sawEOS = true;
@@ -193,13 +208,13 @@ public class MediaSplicer {
             } else {
                 long sampleTime = mediaExtractor.getSampleTime();
                 //presentation time calculate like total time of previous media file + getSampleTime()
-                bufferInfo.presentationTimeUs = sampleTime + presentationTimeOffset;
+                bufferInfo.presentationTimeUs = sampleTime + presentationTimeOffset - firstSampleTime;
                 bufferInfo.flags = mediaExtractor.getSampleFlags();
 
                 mediaMuxer.writeSampleData(trackIndex, dstBuf, bufferInfo);
                 mediaExtractor.advance();
 
-                currentProgress += sampleTime;
+                currentProgress += sampleTime - firstSampleTime;
 
                 if(progressChangedListener != null){
                     progressChangedListener.onProgressChanged(currentProgress, maxProgress);
@@ -228,8 +243,8 @@ public class MediaSplicer {
     }
 
     public interface AsyncBuilder {
-        void addAudioTrack(String path, long trackStart, long maxTrackDurationUS);
-        void addVideoTrack(String path, long trackStart, long maxTrackDurationUS);
+        long addAudioTrack(String path, long trackStart, long maxTrackDurationUS);
+        long addVideoTrack(String path, long maxTrackDurationUS);
     }
 
     public interface SplicingHandler {
@@ -301,29 +316,33 @@ public class MediaSplicer {
                 final Builder finalBuilder = builder;
                 splicingHandler.onBuild(new AsyncBuilder() {
                     @Override
-                    public void addAudioTrack(String path, long trackStart, long maxTrackDurationUS) {
+                    public long addAudioTrack(String path, long trackStart, long maxTrackDurationUS) {
                         if(exceptionHandlingResult){
-                            return;
+                            return -1;
                         }
 
                         try {
-                            finalBuilder.addAudioTrack(path, trackStart, maxTrackDurationUS);
+                            return finalBuilder.addAudioTrack(path, trackStart, maxTrackDurationUS);
                         } catch (IOException e) {
                             handleException(e, SplicingState.BUILD);
                         }
+
+                        return -1;
                     }
 
                     @Override
-                    public void addVideoTrack(String path, long trackStart, long maxTrackDurationUS) {
+                    public long addVideoTrack(String path, long maxTrackDurationUS) {
                         if(exceptionHandlingResult){
-                            return;
+                            return -1;
                         }
 
                         try {
-                            finalBuilder.addVideoTrack(path, trackStart, maxTrackDurationUS);
+                            return finalBuilder.addVideoTrack(path, maxTrackDurationUS);
                         } catch (IOException e) {
                             handleException(e, SplicingState.BUILD);
                         }
+
+                        return -1;
                     }
                 });
 
@@ -355,5 +374,9 @@ public class MediaSplicer {
         }).start();
 
         return mediaSplicer;
+    }
+
+    public long getDuration() {
+        return duration;
     }
 }

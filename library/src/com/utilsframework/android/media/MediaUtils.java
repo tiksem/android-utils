@@ -286,4 +286,9 @@ public class MediaUtils {
 
         return mediaFormat;
     }
+
+    public static void seekTo(MediaExtractor mediaExtractor, long timeUs) {
+
+        //mediaExtractor.readSampleData()
+    }
 }
