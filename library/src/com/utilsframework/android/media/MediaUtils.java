@@ -9,6 +9,7 @@ import android.os.Build;
 import com.utilsframework.android.threading.*;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
@@ -277,7 +278,17 @@ public class MediaUtils {
         return mediaFormat;
     }
 
-    public static MediaFormat selectVideoTrackOrThrow(String trackPath,
+    public static boolean isMediaFileBroken(MediaExtractor mediaExtractor, File file) {
+        try {
+            mediaExtractor.setDataSource(new FileInputStream(file).getFD());
+        } catch (IOException e) {
+            return true;
+        }
+
+        return mediaExtractor.getTrackCount() <= 0;
+    }
+
+ public static MediaFormat selectVideoTrackOrThrow(String trackPath,
                                                       MediaExtractor mediaExtractor) throws IOException {
         MediaFormat mediaFormat = selectVideoTrack(mediaExtractor);
         if (mediaFormat == null) {
@@ -285,10 +296,5 @@ public class MediaUtils {
         }
 
         return mediaFormat;
-    }
-
-    public static void seekTo(MediaExtractor mediaExtractor, long timeUs) {
-
-        //mediaExtractor.readSampleData()
     }
 }
