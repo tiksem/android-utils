@@ -426,4 +426,10 @@ public class GuiUtilities {
             fragment.startActivityForResult(intent, requestCode);
         }
     }
+
+    public static void setChildrenVisibility(SubMenu subMenu, boolean visibility) {
+        for(int i = 0; i < subMenu.size(); i++){
+            subMenu.getItem(i).setVisible(visibility);
+        }
+    }
 }
