@@ -12,4 +12,12 @@
         </attr>
     </declare-styleable>
 
+    <declare-styleable name="LayoutRadioButton">
+        <attr name="is_selected" format="boolean" />
+    </declare-styleable>
+
+    <declare-styleable name="LayoutRadioButtonGroup">
+        <attr name="selected_index" format="integer" />
+    </declare-styleable>
+
 </resources>
