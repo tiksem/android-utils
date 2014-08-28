@@ -28,6 +28,10 @@ public abstract class MediaPlayerProgressUpdater {
             public void run() {
                 boolean shouldCallUpdateListener = false;
 
+                if(!mediaPlayer.isPlaying()){
+                    return;
+                }
+
                 try {
                     long currentPosition = mediaPlayer.getCurrentPosition();
                     if(lastCurrentPosition != currentPosition){

@@ -1,9 +1,11 @@
 package com.utilsframework.android.media;
 
+import android.annotation.TargetApi;
 import android.media.MediaCodec;
 import android.media.MediaExtractor;
 import android.media.MediaFormat;
 import android.media.MediaMuxer;
+import android.os.Build;
 import android.os.Handler;
 import android.util.Log;
 import com.utilsframework.android.threading.Tasks;
@@ -49,6 +51,7 @@ public class MediaSplicer {
 
         private EnumMap<TrackType, Integer> trackIndexMap = new EnumMap<TrackType, Integer>(TrackType.class);
 
+        @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
         private int getTrackIndex(TrackType trackType, MediaFormat mediaFormat) {
             Integer trackIndex = trackIndexMap.get(trackType);
             if (trackIndex == null) {
@@ -59,6 +62,7 @@ public class MediaSplicer {
             return trackIndex;
         }
 
+        @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
         private MediaExtractor getMediaExtractor(String trackPath) throws IOException {
             MediaExtractor mediaExtractor = mediaExtractorMap.get(trackPath);
             if (mediaExtractor == null) {
@@ -70,6 +74,7 @@ public class MediaSplicer {
             return mediaExtractor;
         }
 
+        @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
         private long addTrack(String path, final long trackStart, long maxTrackDurationUS, final TrackType trackType)
                 throws IOException {
             if(trackType == null){
@@ -129,12 +134,14 @@ public class MediaSplicer {
         }
     }
 
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
     public Builder buildSplicing(String outputPath) throws IOException {
         mediaMuxer = new MediaMuxer(outputPath, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4);
         this.outputPath = outputPath;
         return new Builder();
     }
 
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
     public void startSplicing(Builder builder, Tasks.OnException<IOException> onIoException) {
         if(builder.splicingQueue.isEmpty()){
             throw new IllegalStateException("Nothing has been set up for slicing");
@@ -174,6 +181,7 @@ public class MediaSplicer {
         return cancelRequested;
     }
 
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
     private void writeTrack(MediaExtractor mediaExtractor, int trackIndex, long presentationTimeOffset,
                             long maxTrackDurationUS)
             throws IOException {
