@@ -9,6 +9,7 @@ import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.Fragment;
+import android.app.FragmentManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
@@ -463,5 +464,10 @@ public class GuiUtilities {
         }
 
         listView.setSelection(position - 1);
+    }
+
+    public static void replaceFragment(Activity activity, int id, Fragment newFragment) {
+        FragmentManager fragmentManager = activity.getFragmentManager();
+        fragmentManager.beginTransaction().replace(id, newFragment).commit();
     }
 }
