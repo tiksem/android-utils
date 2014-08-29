@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.Fragment;
 import android.content.Context;
@@ -22,6 +23,7 @@ import android.os.Build;
 import android.util.Log;
 import android.view.*;
 
+import android.widget.AbsListView;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import com.utils.framework.CollectionUtils;
@@ -243,17 +245,23 @@ public class GuiUtilities {
         return bitmap;
     }
 
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
+    public static void removeGlobalOnLayoutListener(View view,
+                                                    ViewTreeObserver.OnGlobalLayoutListener listener) {
+        try {
+            view.getViewTreeObserver().removeOnGlobalLayoutListener(listener);
+        } catch (NoSuchMethodError e) {
+            view.getViewTreeObserver().removeGlobalOnLayoutListener(listener);
+        }
+    }
+
     public static void executeWhenViewMeasured(final View view, final Runnable runnable) {
         if(view.getMeasuredHeight() == 0 || view.getMeasuredWidth() == 0){
             view.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
                 @Override
                 public void onGlobalLayout() {
                     runnable.run();
-                    try {
-                        view.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-                    } catch (NoSuchMethodError e) {
-                        view.getViewTreeObserver().removeGlobalOnLayoutListener(this);
-                    }
+                    removeGlobalOnLayoutListener(view, this);
                 }
             });
         } else {
@@ -282,10 +290,11 @@ public class GuiUtilities {
 
         if(view.getMeasuredHeight() == 0 || view.getMeasuredWidth() == 0){
             view.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+                @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
                 @Override
                 public void onGlobalLayout() {
                     asyncTask.execute();
-                    view.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                    removeGlobalOnLayoutListener(view, this);
                 }
             });
         } else {
@@ -322,7 +331,7 @@ public class GuiUtilities {
                             @Override
                             public void onGlobalLayout() {
                                 onFinish.onFinish(bitmap, imageView);
-                                imageView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                                removeGlobalOnLayoutListener(imageView, this);
                             }
                         });
             }
@@ -431,5 +440,15 @@ public class GuiUtilities {
         for(int i = 0; i < subMenu.size(); i++){
             subMenu.getItem(i).setVisible(visibility);
         }
+    }
+
+    public static void scrollListViewToPosition(AbsListView listView, int position){
+        if(position == 0){
+            position = 1;
+        } else if(position < 0) {
+            return;
+        }
+
+        listView.setSelection(position - 1);
     }
 }
