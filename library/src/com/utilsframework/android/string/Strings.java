@@ -110,4 +110,8 @@ public class Strings {
         array[index] = ch;
         return array.toString();
     }
+
+    public static long getLongFromString(String string) {
+        return Long.parseLong(string.replaceAll("[\\D]", ""));
+    }
 }
