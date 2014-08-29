@@ -234,6 +234,19 @@ public class GuiUtilities {
         return result;
     }
 
+    public static <T extends View> List<T> getChildrenAsList(final ViewGroup viewGroup, Class<T> aClass) {
+        int childCount = viewGroup.getChildCount();
+        List<T> result = new ArrayList<T>(childCount);
+        for (int i = 0; i < childCount; i++) {
+            View view = viewGroup.getChildAt(i);
+            if (aClass.isAssignableFrom(view.getClass())) {
+                result.add((T) view);
+            }
+        }
+
+        return result;
+    }
+
     public static List<View> findChildren(ViewGroup viewGroup, Predicate<View> predicate) {
         return CollectionUtils.findAll(getChildren(viewGroup), predicate);
     }
