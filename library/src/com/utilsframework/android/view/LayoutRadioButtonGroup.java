@@ -45,8 +45,6 @@ public class LayoutRadioButtonGroup extends LinearLayout {
         childToSelect.isSelected = true;
     }
 
-    private boolean selectFirst = true;
-
     private void setSelectedItemIndex(int selectedItemIndex,boolean fromUser) {
         if(selectedItemIndex != this.selectedItemIndex){
             LayoutRadioButton old = getSelectedItem();
@@ -73,10 +71,6 @@ public class LayoutRadioButtonGroup extends LinearLayout {
 
     public void setOnSelectedChangedListener(OnSelectedChanged onSelectedChangedListener) {
         this.onSelectedChangedListener = onSelectedChangedListener;
-        if(selectFirst){
-            onSelectedChangedListener.onSelectedChanged(false, getSelectedItem(), null);
-            selectFirst = false;
-        }
     }
 
     public class ItemNotFoundException extends Throwable{
@@ -153,18 +147,6 @@ public class LayoutRadioButtonGroup extends LinearLayout {
 
         public void setOnSelectedChangedListener(OnSelectedChanged onSelectedChangedListener) {
             this.onSelectedChangedListener = onSelectedChangedListener;
-            LayoutRadioButtonGroup parent = getLayoutRadioButtonGroup();
-            if(parent.selectFirst){
-                LayoutRadioButton selected = parent.getSelectedItem();
-                if(selected == this){
-                    this.onSelectedChangedListener.onSelectedChanged(false,selected,null);
-                    OnSelectedChanged parentListener = parent.getOnSelectedChangedListener();
-                    if(parentListener != null){
-                        parentListener.onSelectedChanged(false,selected,null);
-                    }
-                }
-                parent.selectFirst = false;
-            }
         }
 
         public void select(){
