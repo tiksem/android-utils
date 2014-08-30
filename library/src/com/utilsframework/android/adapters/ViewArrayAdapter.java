@@ -21,8 +21,6 @@ public abstract class ViewArrayAdapter<Element, ViewHolder> extends BaseAdapter 
     private static final int ELEMENT_KEY = "ELEMENT_KEY".hashCode();
 
     private List<Element> elements;
-    private int maxRequestedPosition = -1;
-    private int receivedNullElementPosition = -1;
     private OnNullElementReceived<Element> onNullElementReceivedListener;
 
     private LayoutInflater inflater;
@@ -31,22 +29,13 @@ public abstract class ViewArrayAdapter<Element, ViewHolder> extends BaseAdapter 
         return elements;
     }
 
-    protected int getMaxDisplayedNullElementsCount(){
-        return 1;
-    }
-
     @Override
     public int getCount() {
         if(elements == null){
             return 0;
         }
 
-        if(receivedNullElementPosition < 0){
-            return elements.size();
-        }
-        else {
-            return receivedNullElementPosition + getMaxDisplayedNullElementsCount();
-        }
+        return elements.size();
     }
 
     @Override
@@ -91,7 +80,6 @@ public abstract class ViewArrayAdapter<Element, ViewHolder> extends BaseAdapter 
             if(onNullElementReceivedListener != null){
                 onNullElementReceivedListener.onNull(this, Collections.unmodifiableList(elements), position);
             }
-            receivedNullElementPosition = position;
             return getNullView(position, convertView);
         }
 
@@ -105,11 +93,6 @@ public abstract class ViewArrayAdapter<Element, ViewHolder> extends BaseAdapter 
             viewHolder = createViewHolder(convertView);
             convertView.setTag(viewHolder);
             onViewCreated(position, convertView, element, viewHolder);
-        }
-
-        if(position > maxRequestedPosition){
-            onNewElementRequestedForDisplay(element, position, convertView, viewHolder);
-            maxRequestedPosition = position;
         }
 
         convertView.setTag(ELEMENT_KEY, element);
@@ -127,18 +110,6 @@ public abstract class ViewArrayAdapter<Element, ViewHolder> extends BaseAdapter 
         return convertView;
     }
 
-    @Override
-    public void notifyDataSetChanged() {
-        receivedNullElementPosition = -1;
-        super.notifyDataSetChanged();
-    }
-
-    @Override
-    public void notifyDataSetInvalidated() {
-        receivedNullElementPosition = -1;
-        super.notifyDataSetInvalidated();
-    }
-
     protected abstract int getRootLayoutId();
     protected int getNullLayoutId(){
         throw new NullPointerException("null elements are not allowed");
@@ -153,11 +124,6 @@ public abstract class ViewArrayAdapter<Element, ViewHolder> extends BaseAdapter 
     public final void setElements(List<Element> elements){
         this.elements = elements;
         notifyDataSetChanged();
-    }
-
-    protected void onNewElementRequestedForDisplay(Element element, int position, View view,
-                                                   ViewHolder viewHolder){
-
     }
 
     private void internalAddElement(Element element){
