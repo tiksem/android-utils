@@ -470,4 +470,11 @@ public class GuiUtilities {
         FragmentManager fragmentManager = activity.getFragmentManager();
         fragmentManager.beginTransaction().replace(id, newFragment).commit();
     }
+
+    public static void setClickListenerToMenuItems(Menu menu, MenuItem.OnMenuItemClickListener clickListener) {
+        for(int i = 0; i < menu.size(); i++){
+            MenuItem menuItem = menu.getItem(i);
+            menuItem.setOnMenuItemClickListener(clickListener);
+        }
+    }
 }

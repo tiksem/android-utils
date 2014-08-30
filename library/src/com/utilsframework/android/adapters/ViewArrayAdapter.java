@@ -4,13 +4,9 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
-import android.widget.AbsListView;
 import android.widget.BaseAdapter;
 
-import java.util.AbstractList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -22,6 +18,7 @@ public abstract class ViewArrayAdapter<Element, ViewHolder> extends BaseAdapter 
     protected static final int NULL_VIEW_TYPE = 1;
     protected static final int NORMAL_VIEW_TYPE = 0;
     protected static final int VIEW_TYPES_COUNT = 2;
+    private static final int ELEMENT_KEY = "ELEMENT_KEY".hashCode();
 
     private List<Element> elements;
     private int maxRequestedPosition = -1;
@@ -82,6 +79,10 @@ public abstract class ViewArrayAdapter<Element, ViewHolder> extends BaseAdapter 
 
     }
 
+    protected void onViewCreated(final int position, View convertView, Element element, ViewHolder holder) {
+
+    }
+
     @Override
     public View getView(final int position, View convertView, ViewGroup viewGroup) {
         final Element element = getElement(position);
@@ -103,6 +104,7 @@ public abstract class ViewArrayAdapter<Element, ViewHolder> extends BaseAdapter 
             convertView = inflater.inflate(getRootLayoutId(),null);
             viewHolder = createViewHolder(convertView);
             convertView.setTag(viewHolder);
+            onViewCreated(position, convertView, element, viewHolder);
         }
 
         if(position > maxRequestedPosition){
@@ -110,7 +112,8 @@ public abstract class ViewArrayAdapter<Element, ViewHolder> extends BaseAdapter 
             maxRequestedPosition = position;
         }
 
-        reuseView(element,viewHolder,position);
+        convertView.setTag(ELEMENT_KEY, element);
+        reuseView(element, viewHolder, position, convertView);
 
         return convertView;
     }
@@ -141,7 +144,7 @@ public abstract class ViewArrayAdapter<Element, ViewHolder> extends BaseAdapter 
         throw new NullPointerException("null elements are not allowed");
     }
     protected abstract ViewHolder createViewHolder(View view);
-    protected abstract void reuseView(Element element, ViewHolder viewHolder, int position);
+    protected abstract void reuseView(Element element, ViewHolder viewHolder, int position, View view);
 
     public final Element getElement(int index){
         return elements.get(index);
@@ -159,6 +162,10 @@ public abstract class ViewArrayAdapter<Element, ViewHolder> extends BaseAdapter 
 
     private void internalAddElement(Element element){
         elements.add(element);
+    }
+
+    public Element getElementOfView(View view) {
+        return (Element) view.getTag(ELEMENT_KEY);
     }
 
     public final void addElement(Element element){
