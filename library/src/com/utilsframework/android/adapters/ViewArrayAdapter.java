@@ -80,6 +80,11 @@ public abstract class ViewArrayAdapter<Element, ViewHolder> extends BaseAdapter 
             if(onNullElementReceivedListener != null){
                 onNullElementReceivedListener.onNull(this, Collections.unmodifiableList(elements), position);
             }
+
+            if(convertView != null && getElementOfView(convertView) != null){
+                convertView = null;
+            }
+
             return getNullView(position, convertView);
         }
 
