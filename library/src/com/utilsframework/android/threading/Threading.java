@@ -2,6 +2,8 @@ package com.utilsframework.android.threading;
 
 import android.os.AsyncTask;
 
+import java.util.concurrent.ThreadFactory;
+
 /**
  * User: Tikhonenko.S
  * Date: 22.11.13
@@ -55,5 +57,16 @@ public final class Threading {
 
     public static void runOnBackground(final Runnable runnable) {
         runOnBackground(runnable, null);
+    }
+
+    public static ThreadFactory lowPriorityThreadFactory() {
+        return new ThreadFactory() {
+            @Override
+            public Thread newThread(Runnable r) {
+                Thread thread = new Thread(r);
+                thread.setPriority(Thread.MIN_PRIORITY);
+                return thread;
+            }
+        };
     }
 }
