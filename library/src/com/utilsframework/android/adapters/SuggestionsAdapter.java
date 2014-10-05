@@ -48,6 +48,25 @@ public class SuggestionsAdapter<Element, ViewHolder> extends BaseAdapter impleme
         this.suggestionsProvider = suggestionsProvider;
     }
 
+    public SuggestionsAdapter() {
+    }
+
+    public ViewArrayAdapter<Element, ViewHolder> getViewArrayAdapter() {
+        return viewArrayAdapter;
+    }
+
+    public void setViewArrayAdapter(ViewArrayAdapter<Element, ViewHolder> viewArrayAdapter) {
+        this.viewArrayAdapter = viewArrayAdapter;
+    }
+
+    public SuggestionsProvider<Element> getSuggestionsProvider() {
+        return suggestionsProvider;
+    }
+
+    public void setSuggestionsProvider(SuggestionsProvider<Element> suggestionsProvider) {
+        this.suggestionsProvider = suggestionsProvider;
+    }
+
     @Override
     public int getCount() {
         return viewArrayAdapter.getCount();
