@@ -3,7 +3,7 @@ package com.utilsframework.android.db;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import com.utilsframework.android.string.Strings;
+import com.utils.framework.strings.Strings;
 
 import java.lang.reflect.Field;
 

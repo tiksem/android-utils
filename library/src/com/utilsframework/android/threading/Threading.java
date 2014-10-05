@@ -2,6 +2,9 @@ package com.utilsframework.android.threading;
 
 import android.os.AsyncTask;
 
+import java.util.Comparator;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.ThreadFactory;
 
 /**
@@ -68,5 +71,26 @@ public final class Threading {
                 return thread;
             }
         };
+    }
+
+    public static BlockingQueue<Runnable> highPriorityBlockingQueue() {
+        return new PriorityBlockingQueue<Runnable>(11, new Comparator<Runnable>() {
+            @Override
+            public int compare(Runnable lhs, Runnable rhs) {
+                if(lhs instanceof HighPriorityRunnable){
+                    if(rhs instanceof HighPriorityRunnable){
+                        return 0;
+                    } else {
+                        return -1;
+                    }
+                } else {
+                    if(rhs instanceof HighPriorityRunnable){
+                        return 1;
+                    } else {
+                        return 0;
+                    }
+                }
+            }
+        });
     }
 }

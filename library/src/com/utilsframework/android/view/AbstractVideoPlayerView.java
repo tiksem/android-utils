@@ -61,6 +61,7 @@ public abstract class AbstractVideoPlayerView extends FrameLayout{
         currentPosition = videoView.getCurrentPosition();
         videoView.stopPlayback();
         containerLayout.removeView(videoView);
+
     }
 
     public int getCurrentPosition() {

@@ -1,6 +1,7 @@
 package com.utilsframework.android.view;
 
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.view.View;
@@ -89,5 +90,9 @@ public final class Alerts {
         AlertDialog alertDialog = builder.create();
         alertDialog.show();
         return alertDialog;
+    }
+
+    public static ProgressDialog showCircleProgressDialog(Context context, CharSequence message) {
+        return ProgressDialog.show(context, null, message);
     }
 }

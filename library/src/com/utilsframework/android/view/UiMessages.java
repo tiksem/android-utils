@@ -8,7 +8,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.utilsframework.android.R;
-import com.utilsframework.android.string.Strings;
 
 /**
  * Created by Tikhonenko.S on 20.09.13.
