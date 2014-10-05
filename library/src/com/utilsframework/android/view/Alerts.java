@@ -4,7 +4,11 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.os.AsyncTask;
 import android.view.View;
+import com.utilsframework.android.threading.AsyncOperationCallback;
+import com.utilsframework.android.threading.Cancelable;
+import com.utilsframework.android.threading.Threading;
 
 /**
  * User: Tikhonenko.S
@@ -94,5 +98,63 @@ public final class Alerts {
 
     public static ProgressDialog showCircleProgressDialog(Context context, CharSequence message) {
         return ProgressDialog.show(context, null, message);
+    }
+
+    public static <T> Cancelable runAsyncOperationWithCircleLoading(Context context,
+                                                                CharSequence message,
+                                                                final AsyncOperationCallback<T> callback) {
+        final ProgressDialog progressDialog = showCircleProgressDialog(context, message);
+
+        new AsyncTask<Void, Void, T>(){
+            @Override
+            protected T doInBackground(Void... params) {
+                return callback.runOnBackground();
+            }
+
+            @Override
+            protected void onPostExecute(T result) {
+                if (progressDialog.isShowing()) {
+                    progressDialog.dismiss();
+                    callback.onFinish(result);
+                }
+            }
+        }.execute();
+
+        // TODO improve cancelable
+        return new Cancelable() {
+            @Override
+            public void cancel() {
+                progressDialog.dismiss();
+            }
+        };
+    }
+
+    public static <T> Cancelable runAsyncOperationWithCircleLoading(Context context,
+                                                                    int resourceId,
+                                                                    final AsyncOperationCallback<T> callback) {
+        return runAsyncOperationWithCircleLoading(context, context.getString(resourceId), callback);
+    }
+
+    public static <T> Cancelable runAsyncOperationWithCircleLoading(Context context,
+                                                                    CharSequence message,
+                                                                    final Runnable operation) {
+        return runAsyncOperationWithCircleLoading(context, message, new AsyncOperationCallback<Object>() {
+            @Override
+            public Object runOnBackground() {
+                operation.run();
+                return null;
+            }
+
+            @Override
+            public void onFinish(Object result) {
+
+            }
+        });
+    }
+
+    public static <T> Cancelable runAsyncOperationWithCircleLoading(Context context,
+                                                                    int resourceId,
+                                                                    final Runnable operation) {
+        return runAsyncOperationWithCircleLoading(context, context.getString(resourceId), operation);
     }
 }

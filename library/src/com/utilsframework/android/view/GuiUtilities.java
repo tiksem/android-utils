@@ -21,16 +21,20 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Build;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.*;
 
 import android.widget.AbsListView;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import com.utils.framework.CollectionUtils;
 import com.utils.framework.Predicate;
 import com.utils.framework.predicates.InstanceOfPredicate;
 import com.utilsframework.android.BuildConfig;
+import com.utilsframework.android.ListenerRemover;
 import com.utilsframework.android.UiLoopEvent;
 import com.utilsframework.android.threading.OnFinish;
 
@@ -476,5 +480,27 @@ public class GuiUtilities {
             MenuItem menuItem = menu.getItem(i);
             menuItem.setOnMenuItemClickListener(clickListener);
         }
+    }
+
+    public interface EditTextFocusListener {
+        void onFocusEnter();
+        void onFocusLeave(boolean textChanged, String textBefore);
+    }
+
+    public static void setEditTextFocusChangedListener(final EditText editText, final EditTextFocusListener focusListener) {
+        editText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            String textBefore;
+
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if(hasFocus){
+                    focusListener.onFocusEnter();
+                    textBefore = editText.getText().toString();
+                } else {
+                    boolean textChanged = !textBefore.equals(editText.getText().toString());
+                    focusListener.onFocusLeave(textChanged, textBefore);
+                }
+            }
+        });
     }
 }

@@ -8,6 +8,7 @@ import android.widget.Filterable;
 import com.utils.framework.suggestions.SuggestionsProvider;
 import com.utils.framework.strings.Strings;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -22,6 +23,10 @@ public class SuggestionsAdapter<Element, ViewHolder> extends BaseAdapter impleme
     private class SuggestionsFilter extends Filter {
         @Override
         protected FilterResults performFiltering(CharSequence constraint) {
+            if(constraint == null){
+                return null;
+            }
+
             FilterResults filterResults = new FilterResults();
             List<Element> result = suggestionsProvider.getSuggestions(constraint.toString());
             filterResults.values = result;
@@ -31,7 +36,16 @@ public class SuggestionsAdapter<Element, ViewHolder> extends BaseAdapter impleme
 
         @Override
         protected void publishResults(CharSequence constraint, FilterResults results) {
-            lastSuggestedItems = (List<Element>)results.values;
+            if (results != null) {
+                lastSuggestedItems = (List<Element>)results.values;
+            } else {
+                lastSuggestedItems = null;
+            }
+
+            if(lastSuggestedItems == null){
+                lastSuggestedItems = new ArrayList<Element>();
+            }
+
             viewArrayAdapter.setElements(lastSuggestedItems);
             notifyDataSetChanged();
         }
