@@ -1,6 +1,7 @@
 package com.utilsframework.android.view;
 
 import android.content.Context;
+import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.widget.AutoCompleteTextView;
 import android.widget.BaseAdapter;
@@ -23,12 +24,16 @@ public class EditTextWithSuggestions extends AutoCompleteTextView {
     }
 
     @Override
-    protected void onTextChanged(CharSequence text, int start, int lengthBefore, int lengthAfter) {
-        super.onTextChanged(text, start, lengthBefore, lengthAfter);
-        ListAdapter adapter = getAdapter();
-        if(adapter != null && adapter instanceof BaseAdapter){
-            BaseAdapter baseAdapter = (BaseAdapter) adapter;
-            baseAdapter.notifyDataSetChanged();
+    public boolean enoughToFilter() {
+        return true;
+    }
+
+    @Override
+    protected void onFocusChanged(boolean focused, int direction,
+                                  Rect previouslyFocusedRect) {
+        super.onFocusChanged(focused, direction, previouslyFocusedRect);
+        if (focused) {
+            performFiltering(getText(), 0);
         }
     }
 }
