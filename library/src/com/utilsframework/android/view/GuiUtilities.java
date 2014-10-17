@@ -503,4 +503,11 @@ public class GuiUtilities {
             }
         });
     }
+
+    public static void swapVisibilities(View a, View b) {
+        int aVisibility = a.getVisibility();
+        int bVisibility = b.getVisibility();
+        a.setVisibility(bVisibility);
+        b.setVisibility(aVisibility);
+    }
 }
