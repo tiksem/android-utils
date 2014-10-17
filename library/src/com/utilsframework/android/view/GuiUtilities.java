@@ -229,7 +229,7 @@ public class GuiUtilities {
         };
     }
 
-    public List<View> getChildrenAsList(final ViewGroup viewGroup) {
+    public static List<View> getChildrenAsList(final ViewGroup viewGroup) {
         int childCount = viewGroup.getChildCount();
         List<View> result = new ArrayList<View>(childCount);
         for (int i = 0; i < childCount; i++) {

@@ -5,9 +5,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import com.utilsframework.android.UiLoopEvent;
+import com.utilsframework.android.view.GuiUtilities;
 
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 /**
  * User: Tikhonenko.S
@@ -19,11 +20,15 @@ public abstract class ViewArrayAdapter<Element, ViewHolder> extends BaseAdapter 
     protected static final int NORMAL_VIEW_TYPE = 0;
     protected static final int VIEW_TYPES_COUNT = 2;
     private static final int ELEMENT_KEY = "ELEMENT_KEY".hashCode();
+    private static final int POSITION_KEY = "POSITION_KEY".hashCode();
 
     private List<Element> elements;
     private OnNullElementReceived<Element> onNullElementReceivedListener;
 
     private LayoutInflater inflater;
+    private ViewGroup parent;
+    private UiLoopEvent nullItemsUpdater;
+    private Set<Integer> nullItemsPositions;
 
     public List<Element> getElements() {
         return elements;
@@ -73,7 +78,8 @@ public abstract class ViewArrayAdapter<Element, ViewHolder> extends BaseAdapter 
     }
 
     @Override
-    public View getView(final int position, View convertView, ViewGroup viewGroup) {
+    public View getView(final int position, View convertView, final ViewGroup viewGroup) {
+        parent = viewGroup;
         final Element element = getElement(position);
 
         if(element == null){
@@ -84,6 +90,31 @@ public abstract class ViewArrayAdapter<Element, ViewHolder> extends BaseAdapter 
             if(convertView != null && getElementOfView(convertView) != null){
                 convertView = null;
             }
+
+            if(nullItemsUpdater == null){
+                nullItemsPositions = new HashSet<Integer>();
+                nullItemsUpdater = new UiLoopEvent(this);
+                nullItemsUpdater.run(new Runnable() {
+                    @Override
+                    public void run() {
+                        boolean shouldCallNotifyDataSetChanged = false;
+                        Iterator<Integer> iterator = nullItemsPositions.iterator();
+                        while(iterator.hasNext()){
+                            int position = iterator.next();
+                            if(getElement(position) != null){
+                                shouldCallNotifyDataSetChanged = true;
+                                iterator.remove();
+                            }
+                        }
+
+                        if(shouldCallNotifyDataSetChanged){
+                            notifyDataSetChanged();
+                        }
+                    }
+                });
+            }
+
+            nullItemsPositions.add(position);
 
             return getNullView(position, convertView);
         }
@@ -101,6 +132,7 @@ public abstract class ViewArrayAdapter<Element, ViewHolder> extends BaseAdapter 
         }
 
         convertView.setTag(ELEMENT_KEY, element);
+        convertView.setTag(POSITION_KEY, position);
         reuseView(element, viewHolder, position, convertView);
 
         return convertView;
@@ -135,8 +167,12 @@ public abstract class ViewArrayAdapter<Element, ViewHolder> extends BaseAdapter 
         elements.add(element);
     }
 
-    public Element getElementOfView(View view) {
+    public final Element getElementOfView(View view) {
         return (Element) view.getTag(ELEMENT_KEY);
+    }
+
+    protected final Integer getPositionOfView(View view) {
+        return (Integer) view.getTag(POSITION_KEY);
     }
 
     public final void addElement(Element element){
