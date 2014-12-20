@@ -93,4 +93,22 @@ public final class Threading {
             }
         });
     }
+
+    public interface ResultProvider<T> {
+        T get();
+    }
+
+    public static <T> void getResultAsync(final ResultProvider<T> resultProvider, final OnFinish<T> onFinish) {
+        new AsyncTask<Void, Void, T>(){
+            @Override
+            protected T doInBackground(Void... params) {
+                return resultProvider.get();
+            }
+
+            @Override
+            protected void onPostExecute(T result) {
+                onFinish.onFinish(result);
+            }
+        }.execute();
+    }
 }
