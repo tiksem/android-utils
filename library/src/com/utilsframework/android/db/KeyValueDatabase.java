@@ -8,4 +8,5 @@ public interface KeyValueDatabase {
     void set(String key, String value);
     void getAsync(String key, OnResult<String> onResult);
     void setAsync(String key, String value, OnFinish onFinish);
+    void close();
 }

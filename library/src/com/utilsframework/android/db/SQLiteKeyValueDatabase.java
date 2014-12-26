@@ -60,4 +60,9 @@ public class SQLiteKeyValueDatabase implements KeyValueDatabase {
         keyValue.value = value;
         asyncDataStore.addOrReplace(keyValue, onFinish);
     }
+
+    @Override
+    public void close() {
+        dataStore.close();
+    }
 }

@@ -18,4 +18,5 @@ public interface DataStore<T> {
     Class getIdType();
     Object getIdOf(T object);
     void clear();
+    void close();
 }

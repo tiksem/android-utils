@@ -302,4 +302,9 @@ public abstract class AbstractSQLiteDataStore<T> implements DataStore<T> {
 
     protected abstract T createObject();
     protected abstract String getTableName();
+
+    @Override
+    public void close() {
+        database.close();
+    }
 }
