@@ -37,6 +37,11 @@ public class SQLiteKeyValueDatabase implements KeyValueDatabase {
 
     @Override
     public void set(String key, String value) {
+        if(value == null){
+            dataStore.removeObjectWithId(key);
+            return;
+        }
+
         KeyValue keyValue = new KeyValue();
         keyValue.key = key;
         keyValue.value = value;
@@ -55,6 +60,11 @@ public class SQLiteKeyValueDatabase implements KeyValueDatabase {
 
     @Override
     public void setAsync(String key, String value, OnFinish onFinish) {
+        if(value == null){
+            asyncDataStore.removeObjectWithId(key, onFinish);
+            return;
+        }
+
         KeyValue keyValue = new KeyValue();
         keyValue.key = key;
         keyValue.value = value;
