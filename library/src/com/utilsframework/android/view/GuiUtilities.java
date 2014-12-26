@@ -475,6 +475,11 @@ public class GuiUtilities {
         fragmentManager.beginTransaction().replace(id, newFragment).commit();
     }
 
+    public static void addFragment(Activity activity, int containerId, Fragment fragment) {
+        FragmentManager fragmentManager = activity.getFragmentManager();
+        fragmentManager.beginTransaction().add(containerId, fragment).commit();
+    }
+
     public static void setClickListenerToMenuItems(Menu menu, MenuItem.OnMenuItemClickListener clickListener) {
         for(int i = 0; i < menu.size(); i++){
             MenuItem menuItem = menu.getItem(i);
@@ -509,5 +514,10 @@ public class GuiUtilities {
         int bVisibility = b.getVisibility();
         a.setVisibility(bVisibility);
         b.setVisibility(aVisibility);
+    }
+
+    public static String getApplicationName(Context context) {
+        int stringId = context.getApplicationInfo().labelRes;
+        return context.getString(stringId);
     }
 }
