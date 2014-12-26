@@ -51,6 +51,8 @@ public abstract class NavigationFragmentDrawer {
             throw new NullPointerException("actionBar == null");
         }
 
+        actionBar.removeAllTabs();
+
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 
         int tabsCount = fragmentFactory.getTabsCount(currentSelectedItem);
