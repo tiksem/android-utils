@@ -1,5 +1,6 @@
 package com.utilsframework.android.navigation;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.app.Fragment;
 import android.os.Bundle;
@@ -66,7 +67,6 @@ public abstract class NavigationDrawerActivity extends Activity implements Fragm
     @Override
     protected void onStart() {
         super.onStart();
-        navigationDrawer.show();
     }
 
     protected abstract int getNavigationLayoutId();

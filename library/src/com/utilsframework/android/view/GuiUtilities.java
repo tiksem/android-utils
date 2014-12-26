@@ -520,4 +520,8 @@ public class GuiUtilities {
         int stringId = context.getApplicationInfo().labelRes;
         return context.getString(stringId);
     }
+
+    public static int getFragmentContainerId(Fragment fragment) {
+        return ((View) fragment.getView().getParent()).getId();
+    }
 }
