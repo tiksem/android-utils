@@ -5,6 +5,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -25,7 +26,7 @@ public class SQLiteManyToMany<Id> implements ManyToMany<Id>{
                             Class idClass) {
         fields = new String[2];
         fields[0] = fields[1] = SqlUtilities.createIdType(idClass);
-        SqlUtilities.createTableIfNotExists(fields, tableName, database);
+        SqlUtilities.createTableIfNotExists(Arrays.<CharSequence>asList(fields), tableName, database);
         this.tableName = tableName;
         this.database = database;
         this.idClass = idClass;

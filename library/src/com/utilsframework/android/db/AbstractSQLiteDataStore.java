@@ -19,14 +19,14 @@ public abstract class AbstractSQLiteDataStore<T> implements DataStore<T> {
     private Class<T> tClass;
     private Map<String,Field> dataBaseMapping = new LinkedHashMap<String, Field>();
 
-    private String getCreateTableQuery(CharSequence[] fieldDeclarations){
+    private String getCreateTableQuery(List<CharSequence> fieldDeclarations){
         return SqlUtilities.getCreateTableQuery(fieldDeclarations, tableName);
     }
 
     private void createTableIfNotExists(){
         Field[] fields = tClass.getDeclaredFields();
-        CharSequence[] fieldDeclarations = new CharSequence[fields.length];
-        int index = 0;
+        List<CharSequence> fieldDeclarations = new ArrayList<CharSequence>();
+
         for(Field field : fields){
             field.setAccessible(true);
 
@@ -41,12 +41,19 @@ public abstract class AbstractSQLiteDataStore<T> implements DataStore<T> {
 
                 dataBaseMapping.put(fieldName, field);
                 String typeName = SqlUtilities.getSqlTypeName(field);
-                if (field.getAnnotation(SQLIdField.class) != null) {
+                SQLIdField sqlIdField = field.getAnnotation(SQLIdField.class);
+                if (sqlIdField != null) {
                     if(idColumnName != null){
                         throw new IllegalStateException("multiple SQLIdField declaration");
                     }
 
-                    typeName = SqlUtilities.createIdType(typeName);
+                    String type = sqlIdField.type();
+                    if (type.isEmpty()) {
+                        typeName = SqlUtilities.createIdType(typeName);
+                    } else {
+                        typeName = type;
+                    }
+
                     idColumnName = fieldName;
                     idField = field;
                 }
@@ -57,16 +64,17 @@ public abstract class AbstractSQLiteDataStore<T> implements DataStore<T> {
                 fieldDeclaration.append(typeName);
 
                 if(typeName.equals(SqlUtilities.STRING_TYPE)){
-                    fieldDeclaration.append('(');
                     int maxStringLength = sqlDataStoreField.maxStringLength();
-                    fieldDeclaration.append(maxStringLength);
-                    fieldDeclaration.append(')');
+
+                    if (maxStringLength > 0) {
+                        fieldDeclaration.append('(');
+                        fieldDeclaration.append(maxStringLength);
+                        fieldDeclaration.append(')');
+                    }
                 }
 
-                fieldDeclarations[index] = fieldDeclaration;
+                fieldDeclarations.add(fieldDeclaration);
             }
-
-            index++;
         }
 
         if(idColumnName == null){
@@ -79,13 +87,14 @@ public abstract class AbstractSQLiteDataStore<T> implements DataStore<T> {
     }
 
     protected AbstractSQLiteDataStore(SQLiteDatabase database, Class<T> tClass) {
+        this.database = database;
+        this.tClass = tClass;
         tableName = getTableName();
+
         if(tableName == null || tableName.equals("")){
             throw new IllegalArgumentException("getTableName returns empty string");
         }
 
-        this.database = database;
-        this.tClass = tClass;
         createTableIfNotExists();
     }
 

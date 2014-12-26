@@ -10,7 +10,6 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.provider.MediaStore;
 
-import com.utilsframework.android.analytics.L;
 import com.utilsframework.android.image.listener.ImagePicked;
 import com.utilsframework.android.image.listener.ImageProcessResult;
 import com.utilsframework.android.image.task.ImageBitmapProcessAsyncTask;
@@ -100,33 +99,27 @@ public class TakeImageProcessor {
         Context processContext = mContextRef.get();
 
         if (processContext == null) {
-            L.e(new NullPointerException("Context is null"));
 
             return;
         }
         if (intent == null && (!isOutputUriSpecified)) {
-            L.e(new NullPointerException("Result intent is null with no specified output image Uri"));
 
             return;
         }
 
         switch (requestCode) {
             case CAMERA_REQUEST_CODE:
-                L.d(TAG, "CAMERA request");
                 if (resultCode != Activity.RESULT_OK) {
                     throwDeliveryException("Activity abort");
                 }
 
                 if (isOutputUriSpecified) {
-                    L.i(TAG, "Camera image picked with specified Uri");
 
                     imageListener.onImagePicked(requestCode, currentImageDestinationUri);
                 } else {
-                    L.i(TAG, "Camera image picked with Uri from native gallery");
 
                     Uri cameraImageUri = intent.getData();
                     if (cameraImageUri == null) {
-                        L.d(TAG, "Image uri from gallery is null");
 
                         throw new NullPointerException("Image uri is null");
                     }
@@ -140,7 +133,6 @@ public class TakeImageProcessor {
 
                 break;
             case GALLERY_REQUEST_CODE:
-                L.d(TAG, "GALLERY request");
                 if (resultCode != Activity.RESULT_OK) {
                     throwDeliveryException("Activity abort");
                 }
@@ -148,8 +140,6 @@ public class TakeImageProcessor {
                 Uri galleryUri = intent.getData();
 
                 if (galleryUri == null) {
-                    L.d(TAG, "Image uri from gallery is null");
-
                     throw new NullPointerException("Image uri is null");
                 }
 
@@ -160,7 +150,6 @@ public class TakeImageProcessor {
 
                 break;
             case CROP_REQUEST_CODE:
-                L.d(TAG, "CROP request");
                 if (resultCode != Activity.RESULT_OK) {
                     throwDeliveryException("Activity abort");
                 }
@@ -201,8 +190,6 @@ public class TakeImageProcessor {
     }
 
     private void throwDeliveryException(String message) throws DeliveryResultException {
-        L.d(TAG, message);
-
         throw new DeliveryResultException(message);
     }
 

@@ -6,6 +6,7 @@ import android.database.sqlite.SQLiteDatabase;
 import com.utils.framework.strings.Strings;
 
 import java.lang.reflect.Field;
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -22,7 +23,7 @@ public class SqlUtilities {
     public static final String PRIMARY_KEY = "PRIMARY KEY";
     public static final String AUTOINCREMENT = "AUTOINCREMENT";
 
-    public static String getCreateTableQuery(CharSequence[] fieldDeclarations, String tableName){
+    public static String getCreateTableQuery(List<CharSequence> fieldDeclarations, String tableName){
         CharSequence fields = Strings.join(", ", fieldDeclarations);
         StringBuilder result = new StringBuilder();
         result.append(SqlUtilities.CREATE);
@@ -34,7 +35,7 @@ public class SqlUtilities {
         return result.toString();
     }
 
-    public static void createTableIfNotExists(CharSequence[] fieldDeclarations, String tableName,
+    public static void createTableIfNotExists(List<CharSequence> fieldDeclarations, String tableName,
                                               SQLiteDatabase database){
         String query = getCreateTableQuery(fieldDeclarations, tableName);
         database.execSQL(query);

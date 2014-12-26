@@ -7,8 +7,6 @@ import android.os.Environment;
 import java.io.File;
 import java.io.IOException;
 
-import com.utilsframework.android.analytics.L;
-
 import static android.os.Environment.MEDIA_MOUNTED;
 
 /**
@@ -41,7 +39,7 @@ public final class StorageUtils {
 			appCacheDir = context.getCacheDir();
 		}
 		if (appCacheDir == null) {
-			L.w("Can't define system cache directory! The app should be re-installed.");
+
 		}
 		return appCacheDir;
 	}
@@ -92,13 +90,12 @@ public final class StorageUtils {
 		File appCacheDir = new File(new File(dataDir, context.getPackageName()), "cache");
 		if (!appCacheDir.exists()) {
 			if (!appCacheDir.mkdirs()) {
-				L.w("Unable to create external cache directory");
 				return null;
 			}
 			try {
 				new File(appCacheDir, ".nomedia").createNewFile();
 			} catch (IOException e) {
-				L.i("Can't create \".nomedia\" file in application external cache directory");
+
 			}
 		}
 		return appCacheDir;

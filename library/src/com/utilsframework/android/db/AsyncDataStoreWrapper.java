@@ -30,12 +30,14 @@ public class AsyncDataStoreWrapper<T> implements AsyncDataStore<T> {
     }
 
     private void executeOnFinish(final OnFinish onFinish){
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
-                onFinish.onFinish();
-            }
-        });
+        if (onFinish != null) {
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    onFinish.onFinish();
+                }
+            });
+        }
     }
 
     @Override

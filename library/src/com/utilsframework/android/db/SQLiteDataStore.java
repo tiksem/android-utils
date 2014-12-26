@@ -37,6 +37,6 @@ public class SQLiteDataStore<T> extends AbstractSQLiteDataStore<T>{
 
     @Override
     protected String getTableName() {
-        return getTableEntityClass().getCanonicalName();
+        return getTableEntityClass().getSimpleName();
     }
 }
