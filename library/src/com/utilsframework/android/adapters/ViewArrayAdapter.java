@@ -6,7 +6,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import com.utilsframework.android.UiLoopEvent;
-import com.utilsframework.android.view.GuiUtilities;
 
 import java.util.*;
 
@@ -16,9 +15,10 @@ import java.util.*;
  * Time: 20:03
  */
 public abstract class ViewArrayAdapter<Element, ViewHolder> extends BaseAdapter {
+    protected static final int FOOTER_VIEW_TYPE = 2;
     protected static final int NULL_VIEW_TYPE = 1;
     protected static final int NORMAL_VIEW_TYPE = 0;
-    protected static final int VIEW_TYPES_COUNT = 2;
+    protected static final int VIEW_TYPES_COUNT = 3;
     private static final int ELEMENT_KEY = "ELEMENT_KEY".hashCode();
     private static final int POSITION_KEY = "POSITION_KEY".hashCode();
 
@@ -26,9 +26,9 @@ public abstract class ViewArrayAdapter<Element, ViewHolder> extends BaseAdapter 
     private OnNullElementReceived<Element> onNullElementReceivedListener;
 
     private LayoutInflater inflater;
-    private ViewGroup parent;
     private UiLoopEvent nullItemsUpdater;
     private Set<Integer> nullItemsPositions;
+    private View header;
 
     public List<Element> getElements() {
         return elements;
@@ -45,6 +45,14 @@ public abstract class ViewArrayAdapter<Element, ViewHolder> extends BaseAdapter 
 
     @Override
     public Object getItem(int position) {
+        if(header != null) {
+            position--;
+        }
+
+        if(position < 0){
+            return header;
+        }
+
         return getElement(position);
     }
 
@@ -55,11 +63,17 @@ public abstract class ViewArrayAdapter<Element, ViewHolder> extends BaseAdapter 
 
     @Override
     public int getItemViewType(int position) {
+        if(header != null){
+            position--;
+            if(position < 0){
+                return FOOTER_VIEW_TYPE;
+            }
+        }
+
         Element element = getElement(position);
         if(element == null){
             return NULL_VIEW_TYPE;
-        }
-        else {
+        } else {
             return NORMAL_VIEW_TYPE;
         }
     }
@@ -78,8 +92,15 @@ public abstract class ViewArrayAdapter<Element, ViewHolder> extends BaseAdapter 
     }
 
     @Override
-    public View getView(final int position, View convertView, final ViewGroup viewGroup) {
-        parent = viewGroup;
+    public View getView(int position, View convertView, final ViewGroup viewGroup) {
+        if(header != null){
+            position--;
+        }
+
+        if(position < 0){
+            return header;
+        }
+
         final Element element = getElement(position);
 
         if(element == null){
@@ -138,6 +159,15 @@ public abstract class ViewArrayAdapter<Element, ViewHolder> extends BaseAdapter 
         return convertView;
     }
 
+    public View getHeader() {
+        return header;
+    }
+
+    public void setHeader(View header) {
+        this.header = header;
+        notifyDataSetChanged();
+    }
+
     private View getNullView(int position, View convertView) {
         if(convertView == null){
             convertView = inflater.inflate(getNullLayoutId(),null);
@@ -153,6 +183,10 @@ public abstract class ViewArrayAdapter<Element, ViewHolder> extends BaseAdapter 
     }
     protected abstract ViewHolder createViewHolder(View view);
     protected abstract void reuseView(Element element, ViewHolder viewHolder, int position, View view);
+
+    protected boolean footerAllowed() {
+        return false;
+    }
 
     public final Element getElement(int index){
         return elements.get(index);
@@ -193,6 +227,11 @@ public abstract class ViewArrayAdapter<Element, ViewHolder> extends BaseAdapter 
 
     public ViewArrayAdapter(Context context){
         inflater = LayoutInflater.from(context);
+    }
+
+    public ViewArrayAdapter(Context context, View header) {
+        this(context);
+        this.header = header;
     }
 
     public OnNullElementReceived<Element> getOnNullElementReceivedListener() {
