@@ -25,7 +25,7 @@ public final class ExecuteTimeLogger {
         long currentTime = System.currentTimeMillis();
 
         if(!times.containsKey(name)){
-            throw new IllegalArgumentException("timeEnd + " + name + "does not exist");
+            return;
         }
 
         long startTime = times.get(name);
