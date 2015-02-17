@@ -34,13 +34,22 @@ public abstract class ViewArrayAdapter<Element, ViewHolder> extends BaseAdapter 
         return elements;
     }
 
-    @Override
-    public int getCount() {
+    private int getElementsCount() {
         if(elements == null){
             return 0;
         }
 
         return elements.size();
+    }
+
+    @Override
+    public int getCount() {
+        int elementsCount = getElementsCount();
+        if(header != null){
+            elementsCount++;
+        }
+
+        return elementsCount;
     }
 
     @Override
