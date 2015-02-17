@@ -14,10 +14,6 @@ public final class ExecuteTimeLogger {
     public static void timeStart(String name){
         long currentTime = System.currentTimeMillis();
 
-        if(times.containsKey(name)){
-            throw new IllegalArgumentException("timeStart + " + name + "  exists");
-        }
-
         times.put(name, currentTime);
     }
 

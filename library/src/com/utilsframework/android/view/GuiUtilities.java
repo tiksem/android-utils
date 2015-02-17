@@ -360,24 +360,6 @@ public class GuiUtilities {
         void onViewCreated(View view);
     }
 
-    public static void executeWhenViewCreated(final Fragment fragment, final OnViewCreated onViewCreated) {
-        if(fragment.getView() != null){
-            onViewCreated.onViewCreated(fragment.getView());
-            return;
-        }
-
-        final UiLoopEvent uiLoopEvent = new UiLoopEvent(fragment);
-        uiLoopEvent.run(new Runnable() {
-            @Override
-            public void run() {
-                if (fragment.getView() != null) {
-                    onViewCreated.onViewCreated(fragment.getView());
-                    uiLoopEvent.stop();
-                }
-            }
-        });
-    }
-
     public static void insertBefore(View viewToInsert, View view) {
         ViewGroup viewGroup = (ViewGroup) view.getParent();
         int index = viewGroup.indexOfChild(view);
@@ -470,16 +452,6 @@ public class GuiUtilities {
         listView.setSelection(position - 1);
     }
 
-    public static void replaceFragment(Activity activity, int id, Fragment newFragment) {
-        FragmentManager fragmentManager = activity.getFragmentManager();
-        fragmentManager.beginTransaction().replace(id, newFragment).commit();
-    }
-
-    public static void addFragment(Activity activity, int containerId, Fragment fragment) {
-        FragmentManager fragmentManager = activity.getFragmentManager();
-        fragmentManager.beginTransaction().add(containerId, fragment).commit();
-    }
-
     public static void setClickListenerToMenuItems(Menu menu, MenuItem.OnMenuItemClickListener clickListener) {
         for(int i = 0; i < menu.size(); i++){
             MenuItem menuItem = menu.getItem(i);
@@ -521,7 +493,4 @@ public class GuiUtilities {
         return context.getString(stringId);
     }
 
-    public static int getFragmentContainerId(Fragment fragment) {
-        return ((View) fragment.getView().getParent()).getId();
-    }
 }

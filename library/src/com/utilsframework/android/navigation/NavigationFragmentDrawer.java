@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import com.utils.framework.Predicate;
 import com.utilsframework.android.R;
+import com.utilsframework.android.fragments.Fragments;
 import com.utilsframework.android.view.GuiUtilities;
 
 import java.util.List;
@@ -35,8 +36,9 @@ public abstract class NavigationFragmentDrawer {
 
         int tabsCount = fragmentFactory.getTabsCount(currentSelectedItem);
         if (tabsCount <= 1) {
+            Fragments.clearBackStack(activity);
             Fragment fragment = fragmentFactory.createFragmentBySelectedItem(viewId, 0);
-            GuiUtilities.replaceFragment(activity, getContentId(), fragment);
+            Fragments.replaceFragment(activity, getContentId(), fragment);
             activity.getActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
         } else {
             initTabs();
@@ -64,6 +66,7 @@ public abstract class NavigationFragmentDrawer {
             ActionBar.TabListener listener = new ActionBar.TabListener() {
                 @Override
                 public void onTabSelected(ActionBar.Tab tab, FragmentTransaction ft) {
+                    Fragments.clearBackStack(activity);
                     Fragment fragment =
                             fragmentFactory.createFragmentBySelectedItem(currentSelectedItem, tabIndex);
                     ft.replace(getContentId(), fragment);
@@ -86,7 +89,7 @@ public abstract class NavigationFragmentDrawer {
                 actionBar.selectTab(tab);
                 Fragment fragment =
                         fragmentFactory.createFragmentBySelectedItem(currentSelectedItem, tabIndex);
-                GuiUtilities.replaceFragment(activity, getContentId(), fragment);
+                Fragments.replaceFragment(activity, getContentId(), fragment);
             }
         }
     }
@@ -122,7 +125,7 @@ public abstract class NavigationFragmentDrawer {
         if (tabsCount > 1) {
             initTabs();
         } else {
-            GuiUtilities.addFragment(activity, getContentId(),
+            Fragments.addFragment(activity, getContentId(),
                     fragmentFactory.createFragmentBySelectedItem(currentSelectedItem, 0));
             activity.getActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
         }
