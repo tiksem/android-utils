@@ -3,6 +3,7 @@ package com.utilsframework.android.adapters;
 import android.app.Activity;
 import android.view.View;
 import android.widget.AbsListView;
+import com.utils.framework.OnError;
 import com.utils.framework.collections.NavigationList;
 import com.utils.framework.collections.OnAllDataLoaded;
 import com.utilsframework.android.view.GuiUtilities;
@@ -46,6 +47,14 @@ public class AdapterUtils {
             @Override
             public void onAllDataLoaded() {
                 adapter.notifyDataSetChanged();
+            }
+        });
+
+        navigationList.setOnError(new OnError() {
+            @Override
+            public void onError(Throwable e) {
+                listView.setVisibility(View.VISIBLE);
+                loadingView.setVisibility(View.INVISIBLE);
             }
         });
 
