@@ -37,6 +37,7 @@ import com.utilsframework.android.BuildConfig;
 import com.utilsframework.android.ListenerRemover;
 import com.utilsframework.android.UiLoopEvent;
 import com.utilsframework.android.threading.OnFinish;
+import com.utilsframework.android.threading.ResultLoop;
 
 /**
  * Created by Tikhonenko.S on 19.09.13.
@@ -273,6 +274,27 @@ public class GuiUtilities {
         }
     }
 
+    public static void executeWhenViewMeasuredUsingLoop(final View view, final Runnable runnable) {
+        final UiLoopEvent uiLoopEvent = new UiLoopEvent(view);
+        final long time = System.currentTimeMillis();
+        uiLoopEvent.run(new Runnable() {
+            @Override
+            public void run() {
+                if(view.getMeasuredHeight() != 0 || view.getMeasuredWidth() != 0){
+                    runnable.run();
+                    uiLoopEvent.stop();
+                    return;
+                }
+
+                if(System.currentTimeMillis() - time > 1000){
+                    throw new RuntimeException("executeWhenViewMeasuredUsingLoop timeout");
+                }
+            }
+        });
+    }
+
+    /* Might not be called, when passed view is a child or sub-child of GridView, use
+    executeWhenViewMeasuredUsingLoop instead */
     public static void executeWhenViewMeasured(final View view, final Runnable runnable) {
         if(view.getMeasuredHeight() == 0 || view.getMeasuredWidth() == 0){
             view.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
