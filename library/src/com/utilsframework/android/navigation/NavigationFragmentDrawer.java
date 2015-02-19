@@ -6,6 +6,7 @@ import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.widget.DrawerLayout;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import com.utils.framework.Predicate;
@@ -94,6 +95,10 @@ public abstract class NavigationFragmentDrawer {
         }
     }
 
+    protected void onNavigationItemClick(View view) {
+
+    }
+
     public NavigationFragmentDrawer(final Activity activity,
                                     FragmentFactory fragmentFactory,
                                     int currentSelectedItem) {
@@ -110,6 +115,7 @@ public abstract class NavigationFragmentDrawer {
             navigationView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    onNavigationItemClick(v);
                     selectFragment(v);
                 }
             });
@@ -129,6 +135,7 @@ public abstract class NavigationFragmentDrawer {
                     fragmentFactory.createFragmentBySelectedItem(currentSelectedItem, 0));
             activity.getActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
         }
+        onNavigationItemClick(activity.findViewById(currentSelectedItem));
     }
 
     private void initDrawableToggle() {
