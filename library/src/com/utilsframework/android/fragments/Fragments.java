@@ -53,8 +53,35 @@ public class Fragments {
         fragmentManager.beginTransaction().replace(id, newFragment).commit();
     }
 
-    public static void replaceFragmentAndAddToBackStack(Activity activity, int id, Fragment newFragment) {
-        FragmentManager fragmentManager = activity.getFragmentManager();
+    public interface OnBack {
+        void onBack();
+    }
+
+    public static void replaceFragmentAndAddToBackStack(Activity activity, final int id,
+                                                        Fragment newFragment, final OnBack onBack) {
+        final FragmentManager fragmentManager = activity.getFragmentManager();
+        final Fragment currentFragment = fragmentManager.findFragmentById(id);
+        if(currentFragment == null){
+            throw new IllegalStateException("Unable to replace fragment, fragment doesn't exist");
+        }
+
+        if (onBack != null) {
+            final int count = fragmentManager.getBackStackEntryCount();
+            fragmentManager.addOnBackStackChangedListener(new FragmentManager.OnBackStackChangedListener() {
+                @Override
+                public void onBackStackChanged() {
+                    int backStackEntryCount = fragmentManager.getBackStackEntryCount();
+                    if(fragmentManager.findFragmentById(id) == currentFragment && count == backStackEntryCount) {
+                        onBack.onBack();
+                    }
+
+                    if(backStackEntryCount <= count){
+                        fragmentManager.removeOnBackStackChangedListener(this);
+                    }
+                }
+            });
+        }
+
         fragmentManager.beginTransaction().replace(id, newFragment).addToBackStack(null).commit();
     }
 

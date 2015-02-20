@@ -1,11 +1,13 @@
 package com.utilsframework.android.navigation;
 
 import android.app.Activity;
+import android.app.Fragment;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewStub;
 import com.utils.framework.Predicate;
 import com.utilsframework.android.R;
+import com.utilsframework.android.fragments.FragmentReplacer;
 import com.utilsframework.android.view.GuiUtilities;
 
 import java.util.List;
@@ -13,7 +15,7 @@ import java.util.List;
 /**
  * Created by CM on 12/26/2014.
  */
-public abstract class NavigationDrawerActivity extends Activity implements FragmentFactory{
+public abstract class NavigationDrawerActivity extends Activity implements FragmentFactory {
     private NavigationFragmentDrawer navigationDrawer;
     private View navigationView;
     private List<View> navigationViewChildren;
@@ -111,5 +113,9 @@ public abstract class NavigationDrawerActivity extends Activity implements Fragm
             view.setSelected(true);
             view.refreshDrawableState();
         }
+    }
+
+    public void replaceFragment(Fragment newFragment, int navigationLevel) {
+        navigationDrawer.replaceFragment(newFragment, navigationLevel);
     }
 }
