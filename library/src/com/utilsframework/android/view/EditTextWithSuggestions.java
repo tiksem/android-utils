@@ -16,6 +16,11 @@ public class EditTextWithSuggestions extends AutoCompleteTextView {
     private String defaultValue = "";
     private AdapterView.OnItemClickListener onItemClickListener;
     private String lastSelectedItem;
+    private OnDefaultValueSet onDefaultValueSet;
+
+    public interface OnDefaultValueSet {
+        void onDefaultValueSet();
+    }
 
     private void init() {
         super.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -69,6 +74,9 @@ public class EditTextWithSuggestions extends AutoCompleteTextView {
             performFiltering(getText(), 0);
         } else if(displayDefaultValueOnNoItemSelected && !getText().toString().equals(lastSelectedItem)) {
             setText(defaultValue);
+            if (onDefaultValueSet != null) {
+                onDefaultValueSet.onDefaultValueSet();
+            }
         }
     }
 
@@ -78,5 +86,16 @@ public class EditTextWithSuggestions extends AutoCompleteTextView {
 
     public void setDisplayDefaultValueOnNoItemSelected(boolean displayDefaultValueOnNoItemSelected) {
         this.displayDefaultValueOnNoItemSelected = displayDefaultValueOnNoItemSelected;
+        if(displayDefaultValueOnNoItemSelected){
+            setText(defaultValue);
+        }
+    }
+
+    public OnDefaultValueSet getOnDefaultValueSet() {
+        return onDefaultValueSet;
+    }
+
+    public void setOnDefaultValueSet(OnDefaultValueSet onDefaultValueSet) {
+        this.onDefaultValueSet = onDefaultValueSet;
     }
 }
