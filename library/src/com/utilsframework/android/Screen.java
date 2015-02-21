@@ -6,6 +6,7 @@ import android.graphics.Point;
 import android.graphics.Rect;
 import android.util.DisplayMetrics;
 import android.view.Display;
+import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import com.utils.framework.MathUtils;
@@ -74,5 +75,10 @@ public final class Screen {
         result.x = getScreenWidth(context) / 2;
         result.y = getScreenHeight(context) / 2;
         return result;
+    }
+
+    public static Point getContentSize(Activity activity) {
+        View view = activity.getWindow().findViewById(Window.ID_ANDROID_CONTENT);
+        return new Point(view.getMeasuredWidth(), view.getMeasuredHeight());
     }
 }
