@@ -15,7 +15,7 @@ import java.util.*;
  * Time: 20:03
  */
 public abstract class ViewArrayAdapter<Element, ViewHolder> extends BaseAdapter {
-    protected static final int FOOTER_VIEW_TYPE = 2;
+    protected static final int HEADER_VIEW_TYPE = 2;
     protected static final int NULL_VIEW_TYPE = 1;
     protected static final int NORMAL_VIEW_TYPE = 0;
     protected static final int VIEW_TYPES_COUNT = 3;
@@ -75,7 +75,7 @@ public abstract class ViewArrayAdapter<Element, ViewHolder> extends BaseAdapter 
         if(header != null){
             position--;
             if(position < 0){
-                return FOOTER_VIEW_TYPE;
+                return HEADER_VIEW_TYPE;
             }
         }
 
@@ -83,8 +83,12 @@ public abstract class ViewArrayAdapter<Element, ViewHolder> extends BaseAdapter 
         if(element == null){
             return NULL_VIEW_TYPE;
         } else {
-            return NORMAL_VIEW_TYPE;
+            return getItemViewTypeOfElement(element);
         }
+    }
+
+    protected int getItemViewTypeOfElement(Element element) {
+        return NORMAL_VIEW_TYPE;
     }
 
     @Override
@@ -155,7 +159,7 @@ public abstract class ViewArrayAdapter<Element, ViewHolder> extends BaseAdapter 
         }
 
         if(viewHolder == null){
-            convertView = inflater.inflate(getRootLayoutId(),null);
+            convertView = inflater.inflate(getRootLayoutId(getItemViewType(position)),null);
             viewHolder = createViewHolder(convertView);
             convertView.setTag(viewHolder);
             onViewCreated(position, convertView, element, viewHolder);
@@ -186,7 +190,7 @@ public abstract class ViewArrayAdapter<Element, ViewHolder> extends BaseAdapter 
         return convertView;
     }
 
-    protected abstract int getRootLayoutId();
+    protected abstract int getRootLayoutId(int viewType);
     protected int getNullLayoutId(){
         throw new NullPointerException("null elements are not allowed");
     }
@@ -199,6 +203,18 @@ public abstract class ViewArrayAdapter<Element, ViewHolder> extends BaseAdapter 
 
     public final Element getElement(int index){
         return elements.get(index);
+    }
+
+    public Element getElementByViewPosition(int position) {
+        if(header == null) {
+            return getElement(position);
+        } else {
+            if(position == 0){
+                return null;
+            } else {
+                return getElement(position - 1);
+            }
+        }
     }
 
     public final void setElements(List<Element> elements){
