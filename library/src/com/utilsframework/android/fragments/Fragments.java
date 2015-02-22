@@ -21,6 +21,24 @@ public class Fragments {
         return arguments.getLong(key, defaultValue);
     }
 
+    public static int getInt(Fragment fragment, String key, int defaultValue) {
+        Bundle arguments = fragment.getArguments();
+        if(arguments == null){
+            return defaultValue;
+        }
+
+        return arguments.getInt(key, defaultValue);
+    }
+
+    public static boolean getBoolean(Fragment fragment, String key) {
+        Bundle arguments = fragment.getArguments();
+        if(arguments == null){
+            return false;
+        }
+
+        return arguments.getBoolean(key);
+    }
+
     public static void addFragment(Activity activity, int containerId, Fragment fragment) {
         FragmentManager fragmentManager = activity.getFragmentManager();
         fragmentManager.beginTransaction().add(containerId, fragment).commit();
@@ -87,6 +105,11 @@ public class Fragments {
 
     public static void clearBackStack(FragmentManager fragmentManager) {
         fragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+    }
+
+    public static void removeFragmentWithId(FragmentManager fragmentManager, int id) {
+        Fragment fragment = fragmentManager.findFragmentById(id);
+        fragmentManager.beginTransaction().remove(fragment).commit();
     }
 
     public static void clearBackStack(Activity activity) {
