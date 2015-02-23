@@ -197,10 +197,6 @@ public abstract class ViewArrayAdapter<Element, ViewHolder> extends BaseAdapter 
     protected abstract ViewHolder createViewHolder(View view);
     protected abstract void reuseView(Element element, ViewHolder viewHolder, int position, View view);
 
-    protected boolean footerAllowed() {
-        return false;
-    }
-
     public final Element getElement(int index){
         return elements.get(index);
     }
@@ -239,15 +235,15 @@ public abstract class ViewArrayAdapter<Element, ViewHolder> extends BaseAdapter 
         notifyDataSetChanged();
     }
 
+    public void addElementToFront(Element element) {
+        elements.add(0, element);
+    }
+
     public void addElements(Iterable<Element> elements){
         for(Element i : elements){
             internalAddElement(i);
         }
         notifyDataSetChanged();
-    }
-
-    public void onAdapterChanged(){
-        setElements(Collections.<Element>emptyList());
     }
 
     public ViewArrayAdapter(Context context){
