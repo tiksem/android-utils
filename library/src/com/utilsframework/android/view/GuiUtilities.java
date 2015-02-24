@@ -474,6 +474,21 @@ public class GuiUtilities {
         listView.setSelection(position - 1);
     }
 
+    public static int getChildrenHeight(ViewGroup viewGroup) {
+        if (viewGroup.getChildCount() > 0) {
+            View first = viewGroup.getChildAt(0);
+            View last = getLastChild(viewGroup);
+
+            return last.getBottom() - first.getTop();
+        } else {
+            return 0;
+        }
+    }
+
+    private static View getLastChild(ViewGroup viewGroup) {
+        return viewGroup.getChildAt(viewGroup.getChildCount() - 1);
+    }
+
     public static void setClickListenerToMenuItems(Menu menu, MenuItem.OnMenuItemClickListener clickListener) {
         for(int i = 0; i < menu.size(); i++){
             MenuItem menuItem = menu.getItem(i);

@@ -1,10 +1,14 @@
 package com.utilsframework.android.adapters;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.BaseAdapter;
+import android.widget.ListView;
+import android.widget.TextView;
 import com.utilsframework.android.UiLoopEvent;
 
 import java.util.*;
@@ -29,6 +33,8 @@ public abstract class ViewArrayAdapter<Element, ViewHolder> extends BaseAdapter 
     private UiLoopEvent nullItemsUpdater;
     private Set<Integer> nullItemsPositions;
     private View header;
+    private boolean reverse;
+    private View emptyView;
 
     public List<Element> getElements() {
         return elements;
@@ -106,6 +112,10 @@ public abstract class ViewArrayAdapter<Element, ViewHolder> extends BaseAdapter 
 
     @Override
     public View getView(int position, View convertView, final ViewGroup viewGroup) {
+        if(reverse){
+            position = getCount() - position - 1;
+        }
+
         if(header != null){
             position--;
         }
@@ -226,7 +236,7 @@ public abstract class ViewArrayAdapter<Element, ViewHolder> extends BaseAdapter 
         return (Element) view.getTag(ELEMENT_KEY);
     }
 
-    protected final Integer getPositionOfView(View view) {
+    public final Integer getPositionOfView(View view) {
         return (Integer) view.getTag(POSITION_KEY);
     }
 
@@ -261,5 +271,13 @@ public abstract class ViewArrayAdapter<Element, ViewHolder> extends BaseAdapter 
 
     public void setOnNullElementReceivedListener(OnNullElementReceived<Element> onNullElementReceivedListener) {
         this.onNullElementReceivedListener = onNullElementReceivedListener;
+    }
+
+    public boolean isReverse() {
+        return reverse;
+    }
+
+    public void setReverse(boolean reverse) {
+        this.reverse = reverse;
     }
 }
