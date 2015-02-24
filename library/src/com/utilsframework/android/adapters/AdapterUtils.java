@@ -3,6 +3,7 @@ package com.utilsframework.android.adapters;
 import android.app.Activity;
 import android.view.View;
 import android.widget.AbsListView;
+import com.utils.framework.Destroyable;
 import com.utils.framework.OnError;
 import com.utils.framework.collections.NavigationList;
 import com.utils.framework.collections.OnAllDataLoaded;
@@ -20,7 +21,7 @@ public class AdapterUtils {
         }
     }
 
-    public static <T> void initListViewNavigation(ListViewNavigationParams<T> params) {
+    public static <T> Destroyable initListViewNavigation(ListViewNavigationParams<T> params) {
         Activity activity = params.activity;
         final AbsListView listView = (AbsListView) getViewById(params, params.listViewId);
         final View loadingView = getViewById(params, params.loadingViewId);
@@ -62,5 +63,15 @@ public class AdapterUtils {
         navigationList.get(0);
 
         listView.setAdapter(adapter);
+
+        return new Destroyable() {
+            @Override
+            public void destroy() {
+                navigationList.setOnPageLoadingFinished(null);
+                navigationList.setOnAllDataLoaded(null);
+                navigationList.setOnError(null);
+                adapter.setElements(null);
+            }
+        };
     }
 }
