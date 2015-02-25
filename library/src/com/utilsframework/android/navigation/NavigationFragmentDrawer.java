@@ -98,11 +98,7 @@ public abstract class NavigationFragmentDrawer {
                 }
             };
             tab.setTabListener(listener);
-            actionBar.addTab(tab);
-
-            if (tabIndex == selectedTabIndex) {
-                actionBar.selectTab(tab);
-            }
+            actionBar.addTab(tab, tabIndex == selectedTabIndex);
         }
     }
 
@@ -229,13 +225,20 @@ public abstract class NavigationFragmentDrawer {
         return selectedTab.getPosition();
     }
 
+    public void onBackPressed() {
+        int currentTabIndex = getCurrentTabIndex();
+        if(currentTabIndex != 0){
+            Fragments.removeFragmentWithId(activity.getFragmentManager(), R.id.content);
+        }
+    }
+
     public void replaceFragment(Fragment newFragment, final int navigationLevel) {
         final int lastNavigationLevel = this.navigationLevel;
-        final int tabIndex = getCurrentTabIndex();
+        final int lastTabIndex = getCurrentTabIndex();
         Fragments.replaceFragmentAndAddToBackStack(activity, R.id.content, newFragment, new Fragments.OnBack() {
             @Override
             public void onBack() {
-                selectFragment(currentSelectedItem, lastNavigationLevel, tabIndex, false);
+                selectFragment(currentSelectedItem, lastNavigationLevel, lastTabIndex, false);
             }
         });
         selectFragment(currentSelectedItem, navigationLevel, 0, false);

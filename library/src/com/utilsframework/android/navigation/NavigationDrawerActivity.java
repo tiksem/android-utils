@@ -122,4 +122,10 @@ public abstract class NavigationDrawerActivity extends Activity implements Fragm
     public Fragment getCurrentFragment() {
         return getFragmentManager().findFragmentById(R.id.content);
     }
+
+    @Override
+    public void onBackPressed() {
+        navigationDrawer.onBackPressed();
+        super.onBackPressed();
+    }
 }
