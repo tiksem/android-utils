@@ -21,6 +21,15 @@ public class Fragments {
         return arguments.getLong(key, defaultValue);
     }
 
+    public static int getInt(Fragment fragment, String key) {
+        Bundle arguments = fragment.getArguments();
+        if(arguments == null){
+            throw new IllegalStateException("arguments == null");
+        }
+
+        return arguments.getInt(key);
+    }
+
     public static int getInt(Fragment fragment, String key, int defaultValue) {
         Bundle arguments = fragment.getArguments();
         if(arguments == null){

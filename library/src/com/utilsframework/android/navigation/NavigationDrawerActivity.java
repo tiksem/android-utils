@@ -118,4 +118,8 @@ public abstract class NavigationDrawerActivity extends Activity implements Fragm
     public void replaceFragment(Fragment newFragment, int navigationLevel) {
         navigationDrawer.replaceFragment(newFragment, navigationLevel);
     }
+
+    public Fragment getCurrentFragment() {
+        return getFragmentManager().findFragmentById(R.id.content);
+    }
 }

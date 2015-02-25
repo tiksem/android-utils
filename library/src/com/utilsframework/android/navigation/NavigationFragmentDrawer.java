@@ -53,8 +53,8 @@ public abstract class NavigationFragmentDrawer {
     private void initTabs(int tabsCount,
                           final int viewId,
                           final int navigationLevel,
-                          boolean createFragment,
-                          int selectedTabIndex) {
+                          final boolean createFragment,
+                          final int selectedTabIndex) {
         ActionBar actionBar = activity.getActionBar();
         if(actionBar == null){
             throw new NullPointerException("actionBar == null");
@@ -70,15 +70,21 @@ public abstract class NavigationFragmentDrawer {
 
             final int tabIndex = i;
             ActionBar.TabListener listener = new ActionBar.TabListener() {
+                boolean shouldCreateFragment = createFragment;
+
                 @Override
                 public void onTabSelected(ActionBar.Tab tab, FragmentTransaction ft) {
                     if (viewId != currentSelectedItem) {
                         Fragments.clearBackStack(activity);
                     }
-                    Fragment fragment =
-                            fragmentFactory.createFragmentBySelectedItem(viewId, tabIndex,
-                                    navigationLevel);
-                    ft.replace(getContentId(), fragment);
+                    if (shouldCreateFragment || selectedTabIndex != tabIndex) {
+                        Fragment fragment =
+                                fragmentFactory.createFragmentBySelectedItem(viewId, tabIndex,
+                                        navigationLevel);
+                        ft.replace(getContentId(), fragment);
+                    }
+
+                    shouldCreateFragment = true;
                 }
 
                 @Override
@@ -96,11 +102,6 @@ public abstract class NavigationFragmentDrawer {
 
             if (tabIndex == selectedTabIndex) {
                 actionBar.selectTab(tab);
-                if (createFragment) {
-                    Fragment fragment =
-                            fragmentFactory.createFragmentBySelectedItem(viewId, tabIndex, navigationLevel);
-                    Fragments.replaceFragment(activity, getContentId(), fragment);
-                }
             }
         }
     }
