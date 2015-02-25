@@ -36,8 +36,9 @@ public abstract class NavigationFragmentDrawer {
         if (tabsCount <= 1) {
             if (viewId != currentSelectedItem) {
                 Fragments.clearBackStack(activity);
+                Fragments.removeFragmentWithId(activity.getFragmentManager(), getContentId());
                 Fragment fragment = fragmentFactory.createFragmentBySelectedItem(viewId, 0, navigationLevel);
-                Fragments.replaceFragment(activity, getContentId(), fragment);
+                Fragments.addFragment(activity, getContentId(), fragment);
             }
             activity.getActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
         } else {
@@ -76,6 +77,7 @@ public abstract class NavigationFragmentDrawer {
                 public void onTabSelected(ActionBar.Tab tab, FragmentTransaction ft) {
                     if (viewId != currentSelectedItem) {
                         Fragments.clearBackStack(activity);
+                        Fragments.removeFragmentWithId(activity.getFragmentManager(), getContentId());
                     }
                     if (shouldCreateFragment || selectedTabIndex != tabIndex) {
                         Fragment fragment =
