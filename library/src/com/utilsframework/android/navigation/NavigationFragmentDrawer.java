@@ -1,9 +1,6 @@
 package com.utilsframework.android.navigation;
 
-import android.app.ActionBar;
-import android.app.Activity;
-import android.app.Fragment;
-import android.app.FragmentTransaction;
+import android.app.*;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.widget.DrawerLayout;
 import android.view.View;
@@ -13,7 +10,8 @@ import com.utilsframework.android.R;
 import com.utilsframework.android.fragments.Fragments;
 import com.utilsframework.android.view.GuiUtilities;
 
-import java.util.List;
+import java.lang.ref.WeakReference;
+import java.util.*;
 
 /**
  * Created by CM on 12/26/2014.
@@ -26,6 +24,17 @@ public abstract class NavigationFragmentDrawer {
     private int currentSelectedItem;
     private int navigationLevel = 0;
     private ActionBarDrawerToggle drawerToggle;
+    private Set<FragmentManager.OnBackStackChangedListener> backStackChangedListeners =
+            Collections.newSetFromMap(new WeakHashMap<FragmentManager.OnBackStackChangedListener, Boolean>());
+
+    private void clearBackStack() {
+        FragmentManager fragmentManager = activity.getFragmentManager();
+        for(FragmentManager.OnBackStackChangedListener onBackStackChangedListener : backStackChangedListeners) {
+            fragmentManager.removeOnBackStackChangedListener(onBackStackChangedListener);
+        }
+
+        Fragments.clearBackStack(activity);
+    }
 
     private void selectFragment(int viewId, int navigationLevel, int tabIndex, boolean createFragment) {
         if(viewId == currentSelectedItem && navigationLevel == this.navigationLevel){
@@ -35,7 +44,7 @@ public abstract class NavigationFragmentDrawer {
         int tabsCount = fragmentFactory.getTabsCount(viewId, navigationLevel);
         if (tabsCount <= 1) {
             if (viewId != currentSelectedItem) {
-                Fragments.clearBackStack(activity);
+                clearBackStack();
                 Fragments.removeFragmentWithId(activity.getFragmentManager(), getContentId());
                 Fragment fragment = fragmentFactory.createFragmentBySelectedItem(viewId, 0, navigationLevel);
                 Fragments.addFragment(activity, getContentId(), fragment);
@@ -76,7 +85,7 @@ public abstract class NavigationFragmentDrawer {
                 @Override
                 public void onTabSelected(ActionBar.Tab tab, FragmentTransaction ft) {
                     if (viewId != currentSelectedItem) {
-                        Fragments.clearBackStack(activity);
+                        clearBackStack();
                         Fragments.removeFragmentWithId(activity.getFragmentManager(), getContentId());
                     }
                     if (shouldCreateFragment || selectedTabIndex != tabIndex) {
@@ -237,12 +246,15 @@ public abstract class NavigationFragmentDrawer {
     public void replaceFragment(Fragment newFragment, final int navigationLevel) {
         final int lastNavigationLevel = this.navigationLevel;
         final int lastTabIndex = getCurrentTabIndex();
-        Fragments.replaceFragmentAndAddToBackStack(activity, R.id.content, newFragment, new Fragments.OnBack() {
-            @Override
-            public void onBack() {
-                selectFragment(currentSelectedItem, lastNavigationLevel, lastTabIndex, false);
-            }
-        });
+        FragmentManager.OnBackStackChangedListener onBackStackChangedListener =
+                Fragments.replaceFragmentAndAddToBackStack(activity, R.id.content, newFragment,
+                new Fragments.OnBack() {
+                    @Override
+                    public void onBack() {
+                        selectFragment(currentSelectedItem, lastNavigationLevel, lastTabIndex, false);
+                    }
+                });
+        backStackChangedListeners.add(onBackStackChangedListener);
         selectFragment(currentSelectedItem, navigationLevel, 0, false);
     }
 }

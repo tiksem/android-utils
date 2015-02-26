@@ -93,7 +93,8 @@ public class Fragments {
         void onBack();
     }
 
-    public static void replaceFragmentAndAddToBackStack(Activity activity, final int id,
+    public static FragmentManager.OnBackStackChangedListener
+    replaceFragmentAndAddToBackStack(Activity activity, final int id,
                                                         Fragment newFragment, final OnBack onBack) {
         final FragmentManager fragmentManager = activity.getFragmentManager();
         final Fragment currentFragment = fragmentManager.findFragmentById(id);
@@ -101,9 +102,10 @@ public class Fragments {
             throw new IllegalStateException("Unable to replace fragment, fragment doesn't exist");
         }
 
+        FragmentManager.OnBackStackChangedListener result = null;
         if (onBack != null) {
             final int count = fragmentManager.getBackStackEntryCount();
-            fragmentManager.addOnBackStackChangedListener(new FragmentManager.OnBackStackChangedListener() {
+            result = new FragmentManager.OnBackStackChangedListener() {
                 @Override
                 public void onBackStackChanged() {
                     int backStackEntryCount = fragmentManager.getBackStackEntryCount();
@@ -115,14 +117,16 @@ public class Fragments {
                         fragmentManager.removeOnBackStackChangedListener(this);
                     }
                 }
-            });
+            };
+            fragmentManager.addOnBackStackChangedListener(result);
         }
 
         fragmentManager.beginTransaction().replace(id, newFragment).addToBackStack(null).commit();
+        return result;
     }
 
     public static void clearBackStack(FragmentManager fragmentManager) {
-        fragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+        fragmentManager.popBackStackImmediate();
     }
 
     public static void removeFragmentWithId(FragmentManager fragmentManager, int id) {
