@@ -1,13 +1,18 @@
 package com.utilsframework.android.bitmap;
 
 import android.annotation.SuppressLint;
+import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.graphics.*;
 import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.provider.MediaStore;
+import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import com.utilsframework.android.threading.OnFinish;
@@ -23,6 +28,9 @@ import java.util.*;
  */
 public class BitmapUtilities {
     private static final int DOMINANT_CALCULATION_COLOR_STEP = 10;
+
+    private static final String SCHEME_FILE = "file";
+    private static final String SCHEME_CONTENT = "content";
 
     @SuppressLint("NewApi")
 	public static boolean bitmapCompare(Bitmap bmp1, Bitmap bmp2) {
@@ -299,6 +307,37 @@ public class BitmapUtilities {
             com.utilsframework.android.crop.util.Log.e("Error copying Exif data", e);
             return false;
         }
+    }
+
+    public static File getFromMediaUri(ContentResolver resolver, Uri uri) {
+        if (uri == null) return null;
+
+        if (SCHEME_FILE.equals(uri.getScheme())) {
+            return new File(uri.getPath());
+        } else if (SCHEME_CONTENT.equals(uri.getScheme())) {
+            final String[] filePathColumn = { MediaStore.MediaColumns.DATA, MediaStore.MediaColumns.DISPLAY_NAME };
+            Cursor cursor = null;
+            try {
+                cursor = resolver.query(uri, filePathColumn, null, null, null);
+                if (cursor != null && cursor.moveToFirst()) {
+                    final int columnIndex = (uri.toString().startsWith("content://com.google.android.gallery3d")) ?
+                            cursor.getColumnIndex(MediaStore.MediaColumns.DISPLAY_NAME) :
+                            cursor.getColumnIndex(MediaStore.MediaColumns.DATA);
+                    // Picasa image on newer devices with Honeycomb and up
+                    if (columnIndex != -1) {
+                        String filePath = cursor.getString(columnIndex);
+                        if (!TextUtils.isEmpty(filePath)) {
+                            return new File(filePath);
+                        }
+                    }
+                }
+            } catch (SecurityException ignored) {
+                // Nothing we can do
+            } finally {
+                if (cursor != null) cursor.close();
+            }
+        }
+        return null;
     }
 
     public interface OnBitmapReady {
@@ -653,5 +692,27 @@ public class BitmapUtilities {
         int rotation = BitmapUtilities.getExifRotation(new File(path));
         result = BitmapUtilities.rotateBitmap(result, rotation);
         return result;
+    }
+
+    public static Uri getImageContentUri(Context context, File imageFile) {
+        String filePath = imageFile.getAbsolutePath();
+        Cursor cursor = context.getContentResolver().query(
+                MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                new String[] { MediaStore.Images.Media._ID },
+                MediaStore.Images.Media.DATA + "=? ",
+                new String[] { filePath }, null);
+        if (cursor != null && cursor.moveToFirst()) {
+            int id = cursor.getInt(cursor.getColumnIndex(MediaStore.MediaColumns._ID));
+            return Uri.withAppendedPath(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, "" + id);
+        } else {
+            if (imageFile.exists()) {
+                ContentValues values = new ContentValues();
+                values.put(MediaStore.Images.Media.DATA, filePath);
+                return context.getContentResolver().insert(
+                        MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+            } else {
+                return null;
+            }
+        }
     }
 }

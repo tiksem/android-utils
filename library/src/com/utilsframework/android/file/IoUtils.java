@@ -1,6 +1,9 @@
 package com.utilsframework.android.file;
 
+import android.content.Context;
+
 import java.io.*;
+import java.util.UUID;
 
 /**
  * Provides I/O operations

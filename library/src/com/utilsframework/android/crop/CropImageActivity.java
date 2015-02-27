@@ -28,7 +28,6 @@ import android.opengl.*;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
 import android.provider.MediaStore;
 import android.view.Display;
@@ -46,7 +45,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.URI;
 import java.util.concurrent.CountDownLatch;
 
 /*
@@ -174,7 +172,7 @@ public class CropImageActivity extends MonitoredActivity{
 
         if (sourceUri != null) {
 
-            exifRotation = BitmapUtilities.getExifRotation(CropUtil.getFromMediaUri(getContentResolver(), sourceUri));
+            exifRotation = BitmapUtilities.getExifRotation(BitmapUtilities.getFromMediaUri(getContentResolver(), sourceUri));
 
             InputStream is = null;
             try {
@@ -254,7 +252,7 @@ public class CropImageActivity extends MonitoredActivity{
 
         if(bm != null) {
 
-            int exifRotate = BitmapUtilities.getExifRotation(CropUtil.getFromMediaUri(getContentResolver(), bitmapUri));
+            int exifRotate = BitmapUtilities.getExifRotation(BitmapUtilities.getFromMediaUri(getContentResolver(), bitmapUri));
 
             Matrix matrix = new Matrix();
             matrix.postRotate(exifRotate);
@@ -626,8 +624,8 @@ public class CropImageActivity extends MonitoredActivity{
             if (!IN_MEMORY_CROP) {
                 // In-memory crop negates the rotation
                 BitmapUtilities.copyExifRotation(
-                        CropUtil.getFromMediaUri(getContentResolver(), sourceUri),
-                        CropUtil.getFromMediaUri(getContentResolver(), saveUri)
+                        BitmapUtilities.getFromMediaUri(getContentResolver(), sourceUri),
+                        BitmapUtilities.getFromMediaUri(getContentResolver(), saveUri)
                 );
             }
 
