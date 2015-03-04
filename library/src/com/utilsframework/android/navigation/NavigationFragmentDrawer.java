@@ -46,7 +46,7 @@ public abstract class NavigationFragmentDrawer {
                 clearBackStack();
                 Fragments.removeFragmentWithId(activity.getFragmentManager(), getContentId());
                 Fragment fragment = fragmentFactory.createFragmentBySelectedItem(viewId, 0, navigationLevel);
-                Fragments.addFragment(activity, getContentId(), fragment);
+                Fragments.replaceFragment(activity, getContentId(), fragment);
             }
             activity.getActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
         } else {
