@@ -162,7 +162,7 @@ public abstract class NavigationFragmentDrawer {
     private void updateActionBarTitle() {
         ActionBar actionBar = activity.getActionBar();
         if (actionBar != null) {
-            String title = getActionBarTitle(currentSelectedItem, navigationLevel, getCurrentTabIndex());
+            String title = getActionBarTitle(currentSelectedItem, getCurrentTabIndex(), navigationLevel);
             actionBar.setTitle(title);
         }
     }

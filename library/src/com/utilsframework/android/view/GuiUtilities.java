@@ -287,7 +287,7 @@ public class GuiUtilities {
                 }
 
                 if(System.currentTimeMillis() - time > 1000){
-                    throw new RuntimeException("executeWhenViewMeasuredUsingLoop timeout");
+                    uiLoopEvent.stop();
                 }
             }
         });
