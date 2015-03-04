@@ -7,7 +7,6 @@ import android.view.View;
 import android.view.ViewStub;
 import com.utils.framework.Predicate;
 import com.utilsframework.android.R;
-import com.utilsframework.android.fragments.FragmentReplacer;
 import com.utilsframework.android.view.GuiUtilities;
 
 import java.util.List;
@@ -54,10 +53,11 @@ public abstract class NavigationDrawerActivity extends Activity implements Fragm
             }
 
             @Override
-            protected String getActionBarTitle(int currentSelectedItem) {
-                String title = NavigationDrawerActivity.this.getActionBarTitle(currentSelectedItem);
+            protected String getActionBarTitle(int currentSelectedItem, int tabIndex, int navigationLevel) {
+                String title = NavigationDrawerActivity.this.getActionBarTitle(currentSelectedItem,
+                        tabIndex, navigationLevel);
                 if(title == null){
-                    title = super.getActionBarTitle(currentSelectedItem);
+                    title = super.getActionBarTitle(currentSelectedItem, tabIndex, navigationLevel);
                 }
 
                 return title;
@@ -84,6 +84,7 @@ public abstract class NavigationDrawerActivity extends Activity implements Fragm
                 }
             }
         };
+        navigationDrawer.init();
     }
 
     @Override
@@ -93,7 +94,7 @@ public abstract class NavigationDrawerActivity extends Activity implements Fragm
 
     protected abstract int getNavigationLayoutId();
     protected abstract int getCurrentSelectedNavigationItemId();
-    protected String getActionBarTitle(int selectedItemId) {
+    protected String getActionBarTitle(int selectedItemId, int tabIndex, int navigationLevel) {
         return null;
     }
 
@@ -127,5 +128,10 @@ public abstract class NavigationDrawerActivity extends Activity implements Fragm
     public void onBackPressed() {
         navigationDrawer.onBackPressed();
         super.onBackPressed();
+    }
+
+    public View getSelectedView() {
+        int currentSelectedItem = navigationDrawer.getCurrentSelectedItem();
+        return navigationView.findViewById(currentSelectedItem);
     }
 }
