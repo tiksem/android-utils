@@ -134,4 +134,8 @@ public abstract class NavigationDrawerActivity extends Activity implements Fragm
         int currentSelectedItem = navigationDrawer.getCurrentSelectedItem();
         return navigationView.findViewById(currentSelectedItem);
     }
+
+    public void updateActionBarTitle() {
+        navigationDrawer.updateActionBarTitle();
+    }
 }

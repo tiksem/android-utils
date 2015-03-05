@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.view.View;
 import com.utilsframework.android.UiLoopEvent;
 import com.utilsframework.android.view.GuiUtilities;
@@ -55,6 +56,15 @@ public class Fragments {
         }
 
         return arguments.getBoolean(key);
+    }
+
+    public static <T extends Parcelable> T getParcelable(Fragment fragment, String key) {
+        Bundle arguments = fragment.getArguments();
+        if(arguments == null){
+            return null;
+        }
+
+        return arguments.getParcelable(key);
     }
 
     public static void addFragment(Activity activity, int containerId, Fragment fragment) {

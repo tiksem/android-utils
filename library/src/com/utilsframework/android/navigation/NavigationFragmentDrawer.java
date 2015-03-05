@@ -159,12 +159,27 @@ public abstract class NavigationFragmentDrawer {
         }
     }
 
-    private void updateActionBarTitle() {
-        ActionBar actionBar = activity.getActionBar();
-        if (actionBar != null) {
-            String title = getActionBarTitle(currentSelectedItem, getCurrentTabIndex(), navigationLevel);
-            actionBar.setTitle(title);
-        }
+    public void updateActionBarTitle() {
+        navigationLayout.post(new Runnable() {
+            @Override
+            public void run() {
+                ActionBar actionBar = activity.getActionBar();
+                if(actionBar == null){
+                    return;
+                }
+
+                String title = null;
+                Fragment fragment = activity.getFragmentManager().findFragmentById(getContentId());
+                if(fragment instanceof ActionBarTitleProvider){
+                    title = ((ActionBarTitleProvider)fragment).getActionBarTitle();
+                }
+                if (title == null) {
+                    title = getActionBarTitle(currentSelectedItem, getCurrentTabIndex(), navigationLevel);
+                }
+
+                actionBar.setTitle(title);
+            }
+        });
     }
 
     private void initDrawableToggle() {
