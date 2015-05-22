@@ -1,12 +1,12 @@
 package com.utilsframework.android.image;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.Environment;
-import android.support.v4.app.FragmentActivity;
 import android.widget.ImageView;
 import com.utilsframework.android.R;
 
@@ -19,7 +19,7 @@ import java.io.FileOutputStream;
  * Date: 01.07.14
  * Time: 18:30
  */
-public class ImagePreviewActivity extends FragmentActivity {
+public class ImagePreviewActivity extends Activity {
     private static final String BITMAP_KEY = "BITMAP_KEY";
 
     public static void show(Context context, Bitmap bitmap){
