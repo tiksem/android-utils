@@ -25,9 +25,7 @@ public class ImageSelectAndEdit {
     }
 
     public void selectAndEdit() {
-        Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
-        photoPickerIntent.setType("image/*");
-        activity.startActivityForResult(photoPickerIntent, PICK);
+        ImageUtils.pickImageFromGallery(activity, PICK);
     }
 
     public interface Listener {
