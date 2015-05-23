@@ -28,6 +28,10 @@ public class ImageUtils {
 
     public static String getSelectedImagePath(Activity activity, Intent data) {
         File selectedImage = BitmapUtilities.getFromMediaUri(activity.getContentResolver(), data.getData());
+        if (selectedImage == null) {
+            return null;
+        }
+
         return selectedImage.getAbsolutePath();
     }
 }
