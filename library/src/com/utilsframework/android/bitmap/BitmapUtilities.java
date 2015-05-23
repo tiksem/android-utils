@@ -715,4 +715,11 @@ public class BitmapUtilities {
             }
         }
     }
+
+    public static Size getBitmapDimensions(String filePath) {
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+        BitmapFactory.decodeFile(filePath, options);
+        return new Size(options.outWidth, options.outHeight);
+    }
 }

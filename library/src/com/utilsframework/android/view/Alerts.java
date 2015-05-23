@@ -6,6 +6,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.view.View;
+import android.widget.EditText;
+import android.widget.ImageView;
 import com.utilsframework.android.threading.AsyncOperationCallback;
 import com.utilsframework.android.threading.Cancelable;
 import com.utilsframework.android.threading.Threading;
@@ -40,7 +42,7 @@ public final class Alerts {
         builder.setNegativeButton(settings.noButtonText, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                if(settings.onNo != null){
+                if (settings.onNo != null) {
                     settings.onNo.onNo();
                 }
             }
@@ -78,7 +80,6 @@ public final class Alerts {
 
         builder.create().show();
     }
-
     public static void showOkButtonAlert(Context context, String message) {
         OkAlertSettings okAlertSettings = new OkAlertSettings();
         okAlertSettings.message = message;
@@ -90,6 +91,42 @@ public final class Alerts {
 
         builder.setView(view);
         builder.setMessage(message);
+
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+        return alertDialog;
+    }
+
+    public static class InputAlertSettings {
+        public CharSequence message;
+        public CharSequence title;
+        public CharSequence initialText;
+        public CharSequence okButtonText = "OK";
+        public CharSequence cancelButtonText = "Cancel";
+        public OnInputOk onInputOk;
+    }
+
+    public interface OnInputOk {
+        public void onOk(String value);
+    }
+
+    public static AlertDialog showAlertWithInput(Context context, final InputAlertSettings settings) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+
+        final EditText editText = new EditText(context);
+        builder.setView(editText);
+
+        builder.setPositiveButton(settings.okButtonText, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                if (settings.onInputOk != null) {
+                    settings.onInputOk.onOk(editText.getText().toString());
+                }
+            }
+        });
+
+        builder.setTitle(settings.title);
+        builder.setMessage(settings.message);
 
         AlertDialog alertDialog = builder.create();
         alertDialog.show();
