@@ -1,7 +1,9 @@
 package com.utilsframework.android.file;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Environment;
 import com.utilsframework.android.threading.BackgroundLoopEvent;
 import com.utilsframework.android.threading.Cancelable;
@@ -172,5 +174,10 @@ public final class FileUtils {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public static void updateSDCard(Context context) {
+        context.sendBroadcast(new Intent(Intent.ACTION_MEDIA_MOUNTED,
+                Uri.parse("file://" + Environment.getExternalStorageDirectory())));
     }
 }
