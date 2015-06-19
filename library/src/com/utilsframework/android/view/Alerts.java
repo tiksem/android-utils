@@ -7,14 +7,14 @@ import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.view.KeyEvent;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.*;
 import com.utilsframework.android.R;
 import com.utilsframework.android.threading.AsyncOperationCallback;
 import com.utilsframework.android.threading.Cancelable;
-import com.utilsframework.android.threading.Threading;
+
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 
 /**
  * User: Tikhonenko.S
@@ -226,19 +226,37 @@ public final class Alerts {
         return runAsyncOperationWithCircleLoading(context, context.getString(resourceId), operation);
     }
 
-    public static class NumberPickerAlertSettings {
-        public int min = 0;
-        public int max = 10;
-        public Integer current;
+    private static class PickerSettings {
         public CharSequence title;
         public CharSequence message;
         public int okButtonNameId = R.string.set;
         public int cancelButtonNameId = R.string.cancel;
+    }
+
+    public static class NumberPickerAlertSettings extends PickerSettings {
+        public int min = 0;
+        public int max = 10;
+        public Integer current;
         public OnNumberSelected onNumberSelected;
     }
 
-    public static AlertDialog showNumberPickerAlert(Context context, NumberPickerAlertSettings settings) {
+    private static AlertDialog.Builder setupPickerDialogBuilder(Context context, PickerSettings settings) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setMessage(settings.message);
+        builder.setTitle(settings.title);
+
+        builder.setNegativeButton(settings.cancelButtonNameId,
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+        return builder;
+    }
+
+    public static AlertDialog showNumberPickerAlert(Context context, NumberPickerAlertSettings settings) {
+        AlertDialog.Builder builder = setupPickerDialogBuilder(context, settings);
 
         View view = View.inflate(context, R.layout.number_picker_dialog, null);
 
@@ -252,25 +270,98 @@ public final class Alerts {
         numberPicker.setValue(settings.current);
 
         builder.setView(view);
-        builder.setMessage(settings.message);
-        builder.setTitle(settings.title);
 
         builder.setPositiveButton(settings.okButtonNameId,
                 new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        if (settings.onNumberSelected != null) {
+                            int value = numberPicker.getValue();
+                            settings.onNumberSelected.onSelected(value);
+                        }
+                    }
+                });
+
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+        return alertDialog;
+    }
+
+    public interface OnDateTimeSelected {
+        void onSelected(GregorianCalendar gregorianCalendar);
+    }
+
+    public static class DateTimePickerSettings extends PickerSettings {
+        public OnDateTimeSelected onDateTimeSelected;
+        public long currentTimeInMillis;
+    }
+
+
+
+    public static AlertDialog showTimePickerAlert(Context context, DateTimePickerSettings settings) {
+        AlertDialog.Builder builder = setupPickerDialogBuilder(context, settings);
+
+        View view = View.inflate(context, R.layout.time_picker_dialog, null);
+        TimePicker timePicker = (TimePicker) view.findViewById(R.id.time_picker);
+        GregorianCalendar calendar = new GregorianCalendar();
+        long currentTime = calendar.getTimeInMillis();
+        if (settings.currentTimeInMillis > currentTime) {
+            calendar.setTimeInMillis(settings.currentTimeInMillis);
+        }
+        timePicker.setCurrentHour(calendar.get(Calendar.HOUR_OF_DAY));
+        timePicker.setCurrentMinute(calendar.get(Calendar.MINUTE));
+
+        builder.setView(view);
+
+        builder.setPositiveButton(settings.okButtonNameId, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                if (settings.onNumberSelected != null) {
-                    int value = numberPicker.getValue();
-                    settings.onNumberSelected.onSelected(value);
+                if (settings.onDateTimeSelected != null) {
+                    calendar.set(Calendar.HOUR_OF_DAY, timePicker.getCurrentHour());
+                    calendar.set(Calendar.MINUTE, timePicker.getCurrentMinute());
+                    settings.onDateTimeSelected.onSelected(calendar);
                 }
             }
         });
 
-        builder.setNegativeButton(settings.cancelButtonNameId,
-                new DialogInterface.OnClickListener() {
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+        return alertDialog;
+    }
+
+    public static AlertDialog showDatePickerAlert(Context context, DateTimePickerSettings settings) {
+        AlertDialog.Builder builder = setupPickerDialogBuilder(context, settings);
+
+        View view = View.inflate(context, R.layout.date_picker_dialog, null);
+        DatePicker datePicker = (DatePicker) view.findViewById(R.id.date_picker);
+        datePicker.setSpinnersShown(false);
+        datePicker.setCalendarViewShown(true);
+        GregorianCalendar calendar = new GregorianCalendar();
+        long currentTime = calendar.getTimeInMillis();
+        if (settings.currentTimeInMillis > currentTime) {
+            calendar.setTimeInMillis(settings.currentTimeInMillis);
+        }
+        datePicker.updateDate(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH),
+                calendar.get(Calendar.DAY_OF_MONTH));
+
+        GregorianCalendar minimumDateCalendar = new GregorianCalendar();
+        minimumDateCalendar.set(Calendar.MINUTE, 0);
+        minimumDateCalendar.set(Calendar.HOUR_OF_DAY, 0);
+        minimumDateCalendar.set(Calendar.SECOND, 0);
+        minimumDateCalendar.set(Calendar.MILLISECOND, 0);
+        datePicker.setMinDate(minimumDateCalendar.getTimeInMillis());
+
+        builder.setView(view);
+
+        builder.setPositiveButton(settings.okButtonNameId, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
+                if (settings.onDateTimeSelected != null) {
+                    calendar.set(Calendar.YEAR, datePicker.getYear());
+                    calendar.set(Calendar.MONTH, datePicker.getMonth());
+                    calendar.set(Calendar.DAY_OF_MONTH, datePicker.getDayOfMonth());
+                    settings.onDateTimeSelected.onSelected(calendar);
+                }
             }
         });
 
