@@ -9,10 +9,9 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.KeyEvent;
 import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.TextView;
+import android.view.ViewGroup;
+import android.widget.*;
+import com.utilsframework.android.R;
 import com.utilsframework.android.threading.AsyncOperationCallback;
 import com.utilsframework.android.threading.Cancelable;
 import com.utilsframework.android.threading.Threading;
@@ -225,5 +224,58 @@ public final class Alerts {
                                                                     int resourceId,
                                                                     final Runnable operation) {
         return runAsyncOperationWithCircleLoading(context, context.getString(resourceId), operation);
+    }
+
+    public static class NumberPickerAlertSettings {
+        public int min = 0;
+        public int max = 10;
+        public Integer current;
+        public CharSequence title;
+        public CharSequence message;
+        public int okButtonNameId = R.string.set;
+        public int cancelButtonNameId = R.string.cancel;
+        public OnNumberSelected onNumberSelected;
+    }
+
+    public static AlertDialog showNumberPickerAlert(Context context, NumberPickerAlertSettings settings) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+
+        View view = View.inflate(context, R.layout.number_picker_dialog, null);
+
+        NumberPicker numberPicker = (NumberPicker) view.findViewById(R.id.number_picker);
+        numberPicker.setMinValue(settings.min);
+        numberPicker.setMaxValue(settings.max);
+        numberPicker.setWrapSelectorWheel(false);
+        if (settings.current == null) {
+            settings.current = settings.min;
+        }
+        numberPicker.setValue(settings.current);
+
+        builder.setView(view);
+        builder.setMessage(settings.message);
+        builder.setTitle(settings.title);
+
+        builder.setPositiveButton(settings.okButtonNameId,
+                new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                if (settings.onNumberSelected != null) {
+                    int value = numberPicker.getValue();
+                    settings.onNumberSelected.onSelected(value);
+                }
+            }
+        });
+
+        builder.setNegativeButton(settings.cancelButtonNameId,
+                new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+        return alertDialog;
     }
 }

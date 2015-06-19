@@ -540,5 +540,4 @@ public class GuiUtilities {
         int stringId = context.getApplicationInfo().labelRes;
         return context.getString(stringId);
     }
-
 }
