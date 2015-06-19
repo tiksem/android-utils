@@ -6,11 +6,13 @@ import android.os.Build;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
+import com.utilsframework.android.R;
 
 /**
  * Created by CM on 6/19/2015.
  */
-public class NumberPickerButton extends Button {
+public class NumberPickerButton extends TextView {
     Alerts.NumberPickerAlertSettings settings = new Alerts.NumberPickerAlertSettings();
 
     private void init() {
