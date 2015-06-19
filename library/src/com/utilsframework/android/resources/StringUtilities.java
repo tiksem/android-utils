@@ -23,24 +23,4 @@ public class StringUtilities {
         string = String.format(string, args);
         return string;
     }
-
-    public static Resources getStringResourcesInLocale(Context context, Locale locale) {
-        Resources standardResources = context.getResources();
-        AssetManager assets = standardResources.getAssets();
-        DisplayMetrics metrics = standardResources.getDisplayMetrics();
-        Configuration config = new Configuration(standardResources.getConfiguration());
-        config.locale = locale;
-        return new Resources(assets, metrics, config);
-    }
-
-    public static void setLocale(Context context, Locale locale) {
-        Locale.setDefault(locale);
-        Configuration config = new Configuration();
-        config.locale = locale;
-        context.getResources().updateConfiguration(config, null);
-    }
-
-    public static Locale getLocale(Context context) {
-        return context.getResources().getConfiguration().locale;
-    }
 }

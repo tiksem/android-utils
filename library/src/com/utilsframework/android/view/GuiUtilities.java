@@ -1,9 +1,6 @@
 package com.utilsframework.android.view;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
@@ -238,6 +235,20 @@ public class GuiUtilities {
         }
 
         return result;
+    }
+
+    public static List<View> getChildrenAsListNonCopy(final ViewGroup viewGroup) {
+        return new AbstractList<View>() {
+            @Override
+            public View get(int location) {
+                return viewGroup.getChildAt(location);
+            }
+
+            @Override
+            public int size() {
+                return viewGroup.getChildCount();
+            }
+        };
     }
 
     public static <T extends View> List<T> getChildrenAsList(final ViewGroup viewGroup, Class<T> aClass) {
