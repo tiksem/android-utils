@@ -12,6 +12,8 @@ import java.util.GregorianCalendar;
  * Time: 16:25
  */
 public class TimeUtils {
+    public static final int MILLISECONDS_IN_DAY = 24 * 3600 * 1000;
+
     private static long startTimeInMilliseconds = System.currentTimeMillis();
     private static long startNanoSeconds = System.nanoTime();
 
@@ -56,16 +58,36 @@ public class TimeUtils {
         return SHORT_MONTHS[id];
     }
 
-    //01 Jan 2015 at 20:23
-    public static String getAlternativeDisplayDate(long milliseconds) {
-        Calendar calendar = new GregorianCalendar();
-        calendar.setTimeInMillis(milliseconds);
+    public static String getAlternativeDisplayDate(long time) {
+        GregorianCalendar calendar = new GregorianCalendar();
+        calendar.setTimeInMillis(time);
+        return getAlternativeDisplayDate(calendar);
+    }
+
+    public static String getAlternativeDisplayDate(GregorianCalendar calendar) {
         String month = TimeUtils.getShortMonthName(calendar.get(Calendar.MONTH));
         String day = TimeUtils.getFormatDayOrTime(calendar.get(Calendar.DAY_OF_MONTH));
         int year = calendar.get(Calendar.YEAR);
+        return day + " " + month + " " + year;
+    }
+
+    //01 Jan 2015 at 20:23
+    public static String getAlternativeDisplayDateTime(long milliseconds) {
+        GregorianCalendar calendar = new GregorianCalendar();
+        calendar.setTimeInMillis(milliseconds);
+
         String hours = TimeUtils.getFormatDayOrTime(calendar.get(Calendar.HOUR_OF_DAY));
         String minutes = TimeUtils.getFormatDayOrTime(calendar.get(Calendar.MINUTE));
 
-        return day + " " + month + " " + year + " at " + hours + ":" + minutes;
+        return getAlternativeDisplayDate(calendar) + " at " + hours + ":" + minutes;
+    }
+
+    public static long getStartOfCurrentDay() {
+        GregorianCalendar calendar = new GregorianCalendar();
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+        return calendar.getTimeInMillis();
     }
 }

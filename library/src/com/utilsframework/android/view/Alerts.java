@@ -12,6 +12,7 @@ import android.widget.*;
 import com.utilsframework.android.R;
 import com.utilsframework.android.threading.AsyncOperationCallback;
 import com.utilsframework.android.threading.Cancelable;
+import com.utilsframework.android.time.TimeUtils;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -296,8 +297,6 @@ public final class Alerts {
         public long currentTimeInMillis;
     }
 
-
-
     public static AlertDialog showTimePickerAlert(Context context, DateTimePickerSettings settings) {
         AlertDialog.Builder builder = setupPickerDialogBuilder(context, settings);
 
@@ -366,6 +365,54 @@ public final class Alerts {
         });
 
         AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+        return alertDialog;
+    }
+
+    public interface OnDateRangeSelected {
+        void onSelected(GregorianCalendar start, GregorianCalendar end);
+    }
+
+    public static class DateRangePickerSettings extends PickerSettings {
+        public OnDateRangeSelected onDateRangeSelected;
+        public int rootLayoutId = R.layout.date_range_picker;
+        public int invalidRangeErrorId = R.string.invalid_date_range_error;
+    }
+
+    public static AlertDialog showDateRangePickerAlert(Context context, DateRangePickerSettings settings) {
+        AlertDialog.Builder builder = setupPickerDialogBuilder(context, settings);
+
+        View view = View.inflate(context, settings.rootLayoutId, null);
+        CalendarView start = (CalendarView) view.findViewById(R.id.start);
+        CalendarView end = (CalendarView) view.findViewById(R.id.end);
+        builder.setView(view);
+
+        long startOfCurrentDay = TimeUtils.getStartOfCurrentDay();
+        start.setDate(startOfCurrentDay);
+        end.setDate(startOfCurrentDay + TimeUtils.MILLISECONDS_IN_DAY);
+
+        builder.setPositiveButton(settings.okButtonNameId, null);
+
+        AlertDialog alertDialog = builder.create();
+        alertDialog.getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (start.getDate() >= end.getDate()) {
+                    UiMessages.error(context, context.getString(settings.invalidRangeErrorId));
+                } else {
+                    if (settings.onDateRangeSelected != null) {
+                        GregorianCalendar first = new GregorianCalendar();
+                        GregorianCalendar second = new GregorianCalendar();
+                        first.setTimeInMillis(start.getDate());
+                        second.setTimeInMillis(end.getDate());
+                        settings.onDateRangeSelected.onSelected(first,
+                                second);
+                    }
+                    alertDialog.dismiss();
+                }
+            }
+        });
+
         alertDialog.show();
         return alertDialog;
     }
