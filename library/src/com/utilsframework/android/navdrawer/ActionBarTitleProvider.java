@@ -1,4 +1,4 @@
-package com.utilsframework.android.navigation;
+package com.utilsframework.android.navdrawer;
 
 /**
  * Created by CM on 3/5/2015.

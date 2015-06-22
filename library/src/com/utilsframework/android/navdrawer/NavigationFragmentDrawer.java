@@ -1,4 +1,4 @@
-package com.utilsframework.android.navigation;
+package com.utilsframework.android.navdrawer;
 
 import android.app.*;
 import android.support.v4.app.ActionBarDrawerToggle;

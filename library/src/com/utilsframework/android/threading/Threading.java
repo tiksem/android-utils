@@ -122,7 +122,8 @@ public final class Threading {
         public void onComplete() {}
     }
 
-    public static <ErrorType extends Throwable, Result> void executeAsyncTask(Task<ErrorType, Result> task) {
+    public static <ErrorType extends Throwable, Result> void executeAsyncTask(Task<ErrorType, Result> task,
+                                                                              Class<ErrorType> errorClass) {
         new AsyncTask<Void, Void, Result>(){
             ErrorType errorType;
 
@@ -132,7 +133,13 @@ public final class Threading {
                 try {
                     result = task.runOnBackground();
                 } catch (Throwable error) {
-                    errorType = (ErrorType) error;
+                    if (error.getClass().isAssignableFrom(errorClass)) {
+                        errorType = (ErrorType) error;
+                    } else if(error instanceof RuntimeException) {
+                        throw (RuntimeException)error;
+                    } else {
+                        throw (Error)error;
+                    }
                 }
 
                 return result;
