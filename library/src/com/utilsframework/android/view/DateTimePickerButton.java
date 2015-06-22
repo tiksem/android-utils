@@ -103,4 +103,8 @@ public class DateTimePickerButton extends TextView {
         super(context, attrs, defStyleAttr);
         init();
     }
+
+    public long getDate() {
+        return settings.currentTimeInMillis;
+    }
 }
