@@ -133,7 +133,7 @@ public final class Threading {
                 try {
                     result = task.runOnBackground();
                 } catch (Throwable error) {
-                    if (error.getClass().isAssignableFrom(errorClass)) {
+                    if (errorClass.isAssignableFrom(error.getClass())) {
                         errorType = (ErrorType) error;
                     } else if(error instanceof RuntimeException) {
                         throw (RuntimeException)error;
