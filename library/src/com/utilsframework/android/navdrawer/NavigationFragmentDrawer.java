@@ -123,7 +123,7 @@ public abstract class NavigationFragmentDrawer {
         if (tabsCount > 1) {
             initTabs(tabsCount, currentSelectedItem, navigationLevel, true, 0);
         } else {
-            Fragments.addFragment(activity, getContentId(),
+            Fragments.replaceFragment(activity, getContentId(),
                     fragmentFactory.createFragmentBySelectedItem(currentSelectedItem, 0, navigationLevel));
             activity.getActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
         }

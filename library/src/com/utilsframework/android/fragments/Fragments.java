@@ -67,6 +67,8 @@ public class Fragments {
         return arguments.getParcelable(key);
     }
 
+    // use replaceFragment instead
+    @Deprecated
     public static void addFragment(Activity activity, int containerId, Fragment fragment) {
         FragmentManager fragmentManager = activity.getFragmentManager();
         fragmentManager.beginTransaction().add(containerId, fragment).commit();
