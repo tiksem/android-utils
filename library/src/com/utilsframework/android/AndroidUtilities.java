@@ -1,6 +1,7 @@
 package com.utilsframework.android;
 
 import android.app.Activity;
+import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -22,5 +23,15 @@ public class AndroidUtilities {
     public static void startActivity(Context context, Class<? extends Activity> aClass) {
         Intent intent = new Intent(context, aClass);
         context.startActivity(intent);
+    }
+
+    public static void startActivityForResult(Activity activity, Class<? extends Activity> aClass, int requestCode) {
+        Intent intent = new Intent(activity, aClass);
+        activity.startActivityForResult(intent, requestCode);
+    }
+
+    public static void startActivityForResult(Fragment fragment, Class<? extends Activity> aClass, int requestCode) {
+        Intent intent = new Intent(fragment.getActivity(), aClass);
+        fragment.startActivityForResult(intent, requestCode);
     }
 }
