@@ -165,6 +165,11 @@ public final class Alerts {
         return alertDialog;
     }
 
+    public static ProgressDialog showCircleProgressDialog(Context context, int messageId) {
+        return showCircleProgressDialog(context, context.getString(messageId));
+    }
+
+
     public static ProgressDialog showCircleProgressDialog(Context context, CharSequence message) {
         return ProgressDialog.show(context, null, message);
     }
