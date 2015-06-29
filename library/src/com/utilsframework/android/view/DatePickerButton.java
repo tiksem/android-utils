@@ -15,11 +15,22 @@ import java.util.GregorianCalendar;
  */
 public class DatePickerButton extends TextView {
     private Alerts.DateTimePickerSettings settings = new Alerts.DateTimePickerSettings();
+    private OnDateChangedListener onDateChangedListener;
+
+    public interface OnDateChangedListener {
+        void onDateChanged();
+    }
 
     private void updateText(GregorianCalendar calendar) {
         String displayDate = TimeUtils.getAlternativeDisplayDate(calendar);
         setText(displayDate);
-        settings.currentTimeInMillis = calendar.getTimeInMillis();
+        long timeInMillis = calendar.getTimeInMillis();
+        long currentTimeInMillis = settings.currentTimeInMillis;
+        settings.currentTimeInMillis = timeInMillis;
+
+        if (timeInMillis != currentTimeInMillis && onDateChangedListener != null) {
+            onDateChangedListener.onDateChanged();
+        }
     }
 
     private void init() {
@@ -69,5 +80,13 @@ public class DatePickerButton extends TextView {
 
     public long getDate() {
         return settings.currentTimeInMillis;
+    }
+
+    public OnDateChangedListener getOnDateChangedListener() {
+        return onDateChangedListener;
+    }
+
+    public void setOnDateChangedListener(OnDateChangedListener onDateChangedListener) {
+        this.onDateChangedListener = onDateChangedListener;
     }
 }
