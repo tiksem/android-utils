@@ -1,7 +1,7 @@
 package com.utilsframework.android.navdrawer;
 
 import android.app.*;
-import android.support.v4.app.ActionBarDrawerToggle;
+import android.os.Build;
 import android.support.v4.widget.DrawerLayout;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,7 +22,6 @@ public abstract class NavigationFragmentDrawer {
     private ViewGroup navigationLayout;
     private int currentSelectedItem;
     private int navigationLevel = 0;
-    private ActionBarDrawerToggle drawerToggle;
     private Set<FragmentManager.OnBackStackChangedListener> backStackChangedListeners =
             Collections.newSetFromMap(new WeakHashMap<FragmentManager.OnBackStackChangedListener, Boolean>());
 
@@ -183,13 +182,12 @@ public abstract class NavigationFragmentDrawer {
     }
 
     private void initDrawableToggle() {
-        drawerToggle = new ActionBarDrawerToggle(
-                activity,                  /* host Activity */
-                drawerLayout,         /* DrawerLayout object */
-                getToggleIconResourceId(),  /* nav drawer image to replace 'Up' caret */
-                R.string.drawer_open,  /* "open drawer" description for accessibility */
-                R.string.drawer_close  /* "close drawer" description for accessibility */
-        ) {
+        drawerLayout.setDrawerListener(new DrawerLayout.DrawerListener() {
+            @Override
+            public void onDrawerSlide(View view, float v) {
+
+            }
+
             public void onDrawerClosed(View view) {
                 updateActionBarTitle();
             }
@@ -201,8 +199,18 @@ public abstract class NavigationFragmentDrawer {
                     actionBar.setTitle(title);
                 }
             }
-        };
-        drawerLayout.setDrawerListener(drawerToggle);
+
+            @Override
+            public void onDrawerStateChanged(int i) {
+
+            }
+        });
+
+        ActionBar actionBar = activity.getActionBar();
+        actionBar.setDisplayHomeAsUpEnabled(true);
+        if (Build.VERSION.SDK_INT >= 21) {
+            actionBar.setHomeAsUpIndicator(getToggleIconResourceId());
+        }
     }
 
     private List<View> getNavigationViews() {
@@ -244,8 +252,9 @@ public abstract class NavigationFragmentDrawer {
         return GuiUtilities.getApplicationName(activity);
     }
 
+    // Override this method only for API 21+
     protected int getToggleIconResourceId() {
-        return R.drawable.ic_drawer;
+        return R.drawable.ic_menu_white;
     }
 
     private int getCurrentTabIndex() {
@@ -282,5 +291,13 @@ public abstract class NavigationFragmentDrawer {
 
     public int getCurrentSelectedItem() {
         return currentSelectedItem;
+    }
+
+    public void toggleDrawer() {
+        if (drawerLayout.isDrawerOpen(navigationLayout)) {
+            drawerLayout.closeDrawers();
+        } else {
+            drawerLayout.openDrawer(navigationLayout);
+        }
     }
 }

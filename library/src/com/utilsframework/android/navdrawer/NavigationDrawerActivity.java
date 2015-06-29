@@ -3,6 +3,7 @@ package com.utilsframework.android.navdrawer;
 import android.app.Activity;
 import android.app.Fragment;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewStub;
 import com.utils.framework.Predicate;
@@ -137,5 +138,15 @@ public abstract class NavigationDrawerActivity extends Activity implements Fragm
 
     public void updateActionBarTitle() {
         navigationDrawer.updateActionBarTitle();
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            navigationDrawer.toggleDrawer();
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 }
