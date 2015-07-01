@@ -72,6 +72,7 @@ public abstract class NavigationFragmentDrawer {
                           final int navigationLevel,
                           final boolean createFragment,
                           final int selectedTabIndex) {
+        tabLayout.removeAllTabs();
         tabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             boolean shouldCreateFragment = createFragment;
 
