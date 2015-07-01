@@ -218,16 +218,8 @@ public abstract class NavigationFragmentDrawer {
                 new Predicate<View>() {
                     @Override
                     public boolean check(View item) {
-                        if (item.getId() == View.NO_ID) {
-                            return false;
-                        }
+                        return item.getId() != View.NO_ID;
 
-                        if (item instanceof ViewGroup) {
-                            ViewGroup viewGroup = (ViewGroup) item;
-                            return viewGroup.getChildCount() == 0;
-                        }
-
-                        return true;
                     }
                 });
     }
