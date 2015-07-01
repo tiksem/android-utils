@@ -1,6 +1,6 @@
 package com.utilsframework.android.navdrawer;
 
-import android.app.Fragment;
+import android.support.v4.app.Fragment;
 
 /**
  * Created by CM on 2/20/2015.

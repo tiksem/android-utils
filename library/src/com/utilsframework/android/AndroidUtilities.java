@@ -34,4 +34,9 @@ public class AndroidUtilities {
         Intent intent = new Intent(fragment.getActivity(), aClass);
         fragment.startActivityForResult(intent, requestCode);
     }
+
+    public static void startActivityForResult(android.support.v4.app.Fragment fragment, Class<? extends Activity> aClass, int requestCode) {
+        Intent intent = new Intent(fragment.getActivity(), aClass);
+        fragment.startActivityForResult(intent, requestCode);
+    }
 }

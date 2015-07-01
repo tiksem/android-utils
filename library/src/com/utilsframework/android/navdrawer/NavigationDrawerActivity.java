@@ -1,21 +1,18 @@
 package com.utilsframework.android.navdrawer;
 
-import android.app.Activity;
-import android.app.Fragment;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewStub;
-import com.utils.framework.Predicate;
 import com.utilsframework.android.R;
-import com.utilsframework.android.view.GuiUtilities;
 
 import java.util.List;
 
 /**
  * Created by CM on 12/26/2014.
  */
-public abstract class NavigationDrawerActivity extends Activity implements FragmentFactory {
+public abstract class NavigationDrawerActivity extends AppCompatActivity implements FragmentFactory {
     private NavigationFragmentDrawer navigationDrawer;
     private View navigationView;
     private List<View> navigationViewChildren;
@@ -24,17 +21,6 @@ public abstract class NavigationDrawerActivity extends Activity implements Fragm
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.navigation_drawable_activity);
-
-        ViewStub navigationStub = (ViewStub) findViewById(R.id.navigationStub);
-        navigationStub.setLayoutResource(getNavigationLayoutId());
-        navigationView = navigationStub.inflate();
-        navigationViewChildren = GuiUtilities.getAllChildrenRecursive(navigationView,
-                new Predicate<View>() {
-                    @Override
-                    public boolean check(View item) {
-                        return item.getId() != View.NO_ID;
-                    }
-                });
 
         navigationDrawer = new NavigationFragmentDrawer(this, this,
                 getCurrentSelectedNavigationItemId()) {
@@ -49,7 +35,7 @@ public abstract class NavigationDrawerActivity extends Activity implements Fragm
             }
 
             @Override
-            protected int getNavigationLayoutId() {
+            protected int getNavigationViewId() {
                 return R.id.navigation;
             }
 
@@ -76,13 +62,23 @@ public abstract class NavigationDrawerActivity extends Activity implements Fragm
             }
 
             @Override
-            protected void onNavigationItemClick(View selectedView) {
-                NavigationDrawerActivity.this.onNavigationItemSelected(selectedView);
-                for(View view : navigationViewChildren){
-                    if(view != selectedView){
-                        onNavigationItemDeselected(view);
-                    }
+            protected int getTabLayoutId() {
+                return R.id.tabs;
+            }
+
+            @Override
+            protected int getToolBarLayoutId() {
+                return R.id.toolbar;
+            }
+
+            @Override
+            protected int getMenuId() {
+                int navigationMenuId = getNavigationMenuId();
+                if (navigationMenuId == 0) {
+                    throw new IllegalStateException("getNavigationMenuId returns 0");
                 }
+
+                return navigationMenuId;
             }
         };
         navigationDrawer.init();
@@ -93,8 +89,8 @@ public abstract class NavigationDrawerActivity extends Activity implements Fragm
         super.onStart();
     }
 
-    protected abstract int getNavigationLayoutId();
     protected abstract int getCurrentSelectedNavigationItemId();
+    protected abstract int getNavigationMenuId();
     protected String getActionBarTitle(int selectedItemId, int tabIndex, int navigationLevel) {
         return null;
     }
@@ -103,26 +99,12 @@ public abstract class NavigationDrawerActivity extends Activity implements Fragm
         return null;
     }
 
-    protected void onNavigationItemDeselected(View view) {
-        if (view.isSelected()) {
-            view.setSelected(false);
-            view.refreshDrawableState();
-        }
-    }
-
-    protected void onNavigationItemSelected(View view) {
-        if (!view.isSelected()) {
-            view.setSelected(true);
-            view.refreshDrawableState();
-        }
-    }
-
     public void replaceFragment(Fragment newFragment, int navigationLevel) {
         navigationDrawer.replaceFragment(newFragment, navigationLevel);
     }
 
     public Fragment getCurrentFragment() {
-        return getFragmentManager().findFragmentById(R.id.content);
+        return getSupportFragmentManager().findFragmentById(R.id.content);
     }
 
     @Override
