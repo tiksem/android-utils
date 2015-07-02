@@ -16,32 +16,32 @@ import java.util.concurrent.ThreadFactory;
 public final class Threading {
     private static final Handler HANDLER = new Handler();
 
-    public static void runOnBackground(final ThrowingRunnable action, final OnFinish<Throwable> onFinish) {
-        new AsyncTask<Void, Void, Throwable>() {
+    public static <ErrorType extends Throwable> void runOnBackground(final ThrowingRunnable<ErrorType> action,
+                                                                     final OnFinish<ErrorType> onFinish,
+                                                                     Class<ErrorType> errorClass) {
+        new AsyncTask<Void, Void, ErrorType>() {
             @Override
-            protected Throwable doInBackground(Void... params) {
+            protected ErrorType doInBackground(Void... params) {
                 try {
                     action.run();
                 } catch (Throwable e) {
-                    return e;
+                    if (errorClass.isAssignableFrom(e.getClass())) {
+                        return (ErrorType) e;
+                    }
                 }
 
                 return null;
             }
 
             @Override
-            protected void onPostExecute(Throwable throwable) {
+            protected void onPostExecute(ErrorType error) {
                 if (onFinish != null) {
-                    onFinish.onFinish(throwable);
-                } else if (throwable != null) {
-                    throw new RuntimeException(throwable);
+                    onFinish.onFinish(error);
+                } else if (error != null) {
+                    throw new RuntimeException(error);
                 }
             }
         }.execute();
-    }
-
-    public static void runOnBackground(final ThrowingRunnable action) {
-        runOnBackground(action, null);
     }
 
     public static void runOnBackground(final Runnable runnable, final OnComplete onFinish) {

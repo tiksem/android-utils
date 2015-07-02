@@ -1,5 +1,6 @@
 package com.utilsframework.android.media;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.media.*;
 import android.net.Uri;
@@ -73,6 +74,7 @@ public class MediaUtils {
         return mediaPlayer.getDuration();
     }
 
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
     private static int[] generateMuxerIndexMap(MediaMuxer muxer, MediaExtractor extractor){
         int trackCount = extractor.getTrackCount();
 
@@ -88,6 +90,7 @@ public class MediaUtils {
         return indexMap;
     }
 
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
     private static void writeSampleData(MediaMuxer muxer, MediaExtractor extractor, int[] indexMap){
         // Copy the samples from MediaExtractor to MediaMuxer.
         boolean sawEOS = false;
@@ -120,6 +123,7 @@ public class MediaUtils {
     }
 
     // Works on Android 4.3 anf higher
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
     public static void concatVideoAndAudio(String audioSource, String videoSource, String destinationMedia) throws IOException {
         if(Build.VERSION.SDK_INT < MINIMUM_MUXER_SUPPORTED_SDK){
             throw new UnsupportedOperationException("concatVideoAndAudio is supported on Android 4.3 and higher");
@@ -163,14 +167,15 @@ public class MediaUtils {
             }
         };
 
-        Threading.runOnBackground(new ThrowingRunnable() {
+        Threading.runOnBackground(new ThrowingRunnable<Throwable>() {
             @Override
             public void run() throws Throwable {
                 cutAudio(startTime, source, destination);
             }
-        }, finish);
+        }, finish, Throwable.class);
     }
 
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
     public static void cutAudio(int startTime, String source, String destination) throws IOException {
         if(Build.VERSION.SDK_INT < MINIMUM_MUXER_SUPPORTED_SDK){
             throw new UnsupportedOperationException("cutAudio is supported on Android 4.3 and higher");
@@ -245,6 +250,7 @@ public class MediaUtils {
         };
     }
 
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
     public static MediaFormat selectTrack(MediaExtractor mediaExtractor, String mimeType) {
         int audioTrackCount = mediaExtractor.getTrackCount();
         MediaFormat format = null;
@@ -278,6 +284,7 @@ public class MediaUtils {
         return mediaFormat;
     }
 
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
     public static boolean isMediaFileBroken(MediaExtractor mediaExtractor, File file) {
         try {
             mediaExtractor.setDataSource(new FileInputStream(file).getFD());
