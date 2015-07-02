@@ -229,4 +229,12 @@ public class Fragments {
         fragment.setArguments(args);
         return fragment;
     }
+
+    public static <T extends android.support.v4.app.Fragment> T createFragmentWith1Arg(T fragment, String key,
+                                                                                       Parcelable value) {
+        Bundle args = new Bundle();
+        args.putParcelable(key, value);
+        fragment.setArguments(args);
+        return fragment;
+    }
 }
