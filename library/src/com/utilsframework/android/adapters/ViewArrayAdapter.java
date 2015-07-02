@@ -336,4 +336,9 @@ public abstract class ViewArrayAdapter<Element, ViewHolder> extends BaseAdapter 
 
         this.autoUpdateMode = autoUpdateMode;
     }
+
+    @Override
+    public boolean isEnabled(int position) {
+        return getItemViewType(position) != NULL_VIEW_TYPE;
+    }
 }
