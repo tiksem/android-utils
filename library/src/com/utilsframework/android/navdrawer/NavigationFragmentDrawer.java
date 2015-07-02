@@ -46,6 +46,7 @@ public abstract class NavigationFragmentDrawer {
             return;
         }
 
+        tabLayout.removeAllTabs();
         int tabsCount = fragmentFactory.getTabsCount(menuItemId, navigationLevel);
         if (tabsCount <= 1) {
             if (menuItemId != currentSelectedItem) {
@@ -53,8 +54,8 @@ public abstract class NavigationFragmentDrawer {
                 Fragments.removeFragmentWithId(activity.getSupportFragmentManager(), getContentId());
                 Fragment fragment = fragmentFactory.createFragmentBySelectedItem(menuItemId, 0, navigationLevel);
                 Fragments.replaceFragment(activity, getContentId(), fragment);
-                tabLayout.setVisibility(View.GONE);
             }
+            tabLayout.setVisibility(View.GONE);
         } else {
             tabLayout.setVisibility(View.VISIBLE);
             initTabs(tabsCount, menuItemId, navigationLevel, createFragment, tabIndex);
