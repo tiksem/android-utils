@@ -1,9 +1,10 @@
 package com.utilsframework.android.menu;
 
+import android.support.v4.view.MenuItemCompat;
+import android.support.v7.widget.SearchView;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.widget.SearchView;
 import com.utilsframework.android.R;
 
 /**
@@ -24,7 +25,7 @@ public class SearchMenuAction {
         inflater.inflate(getSearchMenuId(), menu);
         final MenuItem searchItem = menu.findItem(R.id.action_search);
 
-        SearchView searchView = (SearchView) searchItem.getActionView();
+        SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
