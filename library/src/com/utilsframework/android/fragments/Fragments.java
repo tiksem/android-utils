@@ -221,4 +221,12 @@ public class Fragments {
     public static void clearBackStack(FragmentActivity activity) {
         clearBackStack(activity.getSupportFragmentManager());
     }
+
+    public static <T extends android.support.v4.app.Fragment> T createFragmentWith1Arg(T fragment, String key,
+                                                                                       String value) {
+        Bundle args = new Bundle();
+        args.putString(key, value);
+        fragment.setArguments(args);
+        return fragment;
+    }
 }
