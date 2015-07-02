@@ -17,7 +17,7 @@ public final class ExecuteTimeLogger {
         times.put(name, currentTime);
     }
 
-    public static void timeEnd(String name){
+    public static void timeEnd(String name, String tag){
         long currentTime = System.currentTimeMillis();
 
         if(!times.containsKey(name)){
@@ -27,6 +27,10 @@ public final class ExecuteTimeLogger {
         long startTime = times.get(name);
         long timeDif = currentTime - startTime;
         times.remove(name);
-        Log.i("ExecuteTimeLogger", name + " " + timeDif);
+        Log.i(tag, name + " " + timeDif);
+    }
+
+    public static void timeEnd(String name) {
+        timeEnd(name, ExecuteTimeLogger.class.getSimpleName());
     }
 }
