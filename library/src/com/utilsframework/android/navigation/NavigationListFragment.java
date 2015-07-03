@@ -2,6 +2,7 @@ package com.utilsframework.android.navigation;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.v4.app.Fragment;
 import android.view.*;
 import android.widget.AbsListView;
@@ -29,6 +30,7 @@ public abstract class NavigationListFragment<T, RequestManager extends IOErrorLi
     protected AbsListView listView;
     private ListViewNavigation<T> navigation;
     private NavigationList<T> elements;
+    private Parcelable listViewState;
 
     @Override
     public void onAttach(Activity activity) {
@@ -75,6 +77,7 @@ public abstract class NavigationListFragment<T, RequestManager extends IOErrorLi
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+        listViewState = listView.onSaveInstanceState();
         requestManager.removeIOErrorListener(ioErrorListener);
     }
 
@@ -103,6 +106,7 @@ public abstract class NavigationListFragment<T, RequestManager extends IOErrorLi
 
     public void updateNavigationList(String filter) {
         elements = getNavigationList(requestManager, filter);
+        listViewState = null;
         updateNavigation();
     }
 
@@ -118,6 +122,7 @@ public abstract class NavigationListFragment<T, RequestManager extends IOErrorLi
         params.listViewId = getListResourceId();
         params.loadingViewId = getLoadingResourceId();
         params.noInternetConnectionViewId = getNoInternetConnectionViewId();
+        params.listViewState = listViewState;
         navigation = createNavigation(params);
     }
 

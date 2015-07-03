@@ -1,6 +1,7 @@
 package com.utilsframework.android.adapters.navigation;
 
 import android.app.Activity;
+import android.os.Parcelable;
 import android.view.View;
 import com.utils.framework.collections.NavigationList;
 import com.utilsframework.android.adapters.ViewArrayAdapter;
@@ -16,4 +17,5 @@ public class ListViewNavigationParams<T> {
     public int loadingViewId;
     public int listViewId;
     public int noInternetConnectionViewId;
+    public Parcelable listViewState;
 }

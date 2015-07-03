@@ -75,6 +75,9 @@ public class ListViewNavigation<T> implements Destroyable {
         }
 
         listView.setAdapter(adapter);
+        if (params.listViewState != null) {
+            listView.onRestoreInstanceState(params.listViewState);
+        }
     }
 
     protected void handleError(NavigationList<T> navigationList,
