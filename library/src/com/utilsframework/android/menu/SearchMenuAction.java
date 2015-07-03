@@ -33,13 +33,28 @@ public class SearchMenuAction {
                     searchListener.onSearch(query);
                 }
 
-                searchItem.collapseActionView();
                 return false;
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
                 return false;
+            }
+        });
+
+        MenuItemCompat.setOnActionExpandListener(searchItem, new MenuItemCompat.OnActionExpandListener() {
+            @Override
+            public boolean onMenuItemActionExpand(MenuItem item) {
+                return true;
+            }
+
+            @Override
+            public boolean onMenuItemActionCollapse(MenuItem item) {
+                if (searchListener != null) {
+                    searchListener.onSearch(null);
+                }
+
+                return true;
             }
         });
     }
