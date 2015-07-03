@@ -28,6 +28,7 @@ public abstract class NavigationListFragment<T, RequestManager extends IOErrorLi
     private ViewArrayAdapter<T, ?> adapter;
     protected AbsListView listView;
     private ListViewNavigation<T> navigation;
+    private NavigationList<T> elements;
 
     @Override
     public void onAttach(Activity activity) {
@@ -101,11 +102,14 @@ public abstract class NavigationListFragment<T, RequestManager extends IOErrorLi
     protected abstract int getNoInternetConnectionViewId();
 
     public void updateNavigationList(String filter) {
+        elements = getNavigationList(requestManager, filter);
+        updateNavigation();
+    }
+
+    private void updateNavigation() {
         if (navigation != null) {
             navigation.destroy();
         }
-
-        final NavigationList<T> elements = getNavigationList(requestManager, filter);
 
         ListViewNavigationParams<T> params = new ListViewNavigationParams<T>();
         params.adapter = adapter;
@@ -139,7 +143,11 @@ public abstract class NavigationListFragment<T, RequestManager extends IOErrorLi
             @Override
             public void onViewCreated(View view) {
                 if (adapter.getElements() == null) {
-                    updateNavigationList(null);
+                    if (elements == null) {
+                        elements = getNavigationList(requestManager, null);
+                    }
+
+                    updateNavigation();
                 }
             }
         });

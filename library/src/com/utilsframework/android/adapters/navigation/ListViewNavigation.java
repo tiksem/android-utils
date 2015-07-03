@@ -66,8 +66,13 @@ public class ListViewNavigation<T> implements Destroyable {
             }
         });
 
-        // load first page
-        navigationList.get(0);
+        if (navigationList.getLoadedElementsCount() <= 0) {
+            // load first page
+            navigationList.get(0);
+        } else {
+            loadingView.setVisibility(View.INVISIBLE);
+            listView.setVisibility(View.VISIBLE);
+        }
 
         listView.setAdapter(adapter);
     }
