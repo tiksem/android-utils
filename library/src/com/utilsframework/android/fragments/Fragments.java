@@ -238,6 +238,14 @@ public class Fragments {
         return fragment;
     }
 
+    public static <T extends android.support.v4.app.Fragment> T createFragmentWith1Arg(T fragment, String key,
+                                                                                       long value) {
+        Bundle args = new Bundle();
+        args.putLong(key, value);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
     public static android.support.v4.app.Fragment getLatestFragmentInBackStack(FragmentActivity activity) {
         android.support.v4.app.FragmentManager fragmentManager = activity.getSupportFragmentManager();
         android.support.v4.app.FragmentManager.BackStackEntry backEntry =
