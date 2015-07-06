@@ -11,6 +11,8 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import com.utils.framework.collections.*;
+import com.utils.framework.collections.Stack;
 import com.utilsframework.android.R;
 import com.utilsframework.android.fragments.Fragments;
 import com.utilsframework.android.view.GuiUtilities;
@@ -31,6 +33,7 @@ public abstract class NavigationFragmentDrawer {
     private int currentSelectedTabIndex;
     private Set<FragmentManager.OnBackStackChangedListener> backStackChangedListeners =
             Collections.newSetFromMap(new WeakHashMap<FragmentManager.OnBackStackChangedListener, Boolean>());
+    private Stack<Fragment> backStack = new UnboundedStack<>();
 
     private void clearBackStack() {
         FragmentManager fragmentManager = activity.getSupportFragmentManager();
@@ -39,6 +42,7 @@ public abstract class NavigationFragmentDrawer {
         }
 
         Fragments.clearBackStack(activity);
+        backStack.clear();
     }
 
     private void selectFragment(int menuItemId, int navigationLevel, int tabIndex, boolean createFragment) {
@@ -240,6 +244,10 @@ public abstract class NavigationFragmentDrawer {
         }
     }
 
+    public Fragment getCurrentFragment() {
+        return activity.getSupportFragmentManager().findFragmentById(R.id.content);
+    }
+
     public void replaceFragment(Fragment newFragment, final int navigationLevel) {
         final int lastNavigationLevel = this.navigationLevel;
         final int lastTabIndex = currentSelectedTabIndex;
@@ -248,10 +256,12 @@ public abstract class NavigationFragmentDrawer {
                 new Fragments.OnBack() {
                     @Override
                     public void onBack() {
+                        backStack.pop();
                         selectFragment(currentSelectedItem, lastNavigationLevel, lastTabIndex, false);
                     }
                 });
         backStackChangedListeners.add(onBackStackChangedListener);
+        backStack.push(getCurrentFragment());
         selectFragment(currentSelectedItem, navigationLevel, 0, false);
     }
 
@@ -265,5 +275,9 @@ public abstract class NavigationFragmentDrawer {
         } else {
             drawerLayout.openDrawer(navigationView);
         }
+    }
+
+    public Fragment getLatestBackStackFragment() {
+        return backStack.top();
     }
 }

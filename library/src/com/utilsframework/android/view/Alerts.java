@@ -26,8 +26,8 @@ public final class Alerts {
     public static class YesNoAlertSettings {
         public CharSequence title = "";
         public CharSequence message = null;
-        public CharSequence yesButtonText = "Yes";
-        public CharSequence noButtonText = "No";
+        public int yesButtonText = R.string.yes;
+        public int noButtonText = R.string.no;
         public OnYes onYes;
         public OnNo onNo;
     }

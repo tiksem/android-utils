@@ -237,4 +237,13 @@ public class Fragments {
         fragment.setArguments(args);
         return fragment;
     }
+
+    public static android.support.v4.app.Fragment getLatestFragmentInBackStack(FragmentActivity activity) {
+        android.support.v4.app.FragmentManager fragmentManager = activity.getSupportFragmentManager();
+        android.support.v4.app.FragmentManager.BackStackEntry backEntry =
+                fragmentManager.getBackStackEntryAt(
+                        fragmentManager.getBackStackEntryCount() - 1);
+        String str = backEntry.getName();
+        return fragmentManager.findFragmentByTag(str);
+    }
 }

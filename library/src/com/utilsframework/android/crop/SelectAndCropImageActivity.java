@@ -62,8 +62,8 @@ public class SelectAndCropImageActivity extends Activity {
             }
 
             Alerts.YesNoAlertSettings settings = new Alerts.YesNoAlertSettings();
-            settings.yesButtonText = "Gallery";
-            settings.noButtonText = "Camera";
+            settings.yesButtonText = R.string.gallery;
+            settings.noButtonText = R.string.camera;
             settings.onYes = new OnYes() {
                 @Override
                 public void onYes() {

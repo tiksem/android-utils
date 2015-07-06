@@ -31,6 +31,7 @@ public abstract class NavigationListFragment<T, RequestManager extends IOErrorLi
     private ListViewNavigation<T> navigation;
     private NavigationList<T> elements;
     private Parcelable listViewState;
+    private String lastFilter;
 
     @Override
     public void onAttach(Activity activity) {
@@ -105,9 +106,14 @@ public abstract class NavigationListFragment<T, RequestManager extends IOErrorLi
     protected abstract int getNoInternetConnectionViewId();
 
     public void updateNavigationList(String filter) {
+        lastFilter = filter;
         elements = getNavigationList(requestManager, filter);
         listViewState = null;
         updateNavigation();
+    }
+
+    public void updateNavigationListWithLastFilter() {
+        updateNavigationList(lastFilter);
     }
 
     private void updateNavigation() {

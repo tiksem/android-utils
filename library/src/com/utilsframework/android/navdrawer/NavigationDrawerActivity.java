@@ -104,7 +104,11 @@ public abstract class NavigationDrawerActivity extends AppCompatActivity impleme
     }
 
     public Fragment getCurrentFragment() {
-        return getSupportFragmentManager().findFragmentById(R.id.content);
+        return navigationDrawer.getCurrentFragment();
+    }
+
+    public Fragment getLatestBackStackFragment() {
+        return navigationDrawer.getLatestBackStackFragment();
     }
 
     @Override
