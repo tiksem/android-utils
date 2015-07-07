@@ -45,7 +45,8 @@ public class ListViewNavigation<T> implements Destroyable {
             @Override
             public void onLoadingFinished() {
                 if (navigationList.getLoadedPagesCount() <= 1) {
-                    GuiUtilities.swapVisibilities(listView, loadingView);
+                    listView.setVisibility(View.VISIBLE);
+                    loadingView.setVisibility(View.INVISIBLE);
                 }
 
                 adapter.notifyDataSetChanged();
@@ -66,7 +67,7 @@ public class ListViewNavigation<T> implements Destroyable {
             }
         });
 
-        if (navigationList.getLoadedElementsCount() <= 0) {
+        if (navigationList.getElementsCount() <= 0) {
             // load first page
             navigationList.get(0);
         } else {
@@ -85,7 +86,7 @@ public class ListViewNavigation<T> implements Destroyable {
                                AbsListView listView,
                                View loadingView,
                                Throwable e) {
-        if (navigationList.getLoadedElementsCount() == 0) {
+        if (navigationList.getElementsCount() == 0) {
             listView.setVisibility(View.INVISIBLE);
             loadingView.setVisibility(View.INVISIBLE);
             noConnectionView.setVisibility(View.VISIBLE);
