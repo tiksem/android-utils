@@ -20,6 +20,7 @@ public abstract class PageLoadingFragment<Data, ErrorType extends Throwable> ext
     private View loading;
     private View noConnection;
     private Class<ErrorType> errorTypeClass;
+    private Data data;
 
     public PageLoadingFragment(Class<ErrorType> errorTypeClass) {
         this.errorTypeClass = errorTypeClass;
@@ -54,6 +55,7 @@ public abstract class PageLoadingFragment<Data, ErrorType extends Throwable> ext
     protected abstract Data loadOnBackground() throws ErrorType;
 
     private void onDataLoaded(Data data) {
+        this.data = data;
         loading.setVisibility(View.INVISIBLE);
         content.setVisibility(View.VISIBLE);
         setupContent(data, content);
@@ -70,21 +72,25 @@ public abstract class PageLoadingFragment<Data, ErrorType extends Throwable> ext
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        Threading.executeAsyncTask(new Threading.Task<ErrorType, Data>() {
-            @Override
-            public Data runOnBackground() throws ErrorType {
-                return loadOnBackground();
-            }
+        if (data == null) {
+            Threading.executeAsyncTask(new Threading.Task<ErrorType, Data>() {
+                @Override
+                public Data runOnBackground() throws ErrorType {
+                    return loadOnBackground();
+                }
 
-            @Override
-            public void onSuccess(Data data) {
-                onDataLoaded(data);
-            }
+                @Override
+                public void onSuccess(Data data) {
+                    onDataLoaded(data);
+                }
 
-            @Override
-            public void onError(ErrorType error) {
-                PageLoadingFragment.this.onError(error);
-            }
-        }, errorTypeClass);
+                @Override
+                public void onError(ErrorType error) {
+                    PageLoadingFragment.this.onError(error);
+                }
+            }, errorTypeClass);
+        } else {
+            onDataLoaded(data);
+        }
     }
 }
