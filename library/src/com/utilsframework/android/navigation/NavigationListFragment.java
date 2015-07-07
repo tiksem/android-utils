@@ -112,6 +112,10 @@ public abstract class NavigationListFragment<T, RequestManager extends IOErrorLi
         updateNavigation();
     }
 
+    public NavigationList<T> getElements() {
+        return elements;
+    }
+
     public void updateNavigationListWithLastFilter() {
         updateNavigationList(lastFilter);
     }
