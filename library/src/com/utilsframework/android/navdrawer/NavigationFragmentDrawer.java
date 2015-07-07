@@ -40,6 +40,7 @@ public abstract class NavigationFragmentDrawer {
         for(FragmentManager.OnBackStackChangedListener onBackStackChangedListener : backStackChangedListeners) {
             fragmentManager.removeOnBackStackChangedListener(onBackStackChangedListener);
         }
+        backStackChangedListeners.clear();
 
         Fragments.clearBackStack(activity);
         backStack.clear();

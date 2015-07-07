@@ -197,11 +197,15 @@ public class Fragments {
 
 
     public static void clearBackStack(FragmentManager fragmentManager) {
-        fragmentManager.popBackStackImmediate();
+        while (fragmentManager.getBackStackEntryCount() > 0) {
+            fragmentManager.popBackStackImmediate();
+        }
     }
 
     public static void clearBackStack(android.support.v4.app.FragmentManager fragmentManager) {
-        fragmentManager.popBackStackImmediate();
+        while (fragmentManager.getBackStackEntryCount() > 0) {
+            fragmentManager.popBackStackImmediate();
+        }
     }
 
     public static void removeFragmentWithId(FragmentManager fragmentManager, int id) {
