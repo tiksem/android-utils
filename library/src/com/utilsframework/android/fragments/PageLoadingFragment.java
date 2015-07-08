@@ -93,4 +93,16 @@ public abstract class PageLoadingFragment<Data, ErrorType extends Throwable> ext
             onDataLoaded(data);
         }
     }
+
+    public Data getData() {
+        return data;
+    }
+
+    public void setData(Data data) {
+        this.data = data;
+    }
+
+    public View getContent() {
+        return content;
+    }
 }
