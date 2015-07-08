@@ -183,4 +183,8 @@ public abstract class NavigationListFragment<T, RequestManager extends IOErrorLi
     protected boolean shouldOverrideHandlingErrorBehavior(Throwable e) {
         return false;
     }
+
+    public String getLastFilter() {
+        return lastFilter;
+    }
 }
