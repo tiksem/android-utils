@@ -300,6 +300,7 @@ public final class Alerts {
     public static class DateTimePickerSettings extends PickerSettings {
         public OnDateTimeSelected onDateTimeSelected;
         public long currentTimeInMillis;
+        public boolean clearTime;
     }
 
     public static AlertDialog showTimePickerAlert(Context context, DateTimePickerSettings settings) {
@@ -354,6 +355,13 @@ public final class Alerts {
         minimumDateCalendar.set(Calendar.SECOND, 0);
         minimumDateCalendar.set(Calendar.MILLISECOND, 0);
         datePicker.setMinDate(minimumDateCalendar.getTimeInMillis());
+
+        if (settings.clearTime) {
+            calendar.set(Calendar.MINUTE, 0);
+            calendar.set(Calendar.HOUR_OF_DAY, 0);
+            calendar.set(Calendar.SECOND, 0);
+            calendar.set(Calendar.MILLISECOND, 0);
+        }
 
         builder.setView(view);
 
