@@ -1,6 +1,7 @@
 package com.utilsframework.android.navdrawer;
 
 import android.os.Bundle;
+import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
@@ -134,5 +135,9 @@ public abstract class NavigationDrawerActivity extends AppCompatActivity impleme
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public NavigationView getNavigationView() {
+        return navigationDrawer.getNavigationView();
     }
 }

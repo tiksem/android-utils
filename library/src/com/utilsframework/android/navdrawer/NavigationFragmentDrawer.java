@@ -281,4 +281,8 @@ public abstract class NavigationFragmentDrawer {
     public Fragment getLatestBackStackFragment() {
         return backStack.top();
     }
+
+    public NavigationView getNavigationView() {
+        return navigationView;
+    }
 }
