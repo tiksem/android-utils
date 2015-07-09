@@ -9,6 +9,7 @@ import com.utils.framework.suggestions.SuggestionsProvider;
 import com.utils.framework.strings.Strings;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -29,6 +30,10 @@ public class SuggestionsAdapter<Element, ViewHolder> extends BaseAdapter impleme
 
             FilterResults filterResults = new FilterResults();
             List<Element> result = suggestionsProvider.getSuggestions(constraint.toString());
+            if (result == null) {
+                result = Collections.emptyList();
+            }
+
             filterResults.values = result;
             filterResults.count = result.size();
             return filterResults;
