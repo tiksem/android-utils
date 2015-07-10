@@ -250,6 +250,12 @@ public class GuiUtilities {
             public int size() {
                 return viewGroup.getChildCount();
             }
+
+            @Override
+            public boolean add(View object) {
+                viewGroup.addView(object);
+                return true;
+            }
         };
     }
 
