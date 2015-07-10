@@ -90,6 +90,9 @@ public final class Alerts {
         okAlertSettings.message = message;
         showOkButtonAlert(context, okAlertSettings);
     }
+    public static void showOkButtonAlert(Context context, int message) {
+        showOkButtonAlert(context, context.getString(message));
+    }
 
     public static AlertDialog showAlertWithCustomView(Context context, View view, CharSequence message){
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
