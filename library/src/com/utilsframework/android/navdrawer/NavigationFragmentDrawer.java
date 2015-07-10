@@ -47,6 +47,8 @@ public abstract class NavigationFragmentDrawer {
     }
 
     private void selectFragment(int menuItemId, int navigationLevel, int tabIndex, boolean createFragment) {
+        hide();
+
         if(menuItemId == currentSelectedItem && navigationLevel == this.navigationLevel){
             return;
         }
@@ -54,7 +56,7 @@ public abstract class NavigationFragmentDrawer {
         tabLayout.removeAllTabs();
         int tabsCount = fragmentFactory.getTabsCount(menuItemId, navigationLevel);
         if (tabsCount <= 1) {
-            if (menuItemId != currentSelectedItem) {
+            if (createFragment) {
                 clearBackStack();
                 Fragments.removeFragmentWithId(activity.getSupportFragmentManager(), getContentId());
                 Fragment fragment = fragmentFactory.createFragmentBySelectedItem(menuItemId, 0, navigationLevel);
@@ -65,8 +67,6 @@ public abstract class NavigationFragmentDrawer {
             tabLayout.setVisibility(View.VISIBLE);
             initTabs(tabsCount, menuItemId, navigationLevel, createFragment, tabIndex);
         }
-
-        hide();
 
         this.currentSelectedItem = menuItemId;
         this.navigationLevel = navigationLevel;
@@ -137,7 +137,6 @@ public abstract class NavigationFragmentDrawer {
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(MenuItem menuItem) {
-                updateActionBarTitle();
                 selectFragment(menuItem.getItemId(), 0, 0, true);
                 return true;
             }
