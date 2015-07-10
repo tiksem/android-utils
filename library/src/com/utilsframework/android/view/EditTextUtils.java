@@ -2,10 +2,12 @@ package com.utilsframework.android.view;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.content.Context;
 import android.os.Build;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import com.utils.framework.strings.Strings;
 
@@ -76,5 +78,11 @@ public class EditTextUtils {
         public void setOnKeyListener(View.OnKeyListener onKeyListener) {
             additionalOnKeyListener = onKeyListener;
         }
+    }
+
+    public static void hideKeyboard(EditText editText) {
+        InputMethodManager imm = (InputMethodManager)editText.getContext().getSystemService(
+                Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(editText.getWindowToken(), 0);
     }
 }
