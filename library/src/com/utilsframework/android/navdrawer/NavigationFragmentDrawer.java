@@ -1,5 +1,6 @@
 package com.utilsframework.android.navdrawer;
 
+import android.graphics.Color;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -154,6 +155,7 @@ public abstract class NavigationFragmentDrawer {
         navigationView = (NavigationView) activity.findViewById(getNavigationViewId());
         tabLayout = (TabLayout) activity.findViewById(getTabLayoutId());
         Toolbar toolbar = (Toolbar) activity.findViewById(getToolBarLayoutId());
+        toolbar.setTitleTextColor(Color.rgb(255, 255, 255));
         activity.setSupportActionBar(toolbar);
     }
 
