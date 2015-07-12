@@ -15,8 +15,6 @@ import java.util.List;
  */
 public abstract class NavigationDrawerActivity extends AppCompatActivity implements FragmentFactory {
     private NavigationFragmentDrawer navigationDrawer;
-    private View navigationView;
-    private List<View> navigationViewChildren;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -116,11 +114,6 @@ public abstract class NavigationDrawerActivity extends AppCompatActivity impleme
     public void onBackPressed() {
         navigationDrawer.onBackPressed();
         super.onBackPressed();
-    }
-
-    public View getSelectedView() {
-        int currentSelectedItem = navigationDrawer.getCurrentSelectedItem();
-        return navigationView.findViewById(currentSelectedItem);
     }
 
     public void updateActionBarTitle() {
