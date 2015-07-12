@@ -20,4 +20,5 @@
     <string name="no">No</string>
     <string name="gallery">Gallery</string>
     <string name="camera">Camera</string>
+    <string name="date_time_divider">at</string>
 </resources>

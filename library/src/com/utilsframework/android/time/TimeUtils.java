@@ -1,6 +1,8 @@
 package com.utilsframework.android.time;
 
+import android.content.Context;
 import android.util.Log;
+import com.utilsframework.android.R;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -16,10 +18,6 @@ public class TimeUtils {
 
     private static long startTimeInMilliseconds = System.currentTimeMillis();
     private static long startNanoSeconds = System.nanoTime();
-
-    public static final String[] SHORT_MONTHS = new String[] { "Jan", "Feb", "Mar",
-            "Apr", "May", "Jun", "Jul", "Aug", "Sep",
-            "Oct", "Nov", "Dec" };
 
     public static long getTimeInMicroSeconds(){
         long milliSeconds = System.currentTimeMillis() - startTimeInMilliseconds;
@@ -54,32 +52,33 @@ public class TimeUtils {
         return result;
     }
 
-    public static String getShortMonthName(int id) {
-        return SHORT_MONTHS[id];
+    public static String getShortMonthName(Context context, int id) {
+        return context.getResources().getStringArray(R.array.short_months)[id];
     }
 
-    public static String getAlternativeDisplayDate(long time) {
+    public static String getAlternativeDisplayDate(Context context, long time) {
         GregorianCalendar calendar = new GregorianCalendar();
         calendar.setTimeInMillis(time);
-        return getAlternativeDisplayDate(calendar);
+        return getAlternativeDisplayDate(context, calendar);
     }
 
-    public static String getAlternativeDisplayDate(GregorianCalendar calendar) {
-        String month = TimeUtils.getShortMonthName(calendar.get(Calendar.MONTH));
+    public static String getAlternativeDisplayDate(Context context, GregorianCalendar calendar) {
+        String month = TimeUtils.getShortMonthName(context, calendar.get(Calendar.MONTH));
         String day = TimeUtils.getFormatDayOrTime(calendar.get(Calendar.DAY_OF_MONTH));
         int year = calendar.get(Calendar.YEAR);
         return day + " " + month + " " + year;
     }
 
     //01 Jan 2015 at 20:23
-    public static String getAlternativeDisplayDateTime(long milliseconds) {
+    public static String getAlternativeDisplayDateTime(Context context, long milliseconds) {
         GregorianCalendar calendar = new GregorianCalendar();
         calendar.setTimeInMillis(milliseconds);
 
         String hours = TimeUtils.getFormatDayOrTime(calendar.get(Calendar.HOUR_OF_DAY));
         String minutes = TimeUtils.getFormatDayOrTime(calendar.get(Calendar.MINUTE));
 
-        return getAlternativeDisplayDate(calendar) + " at " + hours + ":" + minutes;
+        return getAlternativeDisplayDate(context, calendar) + " " + context.getString(R.string.date_time_divider) + " "
+                + hours + ":" + minutes;
     }
 
     public static long getStartOfCurrentDay() {

@@ -22,7 +22,7 @@ public class DatePickerButton extends TextView {
     }
 
     private void updateText(GregorianCalendar calendar) {
-        String displayDate = TimeUtils.getAlternativeDisplayDate(calendar);
+        String displayDate = TimeUtils.getAlternativeDisplayDate(getContext(), calendar);
         setText(displayDate);
         long timeInMillis = calendar.getTimeInMillis();
         long currentTimeInMillis = settings.currentTimeInMillis;

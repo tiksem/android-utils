@@ -49,7 +49,7 @@ public class DateTimePickerButton extends TextView {
     }
 
     protected String createDateText(GregorianCalendar calendar) {
-        String month = TimeUtils.getShortMonthName(calendar.get(Calendar.MONTH));
+        String month = TimeUtils.getShortMonthName(getContext(), calendar.get(Calendar.MONTH));
         String day = TimeUtils.getFormatDayOrTime(calendar.get(Calendar.DAY_OF_MONTH));
         int year = calendar.get(Calendar.YEAR);
 
