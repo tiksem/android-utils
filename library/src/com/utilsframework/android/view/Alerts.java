@@ -32,6 +32,13 @@ public final class Alerts {
         public OnNo onNo;
     }
 
+    public static void showYesNoAlert(Context context, OnYes onYes, int messageId) {
+        YesNoAlertSettings settings = new YesNoAlertSettings();
+        settings.message = context.getString(messageId);
+        settings.onYes = onYes;
+        showYesNoAlert(context, settings);
+    }
+
     public static void showYesNoAlert(Context context, final YesNoAlertSettings settings) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
 
