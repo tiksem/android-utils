@@ -62,7 +62,7 @@ public abstract class NavigationDrawerActivity extends AppCompatActivity impleme
 
             @Override
             protected int getTabLayoutId() {
-                return R.layout.tabs;
+                return NavigationDrawerActivity.this.getTabLayoutId();
             }
 
             @Override
@@ -77,7 +77,7 @@ public abstract class NavigationDrawerActivity extends AppCompatActivity impleme
 
             @Override
             protected int getToolbarLayoutId() {
-                return R.layout.toolbar;
+                return NavigationDrawerActivity.this.getToolbarLayoutId();
             }
 
             @Override
@@ -142,5 +142,13 @@ public abstract class NavigationDrawerActivity extends AppCompatActivity impleme
 
     public NavigationView getNavigationView() {
         return navigationDrawer.getNavigationView();
+    }
+
+    protected int getToolbarLayoutId() {
+        return R.layout.toolbar;
+    }
+
+    protected int getTabLayoutId() {
+        return R.layout.tabs;
     }
 }
