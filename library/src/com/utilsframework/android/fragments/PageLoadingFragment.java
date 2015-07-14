@@ -29,7 +29,7 @@ public abstract class PageLoadingFragment<Data, ErrorType extends Throwable> ext
     protected abstract int getContentLayoutId();
 
     protected int getLoadingLayoutId() {
-        return R.layout.navigation_list_null_item;
+        return R.layout.page_loading;
     }
 
     protected int getNoConnectionLayoutId() {
