@@ -115,11 +115,9 @@ public final class Threading {
         }.execute();
     }
 
-    public static abstract class Task<ErrorType extends Throwable, Result> {
-        public abstract Result runOnBackground() throws ErrorType;
-        public void onError(ErrorType error) {}
-        public void onSuccess(Result result) {}
-        public void onComplete() {}
+    public interface Task<ErrorType extends Throwable, Result> {
+        Result runOnBackground() throws ErrorType;
+        void onComplete(Result result, ErrorType error);
     }
 
     public static <ErrorType extends Throwable, Result> void executeAsyncTask(Task<ErrorType, Result> task,
@@ -147,13 +145,7 @@ public final class Threading {
 
             @Override
             protected void onPostExecute(Result result) {
-                if (result != null) {
-                    task.onSuccess(result);
-                } else {
-                    task.onError(errorType);
-                }
-
-                task.onComplete();
+                task.onComplete(result, errorType);
             }
         }.execute();
     }

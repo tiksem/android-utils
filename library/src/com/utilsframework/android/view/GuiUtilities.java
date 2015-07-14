@@ -45,24 +45,6 @@ public class GuiUtilities {
 
 	private static final String TAG = "GuiUtilities";
 
-	public final static boolean isOnline(Context context) {
-		ConnectivityManager connectivity = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-		if (connectivity == null) {
-			Log.w(TAG, "couldn't get connectivity manager");
-			return false;
-		}
-
-		NetworkInfo activeInfo = connectivity.getActiveNetworkInfo();
-		if (activeInfo == null) {
-			if (BuildConfig.DEBUG) {
-				Log.v(TAG, "network is not available");
-			}
-			return false;
-		}
-
-		return activeInfo.isAvailable() && activeInfo.isConnected();
-	}
-
     public static List<View> getAllChildrenRecursive(View view){
         if(!(view instanceof ViewGroup)){
             return new ArrayList<View>();

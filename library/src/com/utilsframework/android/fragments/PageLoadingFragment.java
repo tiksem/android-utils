@@ -80,13 +80,12 @@ public abstract class PageLoadingFragment<Data, ErrorType extends Throwable> ext
                 }
 
                 @Override
-                public void onSuccess(Data data) {
-                    onDataLoaded(data);
-                }
-
-                @Override
-                public void onError(ErrorType error) {
-                    PageLoadingFragment.this.onError(error);
+                public void onComplete(Data data, ErrorType error) {
+                    if (error != null) {
+                        PageLoadingFragment.this.onError(error);
+                    } else {
+                        onDataLoaded(data);
+                    }
                 }
             }, errorTypeClass);
         } else {
