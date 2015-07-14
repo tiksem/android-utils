@@ -28,12 +28,6 @@ public class SearchMenuAction {
 
         SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
 
-        SearchView.SearchAutoComplete searchAutoComplete =
-                (SearchView.SearchAutoComplete)searchView.findViewById(
-                        android.support.v7.appcompat.R.id.search_src_text);
-        searchAutoComplete.setHintTextColor(Color.WHITE);
-        searchAutoComplete.setTextColor(Color.WHITE);
-
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {

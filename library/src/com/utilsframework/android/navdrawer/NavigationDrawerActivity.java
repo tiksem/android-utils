@@ -62,12 +62,22 @@ public abstract class NavigationDrawerActivity extends AppCompatActivity impleme
 
             @Override
             protected int getTabLayoutId() {
-                return R.id.tabs;
+                return R.layout.tabs;
             }
 
             @Override
-            protected int getToolBarLayoutId() {
-                return R.id.toolbar;
+            protected int getToolBarStubId() {
+                return R.id.toolbarStub;
+            }
+
+            @Override
+            protected int getTabsStubId() {
+                return R.id.tabsStub;
+            }
+
+            @Override
+            protected int getToolbarLayoutId() {
+                return R.layout.toolbar;
             }
 
             @Override

@@ -1,6 +1,5 @@
 package com.utilsframework.android.navdrawer;
 
-import android.graphics.Color;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -11,7 +10,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
+import android.view.ViewStub;
 import com.utils.framework.collections.*;
 import com.utils.framework.collections.Stack;
 import com.utilsframework.android.R;
@@ -153,9 +152,14 @@ public abstract class NavigationFragmentDrawer {
 
         drawerLayout = (DrawerLayout) activity.findViewById(getDrawerLayoutId());
         navigationView = (NavigationView) activity.findViewById(getNavigationViewId());
-        tabLayout = (TabLayout) activity.findViewById(getTabLayoutId());
-        Toolbar toolbar = (Toolbar) activity.findViewById(getToolBarLayoutId());
-        toolbar.setTitleTextColor(Color.rgb(255, 255, 255));
+
+        ViewStub tabsStub = (ViewStub) activity.findViewById(getTabsStubId());
+        tabsStub.setLayoutResource(getTabLayoutId());
+        tabLayout = (TabLayout) tabsStub.inflate();
+
+        ViewStub toolbarStub = (ViewStub) activity.findViewById(getToolBarStubId());
+        toolbarStub.setLayoutResource(getToolbarLayoutId());
+        Toolbar toolbar = (Toolbar) toolbarStub.inflate();
         activity.setSupportActionBar(toolbar);
     }
 
@@ -223,8 +227,10 @@ public abstract class NavigationFragmentDrawer {
     protected abstract int getDrawerLayoutId();
     protected abstract int getContentId();
     protected abstract int getNavigationViewId();
+    protected abstract int getTabsStubId();
     protected abstract int getTabLayoutId();
-    protected abstract int getToolBarLayoutId();
+    protected abstract int getToolBarStubId();
+    protected abstract int getToolbarLayoutId();
     protected abstract int getMenuId();
 
     protected String getActionBarTitle(int currentSelectedItem, int tabIndex, int navigationLevel) {
