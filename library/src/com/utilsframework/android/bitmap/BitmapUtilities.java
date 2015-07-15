@@ -19,6 +19,9 @@ import com.utilsframework.android.threading.OnFinish;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.*;
 
 /**
@@ -698,9 +701,9 @@ public class BitmapUtilities {
         String filePath = imageFile.getAbsolutePath();
         Cursor cursor = context.getContentResolver().query(
                 MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                new String[] { MediaStore.Images.Media._ID },
+                new String[]{MediaStore.Images.Media._ID},
                 MediaStore.Images.Media.DATA + "=? ",
-                new String[] { filePath }, null);
+                new String[]{filePath}, null);
         if (cursor != null && cursor.moveToFirst()) {
             int id = cursor.getInt(cursor.getColumnIndex(MediaStore.MediaColumns._ID));
             return Uri.withAppendedPath(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, "" + id);
@@ -721,5 +724,18 @@ public class BitmapUtilities {
         options.inJustDecodeBounds = true;
         BitmapFactory.decodeFile(filePath, options);
         return new Size(options.outWidth, options.outHeight);
+    }
+
+    public static Bitmap getBitmapFromURL(String url) {
+        try {
+            URL urlObject = new URL(url);
+            HttpURLConnection connection = (HttpURLConnection) urlObject.openConnection();
+            connection.setDoInput(true);
+            connection.connect();
+            InputStream input = connection.getInputStream();
+            return BitmapFactory.decodeStream(input);
+        } catch (IOException e) {
+            return null;
+        }
     }
 }
