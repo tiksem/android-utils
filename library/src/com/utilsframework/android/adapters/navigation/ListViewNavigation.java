@@ -9,8 +9,7 @@ import com.utils.framework.collections.NavigationList;
 import com.utils.framework.collections.OnAllDataLoaded;
 import com.utilsframework.android.R;
 import com.utilsframework.android.adapters.ViewArrayAdapter;
-import com.utilsframework.android.view.GuiUtilities;
-import com.utilsframework.android.view.UiMessages;
+import com.utilsframework.android.view.Toasts;
 
 /**
  * Created by CM on 6/21/2015.
@@ -91,7 +90,7 @@ public class ListViewNavigation<T> implements Destroyable {
             loadingView.setVisibility(View.INVISIBLE);
             noConnectionView.setVisibility(View.VISIBLE);
         } else {
-            UiMessages.error(listView.getContext(), R.string.no_internet_connection);
+            Toasts.error(listView.getContext(), R.string.no_internet_connection);
         }
     }
 

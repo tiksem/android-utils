@@ -421,7 +421,7 @@ public final class Alerts {
             @Override
             public void onClick(View v) {
                 if (start.getDate() >= end.getDate()) {
-                    UiMessages.error(context, context.getString(settings.invalidRangeErrorId));
+                    Toasts.error(context, context.getString(settings.invalidRangeErrorId));
                 } else {
                     if (settings.onDateRangeSelected != null) {
                         GregorianCalendar first = new GregorianCalendar();

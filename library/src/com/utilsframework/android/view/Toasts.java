@@ -12,7 +12,7 @@ import com.utilsframework.android.R;
 /**
  * Created by Tikhonenko.S on 20.09.13.
  */
-public class UiMessages {
+public class Toasts {
     public static void error(Context context, CharSequence text) {
         Toast.makeText(context, text, Toast.LENGTH_SHORT).show();
     }
