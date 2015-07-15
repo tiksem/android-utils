@@ -39,6 +39,13 @@ public class EditTextUtils {
         return onKeyListener;
     }
 
+    public static void showKeyboard(EditText editText) {
+        editText.requestFocus();
+        InputMethodManager imm = (InputMethodManager) editText.getContext().
+                getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.showSoftInput(editText, InputMethodManager.SHOW_IMPLICIT);
+    }
+
     private static class ApplyInputLimitOnKeyListener implements View.OnKeyListener, OnKeyListenerSetter {
         private final EditText editText;
         private final int limit;

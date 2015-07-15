@@ -531,10 +531,4 @@ public class GuiUtilities {
         return context.getString(stringId);
     }
 
-    public static void showKeyboard(EditText editText) {
-        editText.requestFocus();
-        InputMethodManager imm = (InputMethodManager) editText.getContext().
-                getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.showSoftInput(editText, InputMethodManager.SHOW_IMPLICIT);
-    }
 }
