@@ -163,7 +163,7 @@ public class NextPrevCyclingViewPager extends ExtendedViewPager {
 
     @Override
     public void setAdapter(PagerAdapter adapter) {
-        throw new UnsupportedOperationException("User setNextPrevAdapter");
+        throw new UnsupportedOperationException("Use setNextPrevAdapter");
     }
 
     public Adapter getNextPrevAdapter() {
