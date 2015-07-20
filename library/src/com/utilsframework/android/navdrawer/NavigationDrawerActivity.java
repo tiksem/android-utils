@@ -151,4 +151,12 @@ public abstract class NavigationDrawerActivity extends AppCompatActivity impleme
     protected int getTabLayoutId() {
         return R.layout.tabs;
     }
+
+    public void performMenuItemSelection(int id) {
+        navigationDrawer.performMenuItemSelection(id);
+    }
+
+    public void selectTab(int index) {
+        navigationDrawer.selectTab(index);
+    }
 }

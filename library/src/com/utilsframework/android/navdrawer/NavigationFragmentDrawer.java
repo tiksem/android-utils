@@ -137,10 +137,18 @@ public abstract class NavigationFragmentDrawer {
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(MenuItem menuItem) {
-                selectFragment(menuItem.getItemId(), 0, 0, true);
+                performMenuItemSelection(menuItem.getItemId());
                 return true;
             }
         });
+    }
+
+    public void performMenuItemSelection(int id) {
+        selectFragment(id, 0, 0, true);
+    }
+
+    public void selectTab(int index) {
+        tabLayout.getTabAt(index).select();
     }
 
     public NavigationFragmentDrawer(final AppCompatActivity activity,

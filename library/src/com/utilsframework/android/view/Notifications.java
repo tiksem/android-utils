@@ -1,8 +1,11 @@
 package com.utilsframework.android.view;
 
+import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
 
 /**
  * Created by CM on 7/15/2015.
@@ -16,6 +19,23 @@ public final class Notifications {
 
     @SuppressWarnings("deprecation")
     public static void notify(Context context, int id, Notification.Builder builder) {
-        notify(context, id, builder.getNotification());
+        Notification notification = builder.getNotification();
+        notification.flags = Notification.DEFAULT_LIGHTS | Notification.FLAG_AUTO_CANCEL;
+        notify(context, id, notification);
+    }
+
+    public static void setActivity(Context context, Notification.Builder builder, Class<Activity> activity) {
+        Intent resultIntent = new Intent(context, activity);
+        setIntent(context, builder, resultIntent);
+    }
+
+    public static void setIntent(Context context, Notification.Builder builder, Intent resultIntent) {
+        PendingIntent pendingIntent = PendingIntent.getActivity(
+                context,
+                0,
+                resultIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT
+        );
+        builder.setContentIntent(pendingIntent);
     }
 }
