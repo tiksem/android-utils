@@ -26,10 +26,10 @@ public final class Notifications {
 
     public static void setActivity(Context context, Notification.Builder builder, Class<Activity> activity) {
         Intent resultIntent = new Intent(context, activity);
-        setIntent(context, builder, resultIntent);
+        setActivityIntent(context, builder, resultIntent);
     }
 
-    public static void setIntent(Context context, Notification.Builder builder, Intent resultIntent) {
+    public static void setActivityIntent(Context context, Notification.Builder builder, Intent resultIntent) {
         PendingIntent pendingIntent = PendingIntent.getActivity(
                 context,
                 0,

@@ -13,7 +13,8 @@ import java.util.List;
 /**
  * Created by CM on 12/26/2014.
  */
-public abstract class NavigationDrawerActivity extends AppCompatActivity implements FragmentFactory {
+public abstract class NavigationDrawerActivity extends AppCompatActivity implements FragmentFactory,
+        NavigationActivityInterface {
     private NavigationFragmentDrawer navigationDrawer;
 
     @Override
@@ -108,6 +109,7 @@ public abstract class NavigationDrawerActivity extends AppCompatActivity impleme
         return null;
     }
 
+    @Override
     public void replaceFragment(Fragment newFragment, int navigationLevel) {
         navigationDrawer.replaceFragment(newFragment, navigationLevel);
     }

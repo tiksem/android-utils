@@ -12,15 +12,18 @@ import android.view.View;
 import android.view.ViewGroup;
 import com.utilsframework.android.R;
 import com.utilsframework.android.navdrawer.ActionBarTitleProvider;
+import com.utilsframework.android.navdrawer.NavigationActivityInterface;
 import com.utilsframework.android.view.GuiUtilities;
 
 /**
  * Created by CM on 7/20/2015.
  */
-public class OneFragmentActivity extends AppCompatActivity {
+public class OneFragmentActivity extends AppCompatActivity implements NavigationActivityInterface {
     public static final String FRAGMENT = "fragment";
     public static final String ARGS = "args";
     public static final String TOOL_BAR_LAYOUT_ID = "toolbarLayoutId";
+
+    private Fragment latestBackStackFragment;
 
     public static void start(Context context, Class<? extends Fragment> fragmentClass, Bundle args,
                              int toolbarLayoutId) {
@@ -57,15 +60,20 @@ public class OneFragmentActivity extends AppCompatActivity {
             ActionBar actionBar = getSupportActionBar();
             actionBar.setDisplayHomeAsUpEnabled(true);
 
-            if (fragment instanceof ActionBarTitleProvider) {
-                ActionBarTitleProvider actionBarTitleProvider = (ActionBarTitleProvider) fragment;
-                Fragments.executeWhenViewCreated(fragment, new GuiUtilities.OnViewCreated() {
-                    @Override
-                    public void onViewCreated(View view) {
-                        actionBar.setTitle(actionBarTitleProvider.getActionBarTitle());
-                    }
-                });
-            }
+            updateActionBarTitle(fragment);
+        }
+    }
+
+    private void updateActionBarTitle(Fragment fragment) {
+        ActionBar actionBar = getSupportActionBar();
+        if (fragment instanceof ActionBarTitleProvider) {
+            ActionBarTitleProvider actionBarTitleProvider = (ActionBarTitleProvider) fragment;
+            Fragments.executeWhenViewCreated(fragment, new GuiUtilities.OnViewCreated() {
+                @Override
+                public void onViewCreated(View view) {
+                    actionBar.setTitle(actionBarTitleProvider.getActionBarTitle());
+                }
+            });
         }
     }
 
@@ -78,5 +86,17 @@ public class OneFragmentActivity extends AppCompatActivity {
         } else {
             return super.onOptionsItemSelected(item);
         }
+    }
+
+    @Override
+    public void replaceFragment(Fragment newFragment, int navigationLevel) {
+        latestBackStackFragment = getSupportFragmentManager().findFragmentById(R.id.one);
+        Fragments.replaceFragmentAndAddToBackStack(this, R.id.one, newFragment, null);
+        updateActionBarTitle(newFragment);
+    }
+
+    @Override
+    public Fragment getLatestBackStackFragment() {
+        return latestBackStackFragment;
     }
 }
