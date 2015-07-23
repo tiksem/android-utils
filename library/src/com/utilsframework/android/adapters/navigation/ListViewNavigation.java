@@ -11,6 +11,8 @@ import com.utilsframework.android.R;
 import com.utilsframework.android.adapters.ViewArrayAdapter;
 import com.utilsframework.android.view.Toasts;
 
+import java.util.List;
+
 /**
  * Created by CM on 6/21/2015.
  */
@@ -40,10 +42,10 @@ public class ListViewNavigation<T> implements Destroyable {
         listView.setVisibility(View.INVISIBLE);
         loadingView.setVisibility(View.VISIBLE);
 
-        navigationList.setOnPageLoadingFinished(new NavigationList.OnPageLoadingFinished() {
+        navigationList.setOnPageLoadingFinished(new NavigationList.OnPageLoadingFinished<T>() {
             @Override
-            public void onLoadingFinished() {
-                if (navigationList.getLoadedPagesCount() <= 1) {
+            public void onLoadingFinished(List<T> elements) {
+                if (!elements.isEmpty() || navigationList.isAllDataLoaded()) {
                     listView.setVisibility(View.VISIBLE);
                     loadingView.setVisibility(View.INVISIBLE);
                 }
