@@ -66,7 +66,7 @@ public class ListViewNavigation<T> implements Destroyable {
             }
         });
 
-        if (navigationList.getElementsCount() <= 0) {
+        if (!navigationList.isAllDataLoaded() && navigationList.getElementsCount() <= 0) {
             // load first page
             navigationList.get(0);
         } else {
