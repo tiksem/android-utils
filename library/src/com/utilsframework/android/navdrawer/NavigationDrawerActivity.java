@@ -17,9 +17,14 @@ public abstract class NavigationDrawerActivity extends AppCompatActivity impleme
         NavigationActivityInterface {
     private NavigationFragmentDrawer navigationDrawer;
 
+    protected void onPreCreate() {
+
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        onPreCreate();
         setContentView(R.layout.navigation_drawable_activity);
 
         navigationDrawer = new NavigationFragmentDrawer(this, this,
