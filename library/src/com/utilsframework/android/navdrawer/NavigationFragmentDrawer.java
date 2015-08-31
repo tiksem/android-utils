@@ -33,7 +33,7 @@ public abstract class NavigationFragmentDrawer {
     private int currentSelectedTabIndex;
     private Set<FragmentManager.OnBackStackChangedListener> backStackChangedListeners =
             Collections.newSetFromMap(new WeakHashMap<FragmentManager.OnBackStackChangedListener, Boolean>());
-    private Stack<Fragment> backStack = new UnboundedStack<>();
+    private Stack<Fragment> backStack = new LinkedStack<>();
 
     private void clearBackStack() {
         FragmentManager fragmentManager = activity.getSupportFragmentManager();
