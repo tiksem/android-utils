@@ -13,7 +13,7 @@ import java.util.Map;
  * Time: 16:04
  */
 public class ViewGroupChildrenVisibilityChangedListener extends StateChangedListener<ViewGroup, Map<View, Integer>>{
-    public ViewGroupChildrenVisibilityChangedListener(ViewGroup object) {
+    public ViewGroupChildrenVisibilityChangedListener(ViewGroup object) { 
         super(object);
     }
 
