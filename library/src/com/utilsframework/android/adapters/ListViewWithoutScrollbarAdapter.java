@@ -4,7 +4,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.BaseAdapter;
-import com.utilsframework.android.view.ListViews;
 
 /**
  * Created by CM on 7/7/2015.

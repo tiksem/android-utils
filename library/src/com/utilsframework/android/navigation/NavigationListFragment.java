@@ -4,21 +4,25 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.*;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
+import com.utils.framework.OnError;
 import com.utils.framework.collections.NavigationList;
 import com.utilsframework.android.IOErrorListener;
+import com.utilsframework.android.R;
 import com.utilsframework.android.adapters.ViewArrayAdapter;
-import com.utilsframework.android.adapters.navigation.ListViewNavigation;
-import com.utilsframework.android.adapters.navigation.ListViewNavigationParams;
 import com.utilsframework.android.fragments.Fragments;
 import com.utilsframework.android.menu.SearchListener;
 import com.utilsframework.android.menu.SearchMenuAction;
 import com.utilsframework.android.network.IOErrorListenersSet;
 import com.utilsframework.android.view.GuiUtilities;
+import com.utilsframework.android.view.Toasts;
+import com.utilsframework.android.view.listview.SwipeLayoutListViewTouchListener;
 
 import java.io.IOException;
+import java.util.List;
 
 /**
  * Created by CM on 6/21/2015.
@@ -27,11 +31,13 @@ public abstract class NavigationListFragment<T, RequestManager extends IOErrorLi
     private IOErrorListener ioErrorListener;
     private RequestManager requestManager;
     private ViewArrayAdapter<T, ?> adapter;
-    protected AbsListView listView;
-    private ListViewNavigation<T> navigation;
+    private AbsListView listView;
     private NavigationList<T> elements;
     private Parcelable listViewState;
     private String lastFilter;
+    private View loadingView;
+    private View noConnectionView;
+    private SwipeRefreshLayout swipeRefreshLayout;
 
     @Override
     public void onAttach(Activity activity) {
@@ -43,7 +49,10 @@ public abstract class NavigationListFragment<T, RequestManager extends IOErrorLi
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         setHasOptionsMenu(true);
-        return inflater.inflate(getRootLayout(), null);
+        View view = inflater.inflate(getRootLayout(), null);
+        SwipeRefreshLayout swipeRefreshLayout = new SwipeRefreshLayout(getActivity());
+        swipeRefreshLayout.addView(view);
+        return swipeRefreshLayout;
     }
 
     @Override
@@ -51,8 +60,11 @@ public abstract class NavigationListFragment<T, RequestManager extends IOErrorLi
         super.onViewCreated(view, savedInstanceState);
 
         listView = (AbsListView) view.findViewById(getListResourceId());
+        loadingView = view.findViewById(getLoadingResourceId());
+        noConnectionView = view.findViewById(getNoInternetConnectionViewId());
 
         adapter = createAdapter(requestManager);
+        listView.setAdapter(adapter);
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -73,6 +85,30 @@ public abstract class NavigationListFragment<T, RequestManager extends IOErrorLi
             }
         };
         requestManager.addIOErrorListener(ioErrorListener);
+
+        swipeRefreshLayout = (SwipeRefreshLayout) view;
+        listView.setOnTouchListener(new SwipeLayoutListViewTouchListener(swipeRefreshLayout));
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                onSwipeRefresh();
+            }
+        });
+    }
+
+    private void onSwipeRefresh() {
+        elements = getNavigationList(requestManager, lastFilter);
+        elements.setOnPageLoadingFinished(new NavigationList.OnPageLoadingFinished<T>() {
+            @Override
+            public void onLoadingFinished(List<T> pageItems) {
+                updateAdapterAndViewsState();
+                swipeRefreshLayout.setRefreshing(false);
+            }
+        });
+
+        //load first page
+        elements.get(0);
+        listViewState = null;
     }
 
     @Override
@@ -109,7 +145,7 @@ public abstract class NavigationListFragment<T, RequestManager extends IOErrorLi
         lastFilter = filter;
         elements = getNavigationList(requestManager, filter);
         listViewState = null;
-        updateNavigation();
+        updateAdapterAndViewsState();
     }
 
     public NavigationList<T> getElements() {
@@ -120,20 +156,52 @@ public abstract class NavigationListFragment<T, RequestManager extends IOErrorLi
         updateNavigationList(lastFilter);
     }
 
-    private void updateNavigation() {
-        if (navigation != null) {
-            navigation.destroy();
+    private void updateAdapterAndViewsState() {
+        adapter.setElements(elements);
+
+        listView.setVisibility(View.INVISIBLE);
+        loadingView.setVisibility(View.VISIBLE);
+
+        elements.setOnPageLoadingFinished(new NavigationList.OnPageLoadingFinished<T>() {
+            @Override
+            public void onLoadingFinished(List<T> page) {
+                if (!elements.isEmpty() || elements.isAllDataLoaded()) {
+                    listView.setVisibility(View.VISIBLE);
+                    loadingView.setVisibility(View.INVISIBLE);
+                }
+
+                adapter.notifyDataSetChanged();
+            }
+        });
+
+        elements.setOnError(new OnError() {
+            @Override
+            public void onError(Throwable e) {
+                handleNavigationListError(e);
+            }
+        });
+
+        if (!elements.isAllDataLoaded() && elements.getElementsCount() <= 0) {
+            // load first page
+            elements.get(0);
+        } else {
+            loadingView.setVisibility(View.INVISIBLE);
+            listView.setVisibility(View.VISIBLE);
         }
 
-        ListViewNavigationParams<T> params = new ListViewNavigationParams<T>();
-        params.adapter = adapter;
-        params.navigationList = elements;
-        params.rootView = getView();
-        params.listViewId = getListResourceId();
-        params.loadingViewId = getLoadingResourceId();
-        params.noInternetConnectionViewId = getNoInternetConnectionViewId();
-        params.listViewState = listViewState;
-        navigation = createNavigation(params);
+        if (listViewState != null) {
+            listView.onRestoreInstanceState(listViewState);
+        }
+    }
+
+    protected void handleNavigationListError(Throwable e) {
+        if (elements.getElementsCount() == 0) {
+            listView.setVisibility(View.INVISIBLE);
+            loadingView.setVisibility(View.INVISIBLE);
+            noConnectionView.setVisibility(View.VISIBLE);
+        } else {
+            Toasts.error(listView.getContext(), R.string.no_internet_connection);
+        }
     }
 
     protected boolean hasSearchMenu() {
@@ -162,29 +230,25 @@ public abstract class NavigationListFragment<T, RequestManager extends IOErrorLi
                         elements = getNavigationList(requestManager, null);
                     }
 
-                    updateNavigation();
+                    updateAdapterAndViewsState();
                 }
             }
         });
     }
 
-    protected ListViewNavigation<T> createNavigation(ListViewNavigationParams<T> params) {
-        return new ListViewNavigation<T>(params) {
-            @Override
-            protected void handleError(NavigationList<T> navigationList,
-                                       View noConnectionView, AbsListView listView, View loadingView, Throwable e) {
-                if (!shouldOverrideHandlingErrorBehavior(e)) {
-                    super.handleError(navigationList, noConnectionView, listView, loadingView, e);
-                }
-            }
-        };
-    }
-
-    protected boolean shouldOverrideHandlingErrorBehavior(Throwable e) {
-        return false;
-    }
-
     public String getLastFilter() {
         return lastFilter;
+    }
+
+    public AbsListView getListView() {
+        return listView;
+    }
+
+    public View getLoadingView() {
+        return loadingView;
+    }
+
+    public View getNoConnectionView() {
+        return noConnectionView;
     }
 }

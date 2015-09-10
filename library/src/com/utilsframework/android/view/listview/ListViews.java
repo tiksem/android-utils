@@ -1,4 +1,4 @@
-package com.utilsframework.android.view;
+package com.utilsframework.android.view.listview;
 
 import android.view.View;
 import android.widget.AbsListView;
