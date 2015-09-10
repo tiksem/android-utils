@@ -55,7 +55,7 @@ public class SqlUtilities {
     }
 
     public static boolean isInt(Class aClass){
-        return aClass == int.class || aClass == long.class;
+        return aClass == int.class || aClass == long.class || aClass == Integer.class || aClass == Long.class;
     }
 
     public static boolean isFloat(Class aClass){
@@ -107,9 +107,9 @@ public class SqlUtilities {
             type = value.getClass();
         }
 
-        if(int.class.isAssignableFrom(type)) {
+        if(int.class.isAssignableFrom(type) || Integer.class.isAssignableFrom(type)) {
             contentValues.put(fieldName, (Integer) value);
-        } else if(long.class.isAssignableFrom(type)) {
+        } else if(long.class.isAssignableFrom(type) || Long.class.isAssignableFrom(type)) {
             contentValues.put(fieldName, (Long)value);
         } else if(CharSequence.class.isAssignableFrom(type)) {
             contentValues.put(fieldName, value.toString());

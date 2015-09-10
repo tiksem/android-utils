@@ -20,9 +20,13 @@ public class SQLiteKeyValueDatabase implements KeyValueDatabase {
     private DataStore<KeyValue> dataStore;
     private AsyncDataStore<KeyValue> asyncDataStore;
 
-    public SQLiteKeyValueDatabase(Context context) {
-        dataStore = SQLiteDataStore.create(context, KeyValue.class);
+    public SQLiteKeyValueDatabase(Context context, String tableName) {
+        dataStore = SQLiteDataStore.create(context, KeyValue.class, tableName);
         asyncDataStore = new AsyncDataStoreWrapper<KeyValue>(dataStore);
+    }
+
+    public SQLiteKeyValueDatabase(Context context) {
+        this(context, null);
     }
 
     @Override

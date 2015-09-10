@@ -3,6 +3,7 @@ package com.utilsframework.android.db;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import com.utils.framework.Reflection;
 
 import java.lang.reflect.Field;
 import java.util.*;
@@ -56,6 +57,8 @@ public abstract class AbstractSQLiteDataStore<T> implements DataStore<T> {
 
                     idColumnName = fieldName;
                     idField = field;
+                } else if(sqlDataStoreField.unique()) {
+                    typeName += " unique";
                 }
 
                 StringBuilder fieldDeclaration = new StringBuilder();
@@ -77,23 +80,14 @@ public abstract class AbstractSQLiteDataStore<T> implements DataStore<T> {
             }
         }
 
-        if(idColumnName == null){
-            throw new IllegalStateException("SQLIdField must be declared in " +
-                    tClass.getCanonicalName());
-        }
-
         String query = getCreateTableQuery(fieldDeclarations);
         database.execSQL(query);
     }
 
-    protected AbstractSQLiteDataStore(SQLiteDatabase database, Class<T> tClass) {
+    protected AbstractSQLiteDataStore(SQLiteDatabase database, Class<T> tClass, String tableName) {
         this.database = database;
         this.tClass = tClass;
-        tableName = getTableName();
-
-        if(tableName == null || tableName.equals("")){
-            throw new IllegalArgumentException("getTableName returns empty string");
-        }
+        this.tableName = tableName == null ? tClass.getSimpleName() : tableName;
 
         createTableIfNotExists();
     }
@@ -147,6 +141,10 @@ public abstract class AbstractSQLiteDataStore<T> implements DataStore<T> {
                 }
 
                 Object fieldValue = field.get(object);
+                if (fieldValue == null && field == idField) {
+                    continue;
+                }
+
                 putContentValue(contentValues, fieldName, fieldValue);
             } catch (IllegalAccessException e) {
                 throw new RuntimeException(e);
@@ -255,25 +253,27 @@ public abstract class AbstractSQLiteDataStore<T> implements DataStore<T> {
 
     @Override
     public void add(T object) {
-        if(!SqlUtilities.isInt(idField.getType())){
+        if(idField != null && !SqlUtilities.isInt(idField.getType())){
             throw new UnsupportedOperationException("add is not supported for non-integer id, " +
                     "use addOrReplace instead");
         }
 
         ContentValues contentValues = getContentValues(object, idField);
         long id = database.insert(tableName, null, contentValues);
-        try {
-            if(idField.getType() == long.class){
-                idField.setLong(object, id);
-            } else if(idField.getType() == int.class) {
-                if(id > Integer.MAX_VALUE){
-                    throw new RuntimeException("id > Integer.MAX_VALUE");
-                }
+        if (idField != null) {
+            try {
+                if(idField.getType() == long.class){
+                    idField.setLong(object, id);
+                } else if(idField.getType() == int.class) {
+                    if(id > Integer.MAX_VALUE){
+                        throw new RuntimeException("id > Integer.MAX_VALUE");
+                    }
 
-                idField.setInt(object, (int) id);
+                    idField.setInt(object, (int) id);
+                }
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
             }
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
         }
     }
 
@@ -301,10 +301,30 @@ public abstract class AbstractSQLiteDataStore<T> implements DataStore<T> {
     }
 
     protected abstract T createObject();
-    protected abstract String getTableName();
 
     @Override
     public void close() {
         database.close();
+    }
+
+    public void removeLastRecord() {
+        if (SqlUtilities.isInt(getIdType())) {
+            database.execSQL("delete from " + tableName  + " where " + idField.getName() + " = MIN(" +
+                    idField.getName() + ")");
+        }
+
+        throw new UnsupportedOperationException("removeLastRecord is not supported for non-integer id type");
+    }
+
+    @Override
+    public void changeFieldOfAllRecords(String fieldName, int diff) {
+        database.execSQL("update " + tableName + " set " + fieldName + " = " + fieldName + " + " + diff);
+    }
+
+    @Override
+    public T getFirstElement() {
+        Cursor cursor = database.rawQuery("select * from " + tableName + " limit 1", null);
+        cursor.moveToFirst();
+        return objectFromCursor(cursor);
     }
 }

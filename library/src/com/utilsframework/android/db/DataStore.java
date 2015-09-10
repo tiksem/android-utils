@@ -19,4 +19,6 @@ public interface DataStore<T> {
     Object getIdOf(T object);
     void clear();
     void close();
+    void changeFieldOfAllRecords(String fieldName, int diff);
+    T getFirstElement();
 }

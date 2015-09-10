@@ -11,4 +11,5 @@ import java.lang.annotation.RetentionPolicy;
 public @interface SQLDataStoreField {
     String fieldName();
     int maxStringLength() default 0;
+    boolean unique() default false;
 }

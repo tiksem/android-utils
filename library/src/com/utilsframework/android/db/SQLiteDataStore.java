@@ -12,16 +12,24 @@ public class SQLiteDataStore<T> extends AbstractSQLiteDataStore<T>{
     private static final String DATABASE_NAME = "SQLiteDataStore";
 
     protected SQLiteDataStore(SQLiteDatabase database, Class<T> aClass) {
-        super(database, aClass);
+        super(database, aClass, null);
     }
 
-    public static <T> SQLiteDataStore<T> create(SQLiteDatabase database, Class<T> aClass){
-        return new SQLiteDataStore<T>(database, aClass);
+    public static <T> SQLiteDataStore<T> create(SQLiteDatabase database, Class<T> aClass, String tableName){
+        return new SQLiteDataStore<T>(database, aClass, tableName);
+    }
+
+    private SQLiteDataStore(SQLiteDatabase database, Class<T> aClass, String tableName) {
+        super(database, aClass, tableName);
+    }
+
+    public static <T> SQLiteDataStore<T> create(Context context, Class<T> aClass, String tableName) {
+        SQLiteDatabase database = context.openOrCreateDatabase(DATABASE_NAME, Context.MODE_PRIVATE, null);
+        return create(database, aClass, tableName);
     }
 
     public static <T> SQLiteDataStore<T> create(Context context, Class<T> aClass) {
-        SQLiteDatabase database = context.openOrCreateDatabase(DATABASE_NAME, Context.MODE_PRIVATE, null);
-        return create(database, aClass);
+        return create(context, aClass, null);
     }
 
     @Override
@@ -33,10 +41,5 @@ public class SQLiteDataStore<T> extends AbstractSQLiteDataStore<T>{
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    @Override
-    protected String getTableName() {
-        return getTableEntityClass().getSimpleName();
     }
 }
