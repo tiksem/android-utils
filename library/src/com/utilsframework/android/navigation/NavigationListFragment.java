@@ -10,7 +10,6 @@ import android.widget.AbsListView;
 import android.widget.AdapterView;
 import com.utils.framework.OnError;
 import com.utils.framework.collections.NavigationList;
-import com.utilsframework.android.IOErrorListener;
 import com.utilsframework.android.R;
 import com.utilsframework.android.adapters.ViewArrayAdapter;
 import com.utilsframework.android.fragments.Fragments;
@@ -27,7 +26,6 @@ import java.util.List;
  * Created by CM on 6/21/2015.
  */
 public abstract class NavigationListFragment<T, RequestManager> extends Fragment {
-    private IOErrorListener ioErrorListener;
     private RequestManager requestManager;
     private ViewArrayAdapter<T, ?> adapter;
     private AbsListView listView;

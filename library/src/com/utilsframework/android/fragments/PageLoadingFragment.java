@@ -36,6 +36,10 @@ public abstract class PageLoadingFragment<Data, ErrorType extends Throwable> ext
         return R.layout.no_internet_connection;
     }
 
+    protected int getRetryLoadingButtonId() {
+        return 0;
+    }
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -43,21 +47,26 @@ public abstract class PageLoadingFragment<Data, ErrorType extends Throwable> ext
         content = inflater.inflate(getContentLayoutId(), null);
         loading = inflater.inflate(getLoadingLayoutId(), null);
         noConnection = inflater.inflate(getNoConnectionLayoutId(), null);
+
         result.addView(content);
         result.addView(loading);
         result.addView(noConnection);
-        content.setVisibility(View.INVISIBLE);
-        loading.setVisibility(View.VISIBLE);
-        noConnection.setVisibility(View.INVISIBLE);
         return result;
     }
 
     protected abstract Data loadOnBackground() throws ErrorType;
 
+    private void showLoading() {
+        content.setVisibility(View.INVISIBLE);
+        loading.setVisibility(View.VISIBLE);
+        noConnection.setVisibility(View.INVISIBLE);
+    }
+
     private void onDataLoaded(Data data) {
         this.data = data;
         loading.setVisibility(View.INVISIBLE);
         content.setVisibility(View.VISIBLE);
+        noConnection.setVisibility(View.INVISIBLE);
         setupContent(data, content);
     }
 
@@ -68,26 +77,42 @@ public abstract class PageLoadingFragment<Data, ErrorType extends Throwable> ext
 
     protected abstract void setupContent(Data data, View content);
 
+    private void reloadPage() {
+        showLoading();
+
+        Threading.executeAsyncTask(new Threading.Task<ErrorType, Data>() {
+            @Override
+            public Data runOnBackground() throws ErrorType {
+                return loadOnBackground();
+            }
+
+            @Override
+            public void onComplete(Data data, ErrorType error) {
+                if (error != null) {
+                    PageLoadingFragment.this.onError(error);
+                } else {
+                    onDataLoaded(data);
+                }
+            }
+        }, errorTypeClass);
+    }
+
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        if (data == null) {
-            Threading.executeAsyncTask(new Threading.Task<ErrorType, Data>() {
+        int retryButtonId = getRetryLoadingButtonId();
+        if (retryButtonId != 0) {
+            noConnection.findViewById(retryButtonId).setOnClickListener(new View.OnClickListener() {
                 @Override
-                public Data runOnBackground() throws ErrorType {
-                    return loadOnBackground();
+                public void onClick(View v) {
+                    reloadPage();
                 }
+            });
+        }
 
-                @Override
-                public void onComplete(Data data, ErrorType error) {
-                    if (error != null) {
-                        PageLoadingFragment.this.onError(error);
-                    } else {
-                        onDataLoaded(data);
-                    }
-                }
-            }, errorTypeClass);
+        if (data == null) {
+            reloadPage();
         } else {
             onDataLoaded(data);
         }
