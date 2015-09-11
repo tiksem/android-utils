@@ -16,18 +16,17 @@ import com.utilsframework.android.adapters.ViewArrayAdapter;
 import com.utilsframework.android.fragments.Fragments;
 import com.utilsframework.android.menu.SearchListener;
 import com.utilsframework.android.menu.SearchMenuAction;
-import com.utilsframework.android.network.IOErrorListenersSet;
 import com.utilsframework.android.view.GuiUtilities;
+import com.utilsframework.android.view.OneVisibleViewInGroupToggle;
 import com.utilsframework.android.view.Toasts;
 import com.utilsframework.android.view.listview.SwipeLayoutListViewTouchListener;
 
-import java.io.IOException;
 import java.util.List;
 
 /**
  * Created by CM on 6/21/2015.
  */
-public abstract class NavigationListFragment<T, RequestManager extends IOErrorListenersSet> extends Fragment {
+public abstract class NavigationListFragment<T, RequestManager> extends Fragment {
     private IOErrorListener ioErrorListener;
     private RequestManager requestManager;
     private ViewArrayAdapter<T, ?> adapter;
@@ -38,6 +37,7 @@ public abstract class NavigationListFragment<T, RequestManager extends IOErrorLi
     private View loadingView;
     private View noConnectionView;
     private SwipeRefreshLayout swipeRefreshLayout;
+    private OneVisibleViewInGroupToggle viewsVisibilityToggle;
 
     @Override
     public void onAttach(Activity activity) {
@@ -59,10 +59,13 @@ public abstract class NavigationListFragment<T, RequestManager extends IOErrorLi
     public void onViewCreated(final View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        listView = (AbsListView) view.findViewById(getListResourceId());
-        loadingView = view.findViewById(getLoadingResourceId());
-        noConnectionView = view.findViewById(getNoInternetConnectionViewId());
+        setupViews(view);
+        setupListViewListenersAndAdapter();
+        setupSwipeLayout(view);
+        setupRetryLoadingButton();
+    }
 
+    private void setupListViewListenersAndAdapter() {
         adapter = createAdapter(requestManager);
         listView.setAdapter(adapter);
 
@@ -75,17 +78,30 @@ public abstract class NavigationListFragment<T, RequestManager extends IOErrorLi
                 }
             }
         });
+    }
 
-        ioErrorListener = new IOErrorListener() {
-            @Override
-            public void onIOError(IOException error) {
-                listView.setVisibility(View.INVISIBLE);
-                view.findViewById(getLoadingResourceId()).setVisibility(View.INVISIBLE);
-                view.findViewById(getNoInternetConnectionViewId()).setVisibility(View.VISIBLE);
-            }
-        };
-        requestManager.addIOErrorListener(ioErrorListener);
+    private void setupViews(View view) {
+        listView = (AbsListView) view.findViewById(getListResourceId());
+        loadingView = view.findViewById(getLoadingResourceId());
+        noConnectionView = view.findViewById(getNoInternetConnectionViewId());
 
+        viewsVisibilityToggle = new OneVisibleViewInGroupToggle(loadingView, listView, noConnectionView);
+    }
+
+    private void setupRetryLoadingButton() {
+        int buttonId = getRetryLoadingButtonId();
+        if (buttonId != 0) {
+            View retryButton = noConnectionView.findViewById(buttonId);
+            retryButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    onRetryLoading();
+                }
+            });
+        }
+    }
+
+    private void setupSwipeLayout(View view) {
         swipeRefreshLayout = (SwipeRefreshLayout) view;
         listView.setOnTouchListener(new SwipeLayoutListViewTouchListener(swipeRefreshLayout));
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -94,6 +110,10 @@ public abstract class NavigationListFragment<T, RequestManager extends IOErrorLi
                 onSwipeRefresh();
             }
         });
+    }
+
+    private void onRetryLoading() {
+        updateNavigationListWithLastFilter();
     }
 
     private void onSwipeRefresh() {
@@ -115,7 +135,6 @@ public abstract class NavigationListFragment<T, RequestManager extends IOErrorLi
     public void onDestroyView() {
         super.onDestroyView();
         listViewState = listView.onSaveInstanceState();
-        requestManager.removeIOErrorListener(ioErrorListener);
     }
 
     protected abstract RequestManager obtainRequestManager();
@@ -141,6 +160,10 @@ public abstract class NavigationListFragment<T, RequestManager extends IOErrorLi
 
     protected abstract int getNoInternetConnectionViewId();
 
+    protected int getRetryLoadingButtonId() {
+        return 0;
+    }
+
     public void updateNavigationList(String filter) {
         lastFilter = filter;
         elements = getNavigationList(requestManager, filter);
@@ -156,18 +179,19 @@ public abstract class NavigationListFragment<T, RequestManager extends IOErrorLi
         updateNavigationList(lastFilter);
     }
 
+    private void showView(View view) {
+        viewsVisibilityToggle.makeVisible(view);
+        swipeRefreshLayout.setEnabled(view == listView);
+    }
+
     private void updateAdapterAndViewsState() {
         adapter.setElements(elements);
-
-        listView.setVisibility(View.INVISIBLE);
-        loadingView.setVisibility(View.VISIBLE);
 
         elements.setOnPageLoadingFinished(new NavigationList.OnPageLoadingFinished<T>() {
             @Override
             public void onLoadingFinished(List<T> page) {
                 if (!elements.isEmpty() || elements.isAllDataLoaded()) {
-                    listView.setVisibility(View.VISIBLE);
-                    loadingView.setVisibility(View.INVISIBLE);
+                    showView(listView);
                 }
 
                 adapter.notifyDataSetChanged();
@@ -184,9 +208,9 @@ public abstract class NavigationListFragment<T, RequestManager extends IOErrorLi
         if (!elements.isAllDataLoaded() && elements.getElementsCount() <= 0) {
             // load first page
             elements.get(0);
+            showView(loadingView);
         } else {
-            loadingView.setVisibility(View.INVISIBLE);
-            listView.setVisibility(View.VISIBLE);
+            showView(listView);
         }
 
         if (listViewState != null) {
@@ -196,9 +220,7 @@ public abstract class NavigationListFragment<T, RequestManager extends IOErrorLi
 
     protected void handleNavigationListError(Throwable e) {
         if (elements.getElementsCount() == 0) {
-            listView.setVisibility(View.INVISIBLE);
-            loadingView.setVisibility(View.INVISIBLE);
-            noConnectionView.setVisibility(View.VISIBLE);
+            showView(noConnectionView);
         } else {
             Toasts.error(listView.getContext(), R.string.no_internet_connection);
         }
