@@ -16,7 +16,7 @@ public class SwipeLayoutListViewTouchListener implements ListView.OnTouchListene
         AbsListView listView = (AbsListView) v;
         int topRowVerticalPosition = listView.getChildCount() == 0 ? 0 : listView.getChildAt(0).getTop();
         int firstVisibleItem = listView.getFirstVisiblePosition();
-        swipeContainer.setEnabled(firstVisibleItem == 0 && topRowVerticalPosition >= 0);
+        swipeContainer.setEnabled(firstVisibleItem == 0 && topRowVerticalPosition == 0);
         return false;
     }
 
