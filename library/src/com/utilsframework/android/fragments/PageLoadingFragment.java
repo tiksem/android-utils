@@ -79,22 +79,15 @@ public abstract class PageLoadingFragment<Data, ErrorType extends Throwable> ext
 
     private void reloadPage() {
         showLoading();
+        Threading.executeAsyncTask(new PageLoadingTask<>(this), errorTypeClass);
+    }
 
-        Threading.executeAsyncTask(new Threading.Task<ErrorType, Data>() {
-            @Override
-            public Data runOnBackground() throws ErrorType {
-                return loadOnBackground();
-            }
-
-            @Override
-            public void onComplete(Data data, ErrorType error) {
-                if (error != null) {
-                    PageLoadingFragment.this.onError(error);
-                } else {
-                    onDataLoaded(data);
-                }
-            }
-        }, errorTypeClass);
+    void onDataLoadingFinished(Data data, ErrorType error) {
+        if (error != null) {
+            PageLoadingFragment.this.onError(error);
+        } else {
+            onDataLoaded(data);
+        }
     }
 
     @Override
