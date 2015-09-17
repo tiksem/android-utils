@@ -137,6 +137,7 @@ public abstract class NavigationFragmentDrawer {
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(MenuItem menuItem) {
+                menuItem.setChecked(true);
                 performMenuItemSelection(menuItem.getItemId());
                 return true;
             }
