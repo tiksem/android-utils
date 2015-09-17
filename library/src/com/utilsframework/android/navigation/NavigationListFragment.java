@@ -116,11 +116,11 @@ public abstract class NavigationListFragment<T, RequestManager> extends Fragment
 
     private void onSwipeRefresh() {
         elements = getNavigationList(requestManager, lastFilter);
-        elements.setOnPageLoadingFinished(new NavigationList.OnPageLoadingFinished<T>() {
+        elements.setOnPageLoadingFinished(new PageLoadingFinishedCallback<T, RequestManager>(this) {
             @Override
-            public void onLoadingFinished(List<T> pageItems) {
-                updateAdapterAndViewsState();
-                swipeRefreshLayout.setRefreshing(false);
+            protected void onLoadingFinished(List<T> pageItems, NavigationListFragment<T, RequestManager> self) {
+                self.updateAdapterAndViewsState();
+                self.swipeRefreshLayout.setRefreshing(false);
             }
         });
 
@@ -185,23 +185,18 @@ public abstract class NavigationListFragment<T, RequestManager> extends Fragment
     private void updateAdapterAndViewsState() {
         adapter.setElements(elements);
 
-        elements.setOnPageLoadingFinished(new NavigationList.OnPageLoadingFinished<T>() {
+        elements.setOnPageLoadingFinished(new PageLoadingFinishedCallback<T, RequestManager>(this) {
             @Override
-            public void onLoadingFinished(List<T> page) {
-                if (!elements.isEmpty() || elements.isAllDataLoaded()) {
-                    showView(listView);
+            public void onLoadingFinished(List<T> page, NavigationListFragment<T, RequestManager> self) {
+                if (!self.elements.isEmpty() || self.elements.isAllDataLoaded()) {
+                    self.showView(listView);
                 }
 
-                adapter.notifyDataSetChanged();
+                self.adapter.notifyDataSetChanged();
             }
         });
 
-        elements.setOnError(new OnError() {
-            @Override
-            public void onError(Throwable e) {
-                handleNavigationListError(e);
-            }
-        });
+        elements.setOnError(new ErrorCallback(this));
 
         if (!elements.isAllDataLoaded() && elements.getElementsCount() <= 0) {
             // load first page
