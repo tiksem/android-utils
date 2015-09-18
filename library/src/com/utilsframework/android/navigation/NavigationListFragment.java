@@ -180,6 +180,14 @@ public abstract class NavigationListFragment<T, RequestManager> extends Fragment
     private void showView(View view) {
         viewsVisibilityToggle.makeVisible(view);
         swipeRefreshLayout.setEnabled(view == listView);
+
+        if (view == listView) {
+            onListViewIsShown();
+        }
+    }
+
+    protected void onListViewIsShown() {
+
     }
 
     private void updateAdapterAndViewsState() {
