@@ -27,6 +27,12 @@ public class AndroidUtilities {
         }
     }
 
+    public static void startActivityWithExtras(Context context, Class<? extends Activity> aClass, Intent extras) {
+        Intent intent = new Intent(context, aClass);
+        intent.putExtras(extras);
+        context.startActivity(intent);
+    }
+
     public static void startActivity(Context context, Class<? extends Activity> aClass) {
         Intent intent = new Intent(context, aClass);
         context.startActivity(intent);

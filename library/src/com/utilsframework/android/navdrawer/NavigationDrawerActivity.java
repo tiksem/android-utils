@@ -5,10 +5,7 @@ import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
-import android.view.View;
 import com.utilsframework.android.R;
-
-import java.util.List;
 
 /**
  * Created by CM on 12/26/2014.
@@ -25,6 +22,10 @@ public abstract class NavigationDrawerActivity extends AppCompatActivity impleme
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         onPreCreate();
+        init();
+    }
+
+    protected void init() {
         setContentView(R.layout.navigation_drawable_activity);
 
         navigationDrawer = new NavigationFragmentDrawer(this, this,
