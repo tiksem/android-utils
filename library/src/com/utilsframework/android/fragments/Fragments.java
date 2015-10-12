@@ -9,6 +9,7 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import com.utilsframework.android.UiLoopEvent;
+import com.utilsframework.android.WeakUiLoopEvent;
 import com.utilsframework.android.view.GuiUtilities;
 
 /**
@@ -76,16 +77,17 @@ public class Fragments {
         fragmentManager.beginTransaction().add(containerId, fragment).commit();
     }
 
-    public static void executeWhenViewCreated(final Fragment fragment, final GuiUtilities.OnViewCreated onViewCreated) {
+    public static void executeWhenViewCreated(Fragment fragment, final GuiUtilities.OnViewCreated onViewCreated) {
         if(fragment.getView() != null){
             onViewCreated.onViewCreated(fragment.getView());
             return;
         }
 
-        final UiLoopEvent uiLoopEvent = new UiLoopEvent(fragment);
+        final WeakUiLoopEvent<Fragment> uiLoopEvent = new WeakUiLoopEvent<>(fragment);
         uiLoopEvent.run(new Runnable() {
             @Override
             public void run() {
+                Fragment fragment = uiLoopEvent.get();
                 if (fragment.getView() != null) {
                     onViewCreated.onViewCreated(fragment.getView());
                     uiLoopEvent.stop();
@@ -101,10 +103,11 @@ public class Fragments {
             return;
         }
 
-        final UiLoopEvent uiLoopEvent = new UiLoopEvent(fragment);
+        final WeakUiLoopEvent<android.support.v4.app.Fragment> uiLoopEvent = new WeakUiLoopEvent<>(fragment);
         uiLoopEvent.run(new Runnable() {
             @Override
             public void run() {
+                android.support.v4.app.Fragment fragment = uiLoopEvent.get();
                 if (fragment.getView() != null) {
                     onViewCreated.onViewCreated(fragment.getView());
                     uiLoopEvent.stop();

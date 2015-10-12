@@ -1,4 +1,4 @@
-package com.utilsframework.android.view.fragments;
+package com.utilsframework.android.view.pieces;
 
 import android.view.View;
 
@@ -7,6 +7,6 @@ import android.view.View;
  * Date: 04.04.14
  * Time: 14:32
  */
-public interface FragmentsProvider {
+public interface PiecesProvider {
     float getFragment(int viewIndex, View view);
 }

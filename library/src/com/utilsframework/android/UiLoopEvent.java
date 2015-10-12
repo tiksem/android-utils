@@ -8,21 +8,24 @@ import java.lang.ref.WeakReference;
 /**
  * Created by Tikhonenko.S on 31.10.13.
  */
+
+/* Note: Don't forget to stop UiLoopEvent when task is finished or use onDestroy/onStop and other callbacks.
+* Be careful! Unstopped UiLoopEvent will produce memory leaks.
+* */
 public class UiLoopEvent implements LoopEvent{
-    private static final long DEFAULT_DELAY = 30;
+    public static final long DEFAULT_DELAY = 30;
 
     private Runnable runnable;
     private Handler handler = new Handler();
     private Runnable onUi;
     private boolean isPaused = false;
     private long delay;
-    private WeakReference<Object> context;
 
     private void runOnUiThread(){
         onUi = new Runnable() {
             @Override
             public void run() {
-                if(runnable != null && (context == null || context.get() != null)){
+                if(runnable != null && canRun()){
                     if (!isPaused) {
                         runnable.run();
                     }
@@ -34,16 +37,17 @@ public class UiLoopEvent implements LoopEvent{
         handler.post(onUi);
     }
 
-    // if context is null UiLoopEvent will work globally
-    public UiLoopEvent(Object context, long delay) {
-        setDelay(delay);
-        if (context != null) {
-            this.context = new WeakReference<Object>(context);
-        }
+    protected boolean canRun() {
+        return true;
     }
 
-    public UiLoopEvent(Object context) {
-        this(context, DEFAULT_DELAY);
+    // if context is null UiLoopEvent will work globally
+    public UiLoopEvent(long delay) {
+        setDelay(delay);
+    }
+
+    public UiLoopEvent() {
+        this(DEFAULT_DELAY);
     }
 
     @Override

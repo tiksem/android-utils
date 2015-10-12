@@ -11,13 +11,12 @@ public class UiCountableLoopEvent extends UiLoopEvent{
     private int count;
     private int i = 0;
 
-    public UiCountableLoopEvent(Context context, long delay, int count) {
-        super(context, delay);
+    public UiCountableLoopEvent(long delay, int count) {
+        super(delay);
         this.count = count;
     }
 
-    public UiCountableLoopEvent(Context context, int count) {
-        super(context);
+    public UiCountableLoopEvent(int count) {
         this.count = count;
     }
 

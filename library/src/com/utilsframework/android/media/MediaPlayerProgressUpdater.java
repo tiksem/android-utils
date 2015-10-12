@@ -1,6 +1,7 @@
 package com.utilsframework.android.media;
 
 import android.media.MediaPlayer;
+import com.utils.framework.Destroyable;
 import com.utilsframework.android.UiLoopEvent;
 
 /**
@@ -8,7 +9,7 @@ import com.utilsframework.android.UiLoopEvent;
  * Date: 21.08.14
  * Time: 21:06
  */
-public abstract class MediaPlayerProgressUpdater {
+public abstract class MediaPlayerProgressUpdater implements Destroyable {
     private UiLoopEvent uiLoopEvent;
     private long lastDuration = -1;
     private long lastCurrentPosition = -1;
@@ -22,7 +23,7 @@ public abstract class MediaPlayerProgressUpdater {
             uiLoopEvent.stop();
         }
 
-        uiLoopEvent = new UiLoopEvent(mediaPlayer);
+        uiLoopEvent = new UiLoopEvent();
         uiLoopEvent.run(new Runnable() {
             @Override
             public void run() {
@@ -62,4 +63,9 @@ public abstract class MediaPlayerProgressUpdater {
     }
 
     protected abstract void onProgressChanged(long progress, long max);
+
+    @Override
+    public void destroy() {
+        uiLoopEvent.stop();
+    }
 }

@@ -2,38 +2,35 @@ package com.utilsframework.android.listeners;
 
 import android.content.Context;
 import android.content.res.Configuration;
+import com.utils.framework.Destroyable;
 import com.utilsframework.android.UiLoopEvent;
+import com.utilsframework.android.WeakUiLoopEvent;
 
 /**
  * User: Tikhonenko.S
  * Date: 16.04.14
  * Time: 17:48
  */
-public abstract class OrientationLandscapePortraitChangedListener {
-    private final UiLoopEvent uiLoopEvent;
+public abstract class OrientationLandscapePortraitChangedListener implements Destroyable {
+    private final WeakUiLoopEvent<Context> uiLoopEvent;
     private int lastOrientation;
-    private Context context;
-
-    protected OrientationLandscapePortraitChangedListener(final Context context, Object parent) {
-        if(parent == null){
-            parent = context;
-        }
-
-        uiLoopEvent = new UiLoopEvent(parent);
-        this.context = context;
-    }
 
     protected OrientationLandscapePortraitChangedListener(final Context context) {
-        this(context, null);
+        uiLoopEvent = new WeakUiLoopEvent<Context>(context);
     }
 
     public void start(){
+        Context context = uiLoopEvent.get();
+        if (context == null) {
+            return;
+        }
+
         lastOrientation = context.getResources().getConfiguration().orientation;
 
         uiLoopEvent.run(new Runnable() {
             @Override
             public void run() {
-                int currentOrientation = context.getResources().getConfiguration().orientation;
+                int currentOrientation = uiLoopEvent.get().getResources().getConfiguration().orientation;
 
                 if (currentOrientation != lastOrientation) {
                     if(currentOrientation == Configuration.ORIENTATION_LANDSCAPE){
@@ -62,4 +59,9 @@ public abstract class OrientationLandscapePortraitChangedListener {
 
     public abstract void onLandscape();
     public abstract void onPortrait();
+
+    @Override
+    public void destroy() {
+        uiLoopEvent.stop();
+    }
 }

@@ -9,12 +9,8 @@ import com.utilsframework.android.listeners.StateChangedListener;
  * Time: 18:49
  */
 public abstract class ChildCountChangedListener extends StateChangedListener<ViewGroup, Integer>{
-    protected ChildCountChangedListener(ViewGroup object, Object context) {
-        super(object, context);
-    }
-
-    public ChildCountChangedListener(ViewGroup viewGroup) {
-        super(viewGroup);
+    protected ChildCountChangedListener(ViewGroup object) {
+        super(object);
     }
 
     @Override

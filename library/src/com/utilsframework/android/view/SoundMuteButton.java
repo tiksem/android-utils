@@ -20,17 +20,14 @@ public class SoundMuteButton extends ToggleButton{
 
     public SoundMuteButton(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
-        init();
     }
 
     public SoundMuteButton(Context context, AttributeSet attrs) {
         super(context, attrs);
-        init();
     }
 
     public SoundMuteButton(Context context) {
         super(context);
-        init();
     }
 
     public MediaPlayerProvider getMediaPlayerProvider() {
@@ -63,7 +60,10 @@ public class SoundMuteButton extends ToggleButton{
         throw new UnsupportedOperationException();
     }
 
-    private void init(){
+    @Override
+    protected void onAttachedToWindow() {
+        super.onAttachedToWindow();
+
         super.setOnCheckedChangeListener(new OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -71,12 +71,18 @@ public class SoundMuteButton extends ToggleButton{
             }
         });
 
-        mediaPlayerUpdater = new UiLoopEvent(getContext(), MEDIA_PLAYER_UPDATE_DELAY);
+        mediaPlayerUpdater = new UiLoopEvent(MEDIA_PLAYER_UPDATE_DELAY);
         mediaPlayerUpdater.run(new Runnable() {
             @Override
             public void run() {
                 updateCheckedState();
             }
         });
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+        mediaPlayerUpdater.stop();
     }
 }

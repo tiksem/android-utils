@@ -1,4 +1,4 @@
-package com.utilsframework.android.view.fragments;
+package com.utilsframework.android.view.pieces;
 
 import android.content.Context;
 import android.util.AttributeSet;
@@ -8,9 +8,9 @@ import android.util.AttributeSet;
  * Date: 04.04.14
  * Time: 14:52
  */
-public class ColorPickerLinearLayout extends StaticFragmentsView{
+public class ColorPickerLinearLayout extends StaticPieceProgressView {
     private int[] colors = new int[0];
-    private ColorPickerFragmentsAdapter colorPickerFragmentsAdapter;
+    private ColorPickerPieceAdapter colorPickerFragmentsAdapter;
 
     public ColorPickerLinearLayout(Context context) {
         super(context);
@@ -25,12 +25,12 @@ public class ColorPickerLinearLayout extends StaticFragmentsView{
     }
 
     @Override
-    public void setAdapter(FragmentsAdapter fragmentsAdapter) {
+    public void setAdapter(PieceAdapter pieceAdapter) {
         throw new UnsupportedOperationException("fragments adapter should be an instance " +
-                "of ColorPickerFragmentsAdapter");
+                "of ColorPickerPieceAdapter");
     }
 
-    public void setAdapter(ColorPickerFragmentsAdapter colorPickerFragmentsAdapter) {
+    public void setAdapter(ColorPickerPieceAdapter colorPickerFragmentsAdapter) {
         super.setAdapter(colorPickerFragmentsAdapter);
         this.colorPickerFragmentsAdapter = colorPickerFragmentsAdapter;
 
@@ -40,7 +40,7 @@ public class ColorPickerLinearLayout extends StaticFragmentsView{
     }
 
     @Override
-    public void setFragmentsProvider(FragmentsProvider fragmentsProvider) {
+    public void setPiecesProvider(PiecesProvider piecesProvider) {
         throw new UnsupportedOperationException();
     }
 

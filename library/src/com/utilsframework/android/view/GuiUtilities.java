@@ -35,6 +35,7 @@ import com.utils.framework.predicates.InstanceOfPredicate;
 import com.utilsframework.android.BuildConfig;
 import com.utilsframework.android.ListenerRemover;
 import com.utilsframework.android.UiLoopEvent;
+import com.utilsframework.android.WeakUiLoopEvent;
 import com.utilsframework.android.threading.OnFinish;
 import com.utilsframework.android.threading.ResultLoop;
 
@@ -276,11 +277,13 @@ public class GuiUtilities {
     }
 
     public static void executeWhenViewMeasuredUsingLoop(final View view, final Runnable runnable) {
-        final UiLoopEvent uiLoopEvent = new UiLoopEvent(view);
+        final WeakUiLoopEvent<View> uiLoopEvent = new WeakUiLoopEvent<>(view);
         final long time = System.currentTimeMillis();
         uiLoopEvent.run(new Runnable() {
             @Override
             public void run() {
+                View view = uiLoopEvent.get();
+
                 if(view.getMeasuredHeight() != 0 || view.getMeasuredWidth() != 0){
                     runnable.run();
                     uiLoopEvent.stop();

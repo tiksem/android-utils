@@ -55,7 +55,10 @@ public class PausedStateToggleButton extends ToggleButton{
         lastCanPauseState = canPauseState;
     }
 
-    private void init(){
+    @Override
+    protected void onAttachedToWindow() {
+        super.onAttachedToWindow();
+
         super.setOnCheckedChangeListener(new OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -63,7 +66,7 @@ public class PausedStateToggleButton extends ToggleButton{
             }
         });
 
-        enabledStateUpdater = new UiLoopEvent(this);
+        enabledStateUpdater = new UiLoopEvent();
         enabledStateUpdater.run(new Runnable() {
             @Override
             public void run() {
@@ -74,19 +77,22 @@ public class PausedStateToggleButton extends ToggleButton{
         updateCanPauseState();
     }
 
+    @Override
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+        enabledStateUpdater.stop();
+    }
+
     public PausedStateToggleButton(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
-        init();
     }
 
     public PausedStateToggleButton(Context context, AttributeSet attrs) {
         super(context, attrs);
-        init();
     }
 
     public PausedStateToggleButton(Context context) {
         super(context);
-        init();
     }
 
     @Override

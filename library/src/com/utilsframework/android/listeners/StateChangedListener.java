@@ -1,7 +1,9 @@
 package com.utilsframework.android.listeners;
 
+import com.utils.framework.Destroyable;
 import com.utils.framework.patterns.StateProvider;
 import com.utilsframework.android.UiLoopEvent;
+import com.utilsframework.android.WeakUiLoopEvent;
 
 import java.lang.ref.WeakReference;
 
@@ -10,22 +12,12 @@ import java.lang.ref.WeakReference;
  * Date: 30.04.14
  * Time: 18:24
  */
-public abstract class StateChangedListener<T, State> implements StateProvider<T, State> {
-    private UiLoopEvent uiLoopEvent;
-    private WeakReference<T> object;
+public abstract class StateChangedListener<T, State> implements StateProvider<T, State>, Destroyable {
+    private WeakUiLoopEvent<T> uiLoopEvent;
     private State lastState;
 
-    public StateChangedListener(T object, Object context) {
-        if(context == null){
-            context = object;
-        }
-
-        uiLoopEvent = new UiLoopEvent(context);
-        this.object = new WeakReference<T>(object);
-    }
-
-    public StateChangedListener(T object){
-        this(object, null);
+    public StateChangedListener(T object) {
+        uiLoopEvent = new WeakUiLoopEvent<T>(object);
     }
 
     public void resume(){
@@ -45,7 +37,7 @@ public abstract class StateChangedListener<T, State> implements StateProvider<T,
     }
 
     private T getObjectOrThrow() {
-        T result = object.get();
+        T result = uiLoopEvent.get();
         if(result == null){
             throw new IllegalStateException("object was deleted");
         }
@@ -57,7 +49,7 @@ public abstract class StateChangedListener<T, State> implements StateProvider<T,
         uiLoopEvent.run(new Runnable() {
             @Override
             public void run() {
-                T objectValue = object.get();
+                T objectValue = uiLoopEvent.get();
                 if(objectValue == null){
                     uiLoopEvent.stop();
                     return;
@@ -84,5 +76,10 @@ public abstract class StateChangedListener<T, State> implements StateProvider<T,
     @Override
     public void restoreState(T object, State state) {
         throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void destroy() {
+        uiLoopEvent.stop();
     }
 }

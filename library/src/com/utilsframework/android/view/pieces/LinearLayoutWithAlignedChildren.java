@@ -1,4 +1,4 @@
-package com.utilsframework.android.view.fragments;
+package com.utilsframework.android.view.pieces;
 
 import android.content.Context;
 import android.util.AttributeSet;
@@ -9,7 +9,7 @@ import android.view.View;
  * Date: 04.04.14
  * Time: 14:47
  */
-public class LinearLayoutWithAlignedChildren extends StaticFragmentsView{
+public class LinearLayoutWithAlignedChildren extends StaticPieceProgressView {
     public LinearLayoutWithAlignedChildren(Context context) {
         super(context);
         init();
@@ -26,17 +26,17 @@ public class LinearLayoutWithAlignedChildren extends StaticFragmentsView{
     }
 
     @Override
-    public void setAdapter(FragmentsAdapter fragmentsAdapter) {
+    public void setAdapter(PieceAdapter pieceAdapter) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public void setFragmentsProvider(FragmentsProvider fragmentsProvider) {
+    public void setPiecesProvider(PiecesProvider piecesProvider) {
         throw new UnsupportedOperationException();
     }
 
     private void init() {
-        super.setFragmentsProvider(new FragmentsProvider() {
+        super.setPiecesProvider(new PiecesProvider() {
             @Override
             public float getFragment(int viewIndex, View view) {
                 return 1;

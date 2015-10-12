@@ -1,6 +1,7 @@
 package com.utilsframework.android.view;
 
 import android.widget.ProgressBar;
+import com.utils.framework.Destroyable;
 import com.utilsframework.android.UiLoopEventWithTimeTracking;
 
 /**
@@ -8,7 +9,7 @@ import com.utilsframework.android.UiLoopEventWithTimeTracking;
  * Date: 03.12.13
  * Time: 13:47
  */
-public abstract class ProgressBarUpdater {
+public abstract class ProgressBarUpdater implements Destroyable {
     private static final long UPDATE_DELAY = 10;
 
     private ProgressBar progressBar;
@@ -16,7 +17,7 @@ public abstract class ProgressBarUpdater {
 
     public ProgressBarUpdater(final ProgressBar progressBar) {
         this.progressBar = progressBar;
-        updater = new UiLoopEventWithTimeTracking(progressBar, UPDATE_DELAY);
+        updater = new UiLoopEventWithTimeTracking(UPDATE_DELAY);
     }
 
     public void start(){
@@ -55,4 +56,9 @@ public abstract class ProgressBarUpdater {
     }
 
     public abstract int getMax();
+
+    @Override
+    public void destroy() {
+        updater.stop();
+    }
 }

@@ -1,16 +1,11 @@
 package com.utilsframework.android.adapters;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AbsListView;
 import android.widget.BaseAdapter;
-import android.widget.ListView;
-import android.widget.TextView;
-import com.utils.framework.*;
-import com.utilsframework.android.UiLoopEvent;
+import com.utilsframework.android.WeakUiLoopEvent;
 import com.utilsframework.android.view.GuiUtilities;
 
 import java.util.*;
@@ -37,8 +32,8 @@ public abstract class ViewArrayAdapter<Element, ViewHolder> extends BaseAdapter 
     private OnNullElementReceived<Element> onNullElementReceivedListener;
 
     private LayoutInflater inflater;
-    private UiLoopEvent nullItemsUpdater;
-    private UiLoopEvent itemsUpdater;
+    private WeakUiLoopEvent<ViewArrayAdapter> nullItemsUpdater;
+    private WeakUiLoopEvent<ViewArrayAdapter> itemsUpdater;
     private Set<Integer> nullItemsPositions;
     private View header;
     private boolean reverse;
@@ -149,25 +144,8 @@ public abstract class ViewArrayAdapter<Element, ViewHolder> extends BaseAdapter 
 
             if(nullItemsUpdater == null && autoUpdateMode == AutoUpdateMode.UPDATE_NULL){
                 nullItemsPositions = new HashSet<Integer>();
-                nullItemsUpdater = new UiLoopEvent(this);
-                nullItemsUpdater.run(new Runnable() {
-                    @Override
-                    public void run() {
-                        boolean shouldCallNotifyDataSetChanged = false;
-                        Iterator<Integer> iterator = nullItemsPositions.iterator();
-                        while (iterator.hasNext()) {
-                            int position = iterator.next();
-                            if (getElement(position) != null) {
-                                shouldCallNotifyDataSetChanged = true;
-                                iterator.remove();
-                            }
-                        }
-
-                        if (shouldCallNotifyDataSetChanged) {
-                            notifyDataSetChanged();
-                        }
-                    }
-                });
+                nullItemsUpdater = new WeakUiLoopEvent<ViewArrayAdapter>(this);
+                nullItemsUpdater.run(new NullItemsUpdater(nullItemsUpdater));
             }
 
             if (nullItemsPositions != null) {
@@ -194,6 +172,35 @@ public abstract class ViewArrayAdapter<Element, ViewHolder> extends BaseAdapter 
         reuseView(element, viewHolder, position, convertView);
 
         return convertView;
+    }
+
+    private static class NullItemsUpdater implements Runnable {
+        private final WeakUiLoopEvent<ViewArrayAdapter> nullItemsUpdater;
+
+        public NullItemsUpdater(WeakUiLoopEvent<ViewArrayAdapter> nullItemsUpdater) {
+            this.nullItemsUpdater = nullItemsUpdater;
+        }
+
+        @Override
+        public void run() {
+            nullItemsUpdater.get().updateNullItems();
+        }
+    }
+
+    private void updateNullItems() {
+        boolean shouldCallNotifyDataSetChanged = false;
+        Iterator<Integer> iterator = nullItemsPositions.iterator();
+        while (iterator.hasNext()) {
+            int position = iterator.next();
+            if (getElement(position) != null) {
+                shouldCallNotifyDataSetChanged = true;
+                iterator.remove();
+            }
+        }
+
+        if (shouldCallNotifyDataSetChanged) {
+            notifyDataSetChanged();
+        }
     }
 
     public View getHeader() {
@@ -310,31 +317,43 @@ public abstract class ViewArrayAdapter<Element, ViewHolder> extends BaseAdapter 
         }
 
         if (autoUpdateMode == AutoUpdateMode.UPDATE_ALL) {
-            itemsUpdater = new UiLoopEvent(this);
-            itemsUpdater.run(new Runnable() {
-                @Override
-                public void run() {
-                    List<View> children = GuiUtilities.getChildrenAsListNonCopy(viewGroup);
-                    for (View view : children) {
-                        Integer position = getPositionOfView(view);
-                        if (position != null) {
-                            Element newElement = getElement(position);
-                            Element oldElement = getElementOfView(view);
-
-                            if (!Objects.equals(newElement, oldElement)) {
-                                notifyDataSetChanged();
-                                break;
-                            }
-                        }
-                    }
-                }
-            });
+            itemsUpdater = new WeakUiLoopEvent<ViewArrayAdapter>(this);
+            itemsUpdater.run(new AllItemsUpdater(itemsUpdater));
         } else if(itemsUpdater != null) {
             itemsUpdater.stop();
             itemsUpdater = null;
         }
 
         this.autoUpdateMode = autoUpdateMode;
+    }
+
+    private static class AllItemsUpdater implements Runnable {
+        private final WeakUiLoopEvent<ViewArrayAdapter> allItemsUpdater;
+
+        public AllItemsUpdater(WeakUiLoopEvent<ViewArrayAdapter> allItemsUpdater) {
+            this.allItemsUpdater = allItemsUpdater;
+        }
+
+        @Override
+        public void run() {
+            allItemsUpdater.get().updateAllItems();
+        }
+    }
+
+    private void updateAllItems() {
+        List<View> children = GuiUtilities.getChildrenAsListNonCopy(viewGroup);
+        for (View view : children) {
+            Integer position = getPositionOfView(view);
+            if (position != null) {
+                Element newElement = getElement(position);
+                Element oldElement = getElementOfView(view);
+
+                if (!Objects.equals(newElement, oldElement)) {
+                    notifyDataSetChanged();
+                    break;
+                }
+            }
+        }
     }
 
     @Override

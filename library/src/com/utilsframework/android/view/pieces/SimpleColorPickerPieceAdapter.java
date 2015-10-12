@@ -1,4 +1,4 @@
-package com.utilsframework.android.view.fragments;
+package com.utilsframework.android.view.pieces;
 
 import android.content.Context;
 import android.view.View;
@@ -9,10 +9,10 @@ import android.widget.TextView;
  * Date: 04.04.14
  * Time: 15:09
  */
-public class SimpleColorPickerFragmentsAdapter extends ColorPickerFragmentsAdapter{
+public class SimpleColorPickerPieceAdapter extends ColorPickerPieceAdapter {
     private Context context;
 
-    public SimpleColorPickerFragmentsAdapter(Context context) {
+    public SimpleColorPickerPieceAdapter(Context context) {
         this.context = context;
     }
 

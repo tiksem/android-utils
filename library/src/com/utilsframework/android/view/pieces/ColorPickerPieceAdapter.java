@@ -1,4 +1,4 @@
-package com.utilsframework.android.view.fragments;
+package com.utilsframework.android.view.pieces;
 
 import java.util.Collections;
 import java.util.List;
@@ -8,7 +8,7 @@ import java.util.List;
  * Date: 04.04.14
  * Time: 15:03
  */
-public abstract class ColorPickerFragmentsAdapter implements FragmentsAdapter{
+public abstract class ColorPickerPieceAdapter implements PieceAdapter {
     private int[] colors = new int[0];
 
     void setColors(int[] colors) {

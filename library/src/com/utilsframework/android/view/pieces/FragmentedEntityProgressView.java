@@ -1,4 +1,4 @@
-package com.utilsframework.android.view.fragments;
+package com.utilsframework.android.view.pieces;
 
 import android.content.Context;
 import android.util.AttributeSet;
@@ -14,8 +14,8 @@ import java.util.List;
  * Time: 14:00
  */
 public abstract class FragmentedEntityProgressView extends FrameLayout{
-    private FragmentsAdapter fragmentsAdapter;
-    private FragmentsView fragmentsView;
+    private PieceAdapter pieceAdapter;
+    private PieceProgressView fragmentsView;
     private ProgressBar progressBar;
     private boolean alwaysShowFragments = false;
 
@@ -31,8 +31,8 @@ public abstract class FragmentedEntityProgressView extends FrameLayout{
         super(context, attrs, defStyle);
     }
 
-    public FragmentsAdapter getFragmentsAdapter() {
-        return fragmentsAdapter;
+    public PieceAdapter getPieceAdapter() {
+        return pieceAdapter;
     }
 
     @Override
@@ -40,7 +40,7 @@ public abstract class FragmentedEntityProgressView extends FrameLayout{
         super.onFinishInflate();
 
         int fragmentsViewId = getFragmentsViewId();
-        fragmentsView = (FragmentsView)findViewById(fragmentsViewId);
+        fragmentsView = (PieceProgressView)findViewById(fragmentsViewId);
         if(fragmentsView == null){
             throw new RuntimeException("Could not find FragmentsView with id = " + fragmentsViewId);
         }
@@ -88,15 +88,15 @@ public abstract class FragmentedEntityProgressView extends FrameLayout{
         post(runnable);
     }
 
-    private class FragmentsAdapterWrapper implements FragmentsAdapter{
+    private class PieceAdapterWrapper implements PieceAdapter {
         @Override
         public View getView(int index, double sizeInPercents, int size) {
-            return fragmentsAdapter.getView(index, sizeInPercents, size);
+            return pieceAdapter.getView(index, sizeInPercents, size);
         }
 
         @Override
         public List<Float> getFragments() {
-            final List<Float> result = fragmentsAdapter.getFragments();
+            final List<Float> result = pieceAdapter.getFragments();
             int size = result.size();
             if(size == 1){
                 executeUpdate(new Runnable() {
@@ -122,22 +122,22 @@ public abstract class FragmentedEntityProgressView extends FrameLayout{
         }
     }
 
-    public void setFragmentsAdapter(final FragmentsAdapter fragmentsAdapter) {
-        this.fragmentsAdapter = fragmentsAdapter;
+    public void setPieceAdapter(final PieceAdapter pieceAdapter) {
+        this.pieceAdapter = pieceAdapter;
         showFragmentsView();
-        if(fragmentsAdapter != null){
-            fragmentsView.setAdapter(new FragmentsAdapterWrapper());
+        if(pieceAdapter != null){
+            fragmentsView.setAdapter(new PieceAdapterWrapper());
         } else {
             fragmentsView.setAdapter(null);
         }
     }
 
-    public OnFragmentClick getOnFragmentClickListener() {
+    public OnPieceClick getOnFragmentClickListener() {
         return fragmentsView.getOnFragmentClickListener();
     }
 
-    public void setOnFragmentClickListener(OnFragmentClick onFragmentClick) {
-        fragmentsView.setOnFragmentClickListener(onFragmentClick);
+    public void setOnFragmentClickListener(OnPieceClick onPieceClick) {
+        fragmentsView.setOnFragmentClickListener(onPieceClick);
     }
 
     public void pauseViewUpdating(){

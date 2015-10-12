@@ -1,4 +1,4 @@
-package com.utilsframework.android.view.fragments;
+package com.utilsframework.android.view.pieces;
 
 import android.content.Context;
 import android.os.AsyncTask;
@@ -15,12 +15,12 @@ import java.util.List;
  * Date: 04.04.14
  * Time: 14:17
  */
-public class StaticFragmentsView extends LinearLayout{
+public class StaticPieceProgressView extends LinearLayout{
     private List<Float> lastFragments;
-    private FragmentsAdapter fragmentsAdapter;
-    private FragmentsProvider fragmentsProvider;
+    private PieceAdapter pieceAdapter;
+    private PiecesProvider piecesProvider;
     private AsyncTask<Void, Void, Boolean> fragmentsUpdatingAsyncTask;
-    private OnFragmentClick onFragmentClick;
+    private OnPieceClick onPieceClick;
 
     private OnFragmentsChanged mFragmentsListener;
 
@@ -28,7 +28,7 @@ public class StaticFragmentsView extends LinearLayout{
         List<Float> fragments;
 
         boolean fragmentsChanged(){
-            fragments = fragmentsAdapter.getFragments();
+            fragments = pieceAdapter.getFragments();
             if(fragments == null){
                 return false;
             }
@@ -39,7 +39,7 @@ public class StaticFragmentsView extends LinearLayout{
 
         @Override
         public void run() {
-            if(fragmentsAdapter == null){
+            if(pieceAdapter == null){
                 return;
             }
 
@@ -142,8 +142,8 @@ public class StaticFragmentsView extends LinearLayout{
 
         @Override
         public void onClick(View v) {
-            if(onFragmentClick != null){
-                onFragmentClick.onClick(index, value);
+            if(onPieceClick != null){
+                onPieceClick.onClick(index, value);
             }
         }
     }
@@ -157,7 +157,7 @@ public class StaticFragmentsView extends LinearLayout{
             return;
         }
 
-        if(fragmentsAdapter == null){
+        if(pieceAdapter == null){
             throw new IllegalStateException("adapter is null");
         }
 
@@ -165,8 +165,8 @@ public class StaticFragmentsView extends LinearLayout{
         for(float fragment : fragments){
             View view;
 
-            if (fragmentsProvider == null) {
-                view = fragmentsAdapter.getView(index, fragment, fragments.size());
+            if (piecesProvider == null) {
+                view = pieceAdapter.getView(index, fragment, fragments.size());
             } else {
                 view = getChildAt(index);
             }
@@ -174,7 +174,7 @@ public class StaticFragmentsView extends LinearLayout{
             View.OnClickListener onClickListener = new ViewClickListener(index, fragment);
             view.setOnClickListener(onClickListener);
 
-            if (fragmentsProvider == null) {
+            if (piecesProvider == null) {
                 addView(view);
             }
 
@@ -182,52 +182,52 @@ public class StaticFragmentsView extends LinearLayout{
         }
     }
 
-    public StaticFragmentsView(Context context) {
+    public StaticPieceProgressView(Context context) {
         super(context);
     }
 
-    public StaticFragmentsView(Context context, AttributeSet attrs) {
+    public StaticPieceProgressView(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 
-    public StaticFragmentsView(Context context, AttributeSet attrs, int defStyle) {
+    public StaticPieceProgressView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
     }
 
-    public FragmentsAdapter getAdapter() {
-        return fragmentsAdapter;
+    public PieceAdapter getAdapter() {
+        return pieceAdapter;
     }
 
-    public OnFragmentClick getOnFragmentClickListener() {
-        return onFragmentClick;
+    public OnPieceClick getOnFragmentClickListener() {
+        return onPieceClick;
     }
 
-    public void setOnFragmentClickListener(OnFragmentClick onFragmentClick) {
-        this.onFragmentClick = onFragmentClick;
+    public void setOnFragmentClickListener(OnPieceClick onPieceClick) {
+        this.onPieceClick = onPieceClick;
     }
 
     public boolean isGetFragmentsRunning(){
         return fragmentsUpdatingAsyncTask != null;
     }
 
-    public void setAdapter(FragmentsAdapter fragmentsAdapter) {
+    public void setAdapter(PieceAdapter pieceAdapter) {
         if(isGetFragmentsRunning()){
             throw new IllegalStateException("do not call setAdapter while getFragments is running");
         }
 
-        this.fragmentsAdapter = fragmentsAdapter;
-        this.fragmentsProvider = null;
+        this.pieceAdapter = pieceAdapter;
+        this.piecesProvider = null;
         updateFragments();
     }
 
-    public FragmentsProvider getFragmentsProvider() {
-        return fragmentsProvider;
+    public PiecesProvider getPiecesProvider() {
+        return piecesProvider;
     }
 
-    public void setFragmentsProvider(final FragmentsProvider fragmentsProvider) {
-        this.fragmentsProvider = fragmentsProvider;
+    public void setPiecesProvider(final PiecesProvider piecesProvider) {
+        this.piecesProvider = piecesProvider;
 
-        fragmentsAdapter = new FragmentsAdapter() {
+        pieceAdapter = new PieceAdapter() {
             @Override
             public View getView(int index, double sizeInPercents, int size) {
                 throw new UnsupportedOperationException();
@@ -240,7 +240,7 @@ public class StaticFragmentsView extends LinearLayout{
 
                 for(int i = 0; i < childCount; i++){
                     View child = getChildAt(i);
-                    float fragment = fragmentsProvider.getFragment(i, child);
+                    float fragment = piecesProvider.getFragment(i, child);
                     result.add(fragment);
                 }
 

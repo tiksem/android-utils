@@ -17,10 +17,6 @@ public class ViewGroupChildrenVisibilityChangedListener extends StateChangedList
         super(object);
     }
 
-    public ViewGroupChildrenVisibilityChangedListener(ViewGroup object, Object context) {
-        super(object, context);
-    }
-
     @Override
     protected void onStateChanged(ViewGroup object, Map<View, Integer> lastState, Map<View, Integer> currentState) {
     }
