@@ -271,12 +271,12 @@ public final class Alerts {
         return builder;
     }
 
-    public static AlertDialog showNumberPickerAlert(Context context, NumberPickerAlertSettings settings) {
+    public static AlertDialog showNumberPickerAlert(Context context, final NumberPickerAlertSettings settings) {
         AlertDialog.Builder builder = setupPickerDialogBuilder(context, settings);
 
         View view = View.inflate(context, R.layout.number_picker_dialog, null);
 
-        NumberPicker numberPicker = (NumberPicker) view.findViewById(R.id.number_picker);
+        final NumberPicker numberPicker = (NumberPicker) view.findViewById(R.id.number_picker);
         numberPicker.setMinValue(settings.min);
         numberPicker.setMaxValue(settings.max);
         numberPicker.setWrapSelectorWheel(false);
@@ -313,12 +313,12 @@ public final class Alerts {
         public boolean clearTime;
     }
 
-    public static AlertDialog showTimePickerAlert(Context context, DateTimePickerSettings settings) {
+    public static AlertDialog showTimePickerAlert(Context context, final DateTimePickerSettings settings) {
         AlertDialog.Builder builder = setupPickerDialogBuilder(context, settings);
 
         View view = View.inflate(context, R.layout.time_picker_dialog, null);
-        TimePicker timePicker = (TimePicker) view.findViewById(R.id.time_picker);
-        GregorianCalendar calendar = new GregorianCalendar();
+        final TimePicker timePicker = (TimePicker) view.findViewById(R.id.time_picker);
+        final GregorianCalendar calendar = new GregorianCalendar();
         long currentTime = calendar.getTimeInMillis();
         if (settings.currentTimeInMillis > currentTime) {
             calendar.setTimeInMillis(settings.currentTimeInMillis);
@@ -344,14 +344,14 @@ public final class Alerts {
         return alertDialog;
     }
 
-    public static AlertDialog showDatePickerAlert(Context context, DateTimePickerSettings settings) {
+    public static AlertDialog showDatePickerAlert(Context context, final DateTimePickerSettings settings) {
         AlertDialog.Builder builder = setupPickerDialogBuilder(context, settings);
 
         View view = View.inflate(context, R.layout.date_picker_dialog, null);
-        DatePicker datePicker = (DatePicker) view.findViewById(R.id.date_picker);
+        final DatePicker datePicker = (DatePicker) view.findViewById(R.id.date_picker);
         datePicker.setSpinnersShown(false);
         datePicker.setCalendarViewShown(true);
-        GregorianCalendar calendar = new GregorianCalendar();
+        final GregorianCalendar calendar = new GregorianCalendar();
         long currentTime = calendar.getTimeInMillis();
         if (settings.currentTimeInMillis > currentTime) {
             calendar.setTimeInMillis(settings.currentTimeInMillis);
@@ -402,12 +402,12 @@ public final class Alerts {
         public int invalidRangeErrorId = R.string.invalid_date_range_error;
     }
 
-    public static AlertDialog showDateRangePickerAlert(Context context, DateRangePickerSettings settings) {
+    public static AlertDialog showDateRangePickerAlert(final Context context, final DateRangePickerSettings settings) {
         AlertDialog.Builder builder = setupPickerDialogBuilder(context, settings);
 
         View view = View.inflate(context, settings.rootLayoutId, null);
-        CalendarView start = (CalendarView) view.findViewById(R.id.start);
-        CalendarView end = (CalendarView) view.findViewById(R.id.end);
+        final CalendarView start = (CalendarView) view.findViewById(R.id.start);
+        final CalendarView end = (CalendarView) view.findViewById(R.id.end);
         builder.setView(view);
 
         long startOfCurrentDay = TimeUtils.getStartOfCurrentDay();
@@ -416,7 +416,7 @@ public final class Alerts {
 
         builder.setPositiveButton(settings.okButtonNameId, null);
 
-        AlertDialog alertDialog = builder.create();
+        final AlertDialog alertDialog = builder.create();
         alertDialog.getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

@@ -97,7 +97,7 @@ public class AndroidUtilities {
         return result;
     }
 
-    public static boolean isRunning(Context context, String processName) {
+    public static boolean isRunning(Context context, final String processName) {
         ActivityManager activityManager = getActivityManager(context);
         List<ActivityManager.RunningAppProcessInfo> runningAppProcesses = activityManager.getRunningAppProcesses();
         return CollectionUtils.find(runningAppProcesses, new Predicate<ActivityManager.RunningAppProcessInfo>() {

@@ -18,7 +18,7 @@ public final class Threading {
 
     public static <ErrorType extends Throwable> void runOnBackground(final ThrowingRunnable<ErrorType> action,
                                                                      final OnFinish<ErrorType> onFinish,
-                                                                     Class<ErrorType> errorClass) {
+                                                                     final Class<ErrorType> errorClass) {
         new AsyncTask<Void, Void, ErrorType>() {
             @Override
             protected ErrorType doInBackground(Void... params) {
@@ -120,8 +120,8 @@ public final class Threading {
         void onComplete(Result result, ErrorType error);
     }
 
-    public static <ErrorType extends Throwable, Result> void executeAsyncTask(Task<ErrorType, Result> task,
-                                                                              Class<ErrorType> errorClass) {
+    public static <ErrorType extends Throwable, Result> void executeAsyncTask(final Task<ErrorType, Result> task,
+                                                                              final Class<ErrorType> errorClass) {
         new AsyncTask<Void, Void, Result>(){
             ErrorType errorType;
 

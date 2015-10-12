@@ -51,7 +51,7 @@ public class EventManager {
     }
 
     public EventId nextId() {
-        listeners.add(new HashSet<>());
+        listeners.add(new HashSet<EventListener>());
         return new EventId();
     }
 

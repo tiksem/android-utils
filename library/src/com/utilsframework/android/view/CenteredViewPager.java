@@ -1721,7 +1721,7 @@ public class CenteredViewPager extends ViewGroup {
 		if (mSeenPositionMin < 0 || position < mSeenPositionMin) {
 			mSeenPositionMin = position;
 		}
-		if (mSeenPositionMax < 0 || FloatMath.ceil(position + offset) > mSeenPositionMax) {
+		if (mSeenPositionMax < 0 || Math.ceil(position + offset) > mSeenPositionMax) {
 			mSeenPositionMax = position + 1;
 		}
 

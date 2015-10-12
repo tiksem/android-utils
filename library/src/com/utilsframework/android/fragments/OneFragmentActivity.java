@@ -65,9 +65,9 @@ public class OneFragmentActivity extends AppCompatActivity implements Navigation
     }
 
     private void updateActionBarTitle(Fragment fragment) {
-        ActionBar actionBar = getSupportActionBar();
+        final ActionBar actionBar = getSupportActionBar();
         if (fragment instanceof ActionBarTitleProvider) {
-            ActionBarTitleProvider actionBarTitleProvider = (ActionBarTitleProvider) fragment;
+            final ActionBarTitleProvider actionBarTitleProvider = (ActionBarTitleProvider) fragment;
             Fragments.executeWhenViewCreated(fragment, new GuiUtilities.OnViewCreated() {
                 @Override
                 public void onViewCreated(View view) {
