@@ -216,6 +216,14 @@ public class Tasks {
         runnables.clear();
     }
 
+    public static void cancelAndClearQueue(Collection<Cancelable> cancelables){
+        for (Cancelable cancelable : cancelables) {
+            cancelable.cancel();
+        }
+
+        cancelables.clear();
+    }
+
     public static <T extends Throwable> void executeAndClearThrowingRunnableQueue(
             Collection<ThrowingRunnable<T>> runnables, OnException<T> onException) {
         executeThrowingRunnableQueue(runnables, onException);

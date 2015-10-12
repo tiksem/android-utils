@@ -1,0 +1,78 @@
+package com.utilsframework.android.network;
+
+import android.os.AsyncTask;
+import com.utils.framework.network.RequestExecutor;
+import com.utilsframework.android.threading.*;
+
+import java.io.IOException;
+import java.util.ArrayDeque;
+import java.util.Queue;
+
+/**
+ * Created by stykhonenko on 12.10.15.
+ */
+public class AsyncRequestExecutorManager implements RequestManager {
+    private Queue<Cancelable> runningRequests = new ArrayDeque<>();
+
+    @Override
+    public <Result> void execute(final Threading.Task<IOException, Result> task) {
+        final AsyncTask<Void, Void, Result> asyncTask = new AsyncTask<Void, Void, Result>() {
+            IOException error;
+
+            @Override
+            protected Result doInBackground(Void... params) {
+                try {
+                    return task.runOnBackground();
+                } catch (IOException e) {
+                    error = e;
+                    return null;
+                }
+            }
+
+            @Override
+            protected void onCancelled(Result result) {
+
+            }
+
+            @Override
+            protected void onPostExecute(Result result) {
+                task.onComplete(result, error);
+            }
+        };
+
+        executeAsyncTask(asyncTask);
+    }
+
+    private <Result> void executeAsyncTask(final AsyncTask<Void, Void, Result> asyncTask) {
+        Cancelable cancelable = new Cancelable() {
+            @Override
+            public void cancel() {
+                asyncTask.cancel(true);
+            }
+        };
+        runningRequests.add(cancelable);
+
+        asyncTask.execute();
+    }
+
+    @Override
+    public void cancelAll() {
+        Tasks.cancelAndClearQueue(runningRequests);
+    }
+
+    @Override
+    public void execute(final ThrowingRunnable<IOException> runnable, final OnFinish<IOException> onFinish) {
+        execute(new Threading.Task<IOException, Object>() {
+            @Override
+            public Object runOnBackground() throws IOException {
+                runnable.run();
+                return null;
+            }
+
+            @Override
+            public void onComplete(Object o, IOException error) {
+                onFinish.onFinish(error);
+            }
+        });
+    }
+}

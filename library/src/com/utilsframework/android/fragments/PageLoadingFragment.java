@@ -2,12 +2,12 @@ package com.utilsframework.android.fragments;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import com.utilsframework.android.R;
+import com.utilsframework.android.network.RequestManager;
 import com.utilsframework.android.threading.Threading;
 
 import java.io.IOException;
@@ -15,16 +15,12 @@ import java.io.IOException;
 /**
  * Created by CM on 7/2/2015.
  */
-public abstract class PageLoadingFragment<Data, ErrorType extends Throwable> extends Fragment {
+public abstract class PageLoadingFragment<RequestManagerImpl extends RequestManager, Data>
+        extends RequestManagerFragment<RequestManagerImpl> {
     private View content;
     private View loading;
     private View noConnection;
-    private Class<ErrorType> errorTypeClass;
     private Data data;
-
-    public PageLoadingFragment(Class<ErrorType> errorTypeClass) {
-        this.errorTypeClass = errorTypeClass;
-    }
 
     protected abstract int getContentLayoutId();
 
@@ -54,7 +50,7 @@ public abstract class PageLoadingFragment<Data, ErrorType extends Throwable> ext
         return result;
     }
 
-    protected abstract Data loadOnBackground() throws ErrorType;
+    protected abstract Data loadOnBackground(RequestManagerImpl requestManager) throws IOException;
 
     private void showLoading() {
         content.setVisibility(View.INVISIBLE);
@@ -70,7 +66,7 @@ public abstract class PageLoadingFragment<Data, ErrorType extends Throwable> ext
         setupContent(data, content);
     }
 
-    protected void onError(ErrorType error) {
+    protected void onError(IOException error) {
         loading.setVisibility(View.INVISIBLE);
         noConnection.setVisibility(View.VISIBLE);
     }
@@ -79,10 +75,20 @@ public abstract class PageLoadingFragment<Data, ErrorType extends Throwable> ext
 
     private void reloadPage() {
         showLoading();
-        Threading.executeAsyncTask(new PageLoadingTask<>(this), errorTypeClass);
+        getRequestManager().execute(new Threading.Task<IOException, Data>() {
+            @Override
+            public Data runOnBackground() throws IOException {
+                return loadOnBackground(getRequestManager());
+            }
+
+            @Override
+            public void onComplete(Data data, IOException error) {
+                onDataLoadingFinished(data, error);
+            }
+        });
     }
 
-    void onDataLoadingFinished(Data data, ErrorType error) {
+    private void onDataLoadingFinished(Data data, IOException error) {
         if (error != null) {
             PageLoadingFragment.this.onError(error);
         } else {

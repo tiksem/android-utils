@@ -3,6 +3,7 @@ package com.utilsframework.android.threading;
 import android.os.AsyncTask;
 import android.os.Handler;
 
+import java.io.IOException;
 import java.util.Comparator;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.PriorityBlockingQueue;
@@ -118,6 +119,42 @@ public final class Threading {
     public interface Task<ErrorType extends Throwable, Result> {
         Result runOnBackground() throws ErrorType;
         void onComplete(Result result, ErrorType error);
+    }
+
+    public static <Result> Cancelable executeNetworkRequest(final Task<IOException, Result> task) {
+        final AsyncTask<Void, Void, Result> asyncTask = new AsyncTask<Void, Void, Result>() {
+            IOException error;
+
+            @Override
+            protected Result doInBackground(Void... params) {
+                try {
+                    return task.runOnBackground();
+                } catch (IOException e) {
+                    error = e;
+                    return null;
+                }
+            }
+
+            @Override
+            protected void onCancelled(Result result) {
+                task.onComplete(result, error);
+            }
+
+            @Override
+            protected void onPostExecute(Result result) {
+                task.onComplete(result, error);
+            }
+        };
+
+        Cancelable cancelable = new Cancelable() {
+            @Override
+            public void cancel() {
+                asyncTask.cancel(true);
+            }
+        };
+
+        asyncTask.execute();
+        return cancelable;
     }
 
     public static <ErrorType extends Throwable, Result> void executeAsyncTask(final Task<ErrorType, Result> task,
