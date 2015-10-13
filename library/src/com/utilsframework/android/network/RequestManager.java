@@ -1,5 +1,6 @@
 package com.utilsframework.android.network;
 
+import android.os.AsyncTask;
 import com.utilsframework.android.threading.OnFinish;
 import com.utilsframework.android.threading.Threading;
 import com.utilsframework.android.threading.ThrowingRunnable;
@@ -14,7 +15,7 @@ import java.io.IOException;
  * and cancel unused network requests executions.
  */
 public interface RequestManager {
-    <Result> void execute(Threading.Task<IOException, Result> task);
+    <Result> AsyncTask execute(Threading.Task<IOException, Result> task);
     void execute(ThrowingRunnable<IOException> runnable, OnFinish<IOException> onFinish);
     void cancelAll();
 }

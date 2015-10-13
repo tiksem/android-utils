@@ -14,7 +14,7 @@ public class AsyncRequestExecutorManager implements RequestManager {
     private Queue<AsyncTask> runningRequests = new ArrayDeque<>();
 
     @Override
-    public <Result> void execute(final Threading.Task<IOException, Result> task) {
+    public <Result> AsyncTask execute(final Threading.Task<IOException, Result> task) {
         final AsyncTask<Void, Void, Result> asyncTask = new AsyncTask<Void, Void, Result>() {
             IOException error;
 
@@ -31,17 +31,21 @@ public class AsyncRequestExecutorManager implements RequestManager {
             @Override
             protected void onCancelled(Result result) {
                 task.onCancelled(result, error);
+                runningRequests.remove(this);
                 task.onAfterCompleteOrCancelled();
             }
 
             @Override
             protected void onPostExecute(Result result) {
                 task.onComplete(result, error);
+                runningRequests.remove(this);
                 task.onAfterCompleteOrCancelled();
             }
         };
 
         executeAsyncTask(asyncTask);
+
+        return asyncTask;
     }
 
     private <Result> void executeAsyncTask(final AsyncTask<Void, Void, Result> asyncTask) {
