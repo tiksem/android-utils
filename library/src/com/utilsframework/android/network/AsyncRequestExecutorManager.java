@@ -1,7 +1,6 @@
 package com.utilsframework.android.network;
 
 import android.os.AsyncTask;
-import com.utils.framework.network.RequestExecutor;
 import com.utilsframework.android.threading.*;
 
 import java.io.IOException;
@@ -12,7 +11,7 @@ import java.util.Queue;
  * Created by stykhonenko on 12.10.15.
  */
 public class AsyncRequestExecutorManager implements RequestManager {
-    private Queue<Cancelable> runningRequests = new ArrayDeque<>();
+    private Queue<AsyncTask> runningRequests = new ArrayDeque<>();
 
     @Override
     public <Result> void execute(final Threading.Task<IOException, Result> task) {
@@ -44,20 +43,13 @@ public class AsyncRequestExecutorManager implements RequestManager {
     }
 
     private <Result> void executeAsyncTask(final AsyncTask<Void, Void, Result> asyncTask) {
-        Cancelable cancelable = new Cancelable() {
-            @Override
-            public void cancel() {
-                asyncTask.cancel(true);
-            }
-        };
-        runningRequests.add(cancelable);
-
+        runningRequests.add(asyncTask);
         asyncTask.execute();
     }
 
     @Override
     public void cancelAll() {
-        Tasks.cancelAndClearQueue(runningRequests);
+        Tasks.cancelAndClearAsyncTasksQueue(runningRequests);
     }
 
     @Override

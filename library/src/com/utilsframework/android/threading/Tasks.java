@@ -224,6 +224,14 @@ public class Tasks {
         cancelables.clear();
     }
 
+    public static void cancelAndClearAsyncTasksQueue(Collection<AsyncTask> asyncTasks) {
+        for (AsyncTask asyncTask : asyncTasks) {
+            asyncTask.cancel(true);
+        }
+
+        asyncTasks.clear();
+    }
+
     public static <T extends Throwable> void executeAndClearThrowingRunnableQueue(
             Collection<ThrowingRunnable<T>> runnables, OnException<T> onException) {
         executeThrowingRunnableQueue(runnables, onException);
