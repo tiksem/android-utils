@@ -120,6 +120,7 @@ public final class Threading {
         public abstract Result runOnBackground() throws ErrorType;
         public abstract void onComplete(Result result, ErrorType error);
         public void onCancelled(Result result, ErrorType error) {}
+        public void onAfterCompleteOrCancelled() {}
     }
 
     public static <Result> AsyncTask executeNetworkRequest(final Task<IOException, Result> task) {
@@ -139,11 +140,13 @@ public final class Threading {
             @Override
             protected void onCancelled(Result result) {
                 task.onCancelled(result, error);
+                task.onAfterCompleteOrCancelled();
             }
 
             @Override
             protected void onPostExecute(Result result) {
                 task.onComplete(result, error);
+                task.onAfterCompleteOrCancelled();
             }
         };
 

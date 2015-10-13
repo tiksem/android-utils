@@ -30,12 +30,14 @@ public class AsyncRequestExecutorManager implements RequestManager {
 
             @Override
             protected void onCancelled(Result result) {
-
+                task.onCancelled(result, error);
+                task.onAfterCompleteOrCancelled();
             }
 
             @Override
             protected void onPostExecute(Result result) {
                 task.onComplete(result, error);
+                task.onAfterCompleteOrCancelled();
             }
         };
 
