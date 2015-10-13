@@ -13,8 +13,10 @@ import com.utils.framework.collections.NavigationList;
 import com.utilsframework.android.R;
 import com.utilsframework.android.adapters.ViewArrayAdapter;
 import com.utilsframework.android.fragments.Fragments;
+import com.utilsframework.android.fragments.RequestManagerFragment;
 import com.utilsframework.android.menu.SearchListener;
 import com.utilsframework.android.menu.SearchMenuAction;
+import com.utilsframework.android.network.RequestManager;
 import com.utilsframework.android.view.GuiUtilities;
 import com.utilsframework.android.view.OneVisibleViewInGroupToggle;
 import com.utilsframework.android.view.Toasts;
@@ -25,8 +27,8 @@ import java.util.List;
 /**
  * Created by CM on 6/21/2015.
  */
-public abstract class NavigationListFragment<T, RequestManager> extends Fragment {
-    private RequestManager requestManager;
+public abstract class NavigationListFragment<T, RequestManagerImpl extends RequestManager>
+        extends RequestManagerFragment<RequestManagerImpl> {
     private ViewArrayAdapter<T, ?> adapter;
     private AbsListView listView;
     private NavigationList<T> elements;
@@ -40,7 +42,6 @@ public abstract class NavigationListFragment<T, RequestManager> extends Fragment
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        requestManager = obtainRequestManager();
     }
 
     @Override
@@ -64,7 +65,7 @@ public abstract class NavigationListFragment<T, RequestManager> extends Fragment
     }
 
     private void setupListViewListenersAndAdapter() {
-        adapter = createAdapter(requestManager);
+        adapter = createAdapter(getRequestManager());
         listView.setAdapter(adapter);
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -115,12 +116,12 @@ public abstract class NavigationListFragment<T, RequestManager> extends Fragment
     }
 
     private void onSwipeRefresh() {
-        elements = getNavigationList(requestManager, lastFilter);
-        elements.setOnPageLoadingFinished(new PageLoadingFinishedCallback<T, RequestManager>(this) {
+        elements = getNavigationList(getRequestManager(), lastFilter);
+        elements.setOnPageLoadingFinished(new NavigationList.OnPageLoadingFinished<T>() {
             @Override
-            protected void onLoadingFinished(List<T> pageItems, NavigationListFragment<T, RequestManager> self) {
-                self.updateAdapterAndViewsState();
-                self.swipeRefreshLayout.setRefreshing(false);
+            public void onLoadingFinished(List<T> elements) {
+                updateAdapterAndViewsState();
+                swipeRefreshLayout.setRefreshing(false);
             }
         });
 
@@ -135,12 +136,6 @@ public abstract class NavigationListFragment<T, RequestManager> extends Fragment
         listViewState = listView.onSaveInstanceState();
     }
 
-    protected abstract RequestManager obtainRequestManager();
-
-    public RequestManager getRequestManager() {
-        return requestManager;
-    }
-
     public ViewArrayAdapter<T, ?> getAdapter() {
         return adapter;
     }
@@ -149,8 +144,8 @@ public abstract class NavigationListFragment<T, RequestManager> extends Fragment
 
     protected abstract int getLoadingResourceId();
 
-    protected abstract ViewArrayAdapter<T, ? extends Object> createAdapter(RequestManager requestManager);
-    protected abstract NavigationList<T> getNavigationList(RequestManager requestManager, String filter);
+    protected abstract ViewArrayAdapter<T, ? extends Object> createAdapter(RequestManagerImpl requestManager);
+    protected abstract NavigationList<T> getNavigationList(RequestManagerImpl requestManager, String filter);
 
     protected abstract void onListItemClicked(T item);
 
@@ -164,7 +159,7 @@ public abstract class NavigationListFragment<T, RequestManager> extends Fragment
 
     public void updateNavigationList(String filter) {
         lastFilter = filter;
-        elements = getNavigationList(requestManager, filter);
+        elements = getNavigationList(getRequestManager(), filter);
         listViewState = null;
         updateAdapterAndViewsState();
     }
@@ -193,18 +188,23 @@ public abstract class NavigationListFragment<T, RequestManager> extends Fragment
     private void updateAdapterAndViewsState() {
         adapter.setElements(elements);
 
-        elements.setOnPageLoadingFinished(new PageLoadingFinishedCallback<T, RequestManager>(this) {
+        elements.setOnPageLoadingFinished(new NavigationList.OnPageLoadingFinished<T>() {
             @Override
-            public void onLoadingFinished(List<T> page, NavigationListFragment<T, RequestManager> self) {
-                if (!self.elements.isEmpty() || self.elements.isAllDataLoaded()) {
-                    self.showView(listView);
+            public void onLoadingFinished(List<T> page) {
+                if (!elements.isEmpty() || elements.isAllDataLoaded()) {
+                    showView(listView);
                 }
 
-                self.adapter.notifyDataSetChanged();
+                adapter.notifyDataSetChanged();
             }
         });
 
-        elements.setOnError(new ErrorCallback(this));
+        elements.setOnError(new OnError() {
+            @Override
+            public void onError(Throwable e) {
+                handleNavigationListError(e);
+            }
+        });
 
         if (!elements.isAllDataLoaded() && elements.getElementsCount() <= 0) {
             // load first page
@@ -250,7 +250,7 @@ public abstract class NavigationListFragment<T, RequestManager> extends Fragment
             public void onViewCreated(View view) {
                 if (adapter.getElements() == null) {
                     if (elements == null) {
-                        elements = getNavigationList(requestManager, null);
+                        elements = getNavigationList(getRequestManager(), null);
                     }
 
                     updateAdapterAndViewsState();

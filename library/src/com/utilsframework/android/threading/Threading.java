@@ -116,12 +116,13 @@ public final class Threading {
         }.execute();
     }
 
-    public interface Task<ErrorType extends Throwable, Result> {
-        Result runOnBackground() throws ErrorType;
-        void onComplete(Result result, ErrorType error);
+    public static abstract class Task<ErrorType extends Throwable, Result> {
+        public abstract Result runOnBackground() throws ErrorType;
+        public abstract void onComplete(Result result, ErrorType error);
+        public void onCancelled(Result result, ErrorType error) {}
     }
 
-    public static <Result> Cancelable executeNetworkRequest(final Task<IOException, Result> task) {
+    public static <Result> AsyncTask executeNetworkRequest(final Task<IOException, Result> task) {
         final AsyncTask<Void, Void, Result> asyncTask = new AsyncTask<Void, Void, Result>() {
             IOException error;
 
@@ -137,7 +138,7 @@ public final class Threading {
 
             @Override
             protected void onCancelled(Result result) {
-                task.onComplete(result, error);
+                task.onCancelled(result, error);
             }
 
             @Override
@@ -146,15 +147,8 @@ public final class Threading {
             }
         };
 
-        Cancelable cancelable = new Cancelable() {
-            @Override
-            public void cancel() {
-                asyncTask.cancel(true);
-            }
-        };
-
         asyncTask.execute();
-        return cancelable;
+        return asyncTask;
     }
 
     public static <ErrorType extends Throwable, Result> void executeAsyncTask(final Task<ErrorType, Result> task,
