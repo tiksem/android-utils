@@ -73,7 +73,7 @@ public abstract class PageLoadingFragment<RequestManagerImpl extends RequestMana
 
     protected abstract void setupContent(Data data, View content);
 
-    private void reloadPage() {
+    public void reloadPage() {
         showLoading();
         getRequestManager().execute(new Threading.Task<IOException, Data>() {
             @Override

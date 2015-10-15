@@ -107,4 +107,10 @@ public class DateTimePickerButton extends TextView {
     public long getDate() {
         return settings.currentTimeInMillis;
     }
+
+    public void setDate(long dateMillis) {
+        GregorianCalendar calendar = new GregorianCalendar();
+        calendar.setTimeInMillis(dateMillis);
+        updateText(calendar);
+    }
 }
