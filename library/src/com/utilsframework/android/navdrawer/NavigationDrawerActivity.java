@@ -10,8 +10,7 @@ import com.utilsframework.android.R;
 /**
  * Created by CM on 12/26/2014.
  */
-public abstract class NavigationDrawerActivity extends AppCompatActivity implements FragmentFactory,
-        NavigationActivityInterface {
+public abstract class NavigationDrawerActivity extends AppCompatActivity implements NavigationActivityInterface {
     private NavigationFragmentDrawer navigationDrawer;
 
     protected void onPreCreate() {
@@ -27,8 +26,9 @@ public abstract class NavigationDrawerActivity extends AppCompatActivity impleme
 
     protected void init() {
         setContentView(R.layout.navigation_drawable_activity);
+        FragmentFactory fragmentFactory = createFragmentFactory();
 
-        navigationDrawer = new NavigationFragmentDrawer(this, this,
+        navigationDrawer = new NavigationFragmentDrawer(this, fragmentFactory,
                 getCurrentSelectedNavigationItemId()) {
             @Override
             protected int getDrawerLayoutId() {
@@ -107,6 +107,8 @@ public abstract class NavigationDrawerActivity extends AppCompatActivity impleme
 
     protected abstract int getCurrentSelectedNavigationItemId();
     protected abstract int getNavigationMenuId();
+    protected abstract FragmentFactory createFragmentFactory();
+
     protected String getActionBarTitle(int selectedItemId, int tabIndex, int navigationLevel) {
         return null;
     }
