@@ -143,6 +143,7 @@ public abstract class NavigationFragmentDrawer {
         updateActionBarTitle();
 
         navigationView.inflateMenu(getMenuId());
+        navigationView.getMenu().findItem(currentSelectedItem).setChecked(true);
 
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
