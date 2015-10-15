@@ -141,7 +141,7 @@ public abstract class NavigationDrawerActivity extends AppCompatActivity impleme
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
-            navigationDrawer.toggleDrawer();
+            navigationDrawer.handleHomeButtonClick();
             return true;
         }
 

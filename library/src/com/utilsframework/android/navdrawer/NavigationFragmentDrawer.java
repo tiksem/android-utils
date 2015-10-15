@@ -31,6 +31,7 @@ public abstract class NavigationFragmentDrawer {
     private int currentSelectedItem;
     private int navigationLevel = 0;
     private int currentSelectedTabIndex;
+    private NavigationMode navigationMode = NavigationMode.SHOW_BACK_FOR_NESTED_LEVELS;
     private Set<FragmentManager.OnBackStackChangedListener> backStackChangedListeners =
             Collections.newSetFromMap(new WeakHashMap<FragmentManager.OnBackStackChangedListener, Boolean>());
     private Stack<Fragment> backStack = new LinkedStack<>();
@@ -71,6 +72,15 @@ public abstract class NavigationFragmentDrawer {
         this.currentSelectedItem = menuItemId;
         this.navigationLevel = navigationLevel;
         updateActionBarTitle();
+
+        if (navigationMode == NavigationMode.SHOW_BACK_FOR_NESTED_LEVELS) {
+            ActionBar actionBar = activity.getSupportActionBar();
+            if (navigationLevel == 0) {
+                actionBar.setHomeAsUpIndicator(getToggleIconResourceId());
+            } else {
+                actionBar.setHomeAsUpIndicator(null);
+            }
+        }
     }
 
     private void initTabs(int tabsCount,
@@ -286,6 +296,14 @@ public abstract class NavigationFragmentDrawer {
         return currentSelectedItem;
     }
 
+    public void handleHomeButtonClick() {
+        if (navigationMode == NavigationMode.ALWAYS_SHOW_NAVIGATION_TOGGLE || navigationLevel == 0) {
+            toggleDrawer();
+        } else {
+            activity.onBackPressed();
+        }
+    }
+
     public void toggleDrawer() {
         if (drawerLayout.isDrawerOpen(navigationView)) {
             drawerLayout.closeDrawers();
@@ -300,5 +318,17 @@ public abstract class NavigationFragmentDrawer {
 
     public NavigationView getNavigationView() {
         return navigationView;
+    }
+
+    public NavigationMode getNavigationMode() {
+        return navigationMode;
+    }
+
+    public void setNavigationMode(NavigationMode navigationMode) {
+        if (navigationMode == null) {
+            throw new NullPointerException();
+        }
+
+        this.navigationMode = navigationMode;
     }
 }
