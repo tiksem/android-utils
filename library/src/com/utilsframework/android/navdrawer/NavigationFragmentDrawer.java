@@ -1,6 +1,5 @@
 package com.utilsframework.android.navdrawer;
 
-import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -8,7 +7,6 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewStub;
 import com.utils.framework.collections.*;
@@ -27,7 +25,6 @@ public abstract class NavigationFragmentDrawer {
     private final TabLayout tabLayout;
     private DrawerLayout drawerLayout;
     private FragmentFactory fragmentFactory;
-    private NavigationView navigationView;
     private int currentSelectedItem;
     private int navigationLevel = 0;
     private int currentSelectedTabIndex;
@@ -35,6 +32,8 @@ public abstract class NavigationFragmentDrawer {
     private Set<FragmentManager.OnBackStackChangedListener> backStackChangedListeners =
             Collections.newSetFromMap(new WeakHashMap<FragmentManager.OnBackStackChangedListener, Boolean>());
     private Stack<Fragment> backStack = new LinkedStack<>();
+    private NavigationDrawerMenuAdapter navigationDrawerMenuAdapter;
+    private View navigationView;
 
     private void clearBackStack() {
         FragmentManager fragmentManager = activity.getSupportFragmentManager();
@@ -130,7 +129,6 @@ public abstract class NavigationFragmentDrawer {
     }
 
     public void init() {
-        initDrawableToggle();
         int tabsCount = fragmentFactory.getTabsCount(currentSelectedItem, navigationLevel);
         if (tabsCount > 1) {
             tabLayout.setVisibility(View.VISIBLE);
@@ -140,19 +138,21 @@ public abstract class NavigationFragmentDrawer {
             Fragments.replaceFragment(activity, getContentId(),
                     fragmentFactory.createFragmentBySelectedItem(currentSelectedItem, 0, navigationLevel));
         }
-        updateActionBarTitle();
 
-        navigationView.inflateMenu(getMenuId());
-        navigationView.getMenu().findItem(currentSelectedItem).setChecked(true);
-
-        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+        navigationDrawerMenuAdapter = createNavigationDrawerMenuAdapter(getNavigationViewId());
+        navigationDrawerMenuAdapter.setOnItemSelectedListener(
+                new NavigationDrawerMenuAdapter.OnItemSelectedListener() {
             @Override
-            public boolean onNavigationItemSelected(MenuItem menuItem) {
-                menuItem.setChecked(true);
-                performMenuItemSelection(menuItem.getItemId());
-                return true;
+            public void onItemSelected(int id) {
+                performMenuItemSelection(id);
             }
         });
+
+        navigationView = navigationDrawerMenuAdapter.getNavigationMenuView();
+        navigationDrawerMenuAdapter.selectItem(currentSelectedItem);
+
+        updateActionBarTitle();
+        initDrawableToggle();
     }
 
     public void performMenuItemSelection(int id) {
@@ -171,7 +171,6 @@ public abstract class NavigationFragmentDrawer {
         this.activity = activity;
 
         drawerLayout = (DrawerLayout) activity.findViewById(getDrawerLayoutId());
-        navigationView = (NavigationView) activity.findViewById(getNavigationViewId());
 
         ViewStub tabsStub = (ViewStub) activity.findViewById(getTabsStubId());
         tabsStub.setLayoutResource(getTabLayoutId());
@@ -251,7 +250,7 @@ public abstract class NavigationFragmentDrawer {
     protected abstract int getTabLayoutId();
     protected abstract int getToolBarStubId();
     protected abstract int getToolbarLayoutId();
-    protected abstract int getMenuId();
+    protected abstract NavigationDrawerMenuAdapter createNavigationDrawerMenuAdapter(int navigationViewId);
 
     protected String getActionBarTitle(int currentSelectedItem, int tabIndex, int navigationLevel) {
         return GuiUtilities.getApplicationName(activity);
@@ -315,10 +314,6 @@ public abstract class NavigationFragmentDrawer {
 
     public Fragment getLatestBackStackFragment() {
         return backStack.top();
-    }
-
-    public NavigationView getNavigationView() {
-        return navigationView;
     }
 
     public NavigationMode getNavigationMode() {

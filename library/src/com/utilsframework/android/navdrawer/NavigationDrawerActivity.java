@@ -1,7 +1,6 @@
 package com.utilsframework.android.navdrawer;
 
 import android.os.Bundle;
-import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
@@ -88,13 +87,8 @@ public abstract class NavigationDrawerActivity extends AppCompatActivity impleme
             }
 
             @Override
-            protected int getMenuId() {
-                int navigationMenuId = getNavigationMenuId();
-                if (navigationMenuId == 0) {
-                    throw new IllegalStateException("getNavigationMenuId returns 0");
-                }
-
-                return navigationMenuId;
+            protected NavigationDrawerMenuAdapter createNavigationDrawerMenuAdapter(int navigationViewId) {
+                return NavigationDrawerActivity.this.createNavigationDrawerMenuAdapter(navigationViewId);
             }
         };
         navigationDrawer.init();
@@ -106,7 +100,6 @@ public abstract class NavigationDrawerActivity extends AppCompatActivity impleme
     }
 
     protected abstract int getCurrentSelectedNavigationItemId();
-    protected abstract int getNavigationMenuId();
     protected abstract FragmentFactory createFragmentFactory();
 
     protected String getActionBarTitle(int selectedItemId, int tabIndex, int navigationLevel) {
@@ -150,10 +143,6 @@ public abstract class NavigationDrawerActivity extends AppCompatActivity impleme
         return super.onOptionsItemSelected(item);
     }
 
-    public NavigationView getNavigationView() {
-        return navigationDrawer.getNavigationView();
-    }
-
     protected int getToolbarLayoutId() {
         return R.layout.toolbar;
     }
@@ -162,11 +151,13 @@ public abstract class NavigationDrawerActivity extends AppCompatActivity impleme
         return R.layout.tabs;
     }
 
-    public void performMenuItemSelection(int id) {
+    private void performMenuItemSelection(int id) {
         navigationDrawer.performMenuItemSelection(id);
     }
 
     public void selectTab(int index) {
         navigationDrawer.selectTab(index);
     }
+
+    protected abstract NavigationDrawerMenuAdapter createNavigationDrawerMenuAdapter(int navigationViewId);
 }
