@@ -191,7 +191,7 @@ public abstract class NavigationListFragment<T, RequestManagerImpl extends Reque
         elements.setOnPageLoadingFinished(new NavigationList.OnPageLoadingFinished<T>() {
             @Override
             public void onLoadingFinished(List<T> page) {
-                if (!elements.isEmpty() || elements.isAllDataLoaded()) {
+                if (elements.getElementsCount() > 0 || elements.isAllDataLoaded()) {
                     showView(listView);
                 }
 
