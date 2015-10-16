@@ -71,7 +71,9 @@ public class EditTextWithSuggestions extends AutoCompleteTextView {
                 }
             }
 
-            performFiltering(getText(), 0);
+            if (getAdapter() != null) {
+                performFiltering(getText(), 0);
+            }
         } else if(displayDefaultValueOnNoItemSelected && !getText().toString().equals(lastSelectedItem)) {
             setText(defaultValue);
             if (onDefaultValueSet != null) {
