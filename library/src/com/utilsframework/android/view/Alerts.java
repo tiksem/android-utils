@@ -5,6 +5,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
@@ -15,6 +16,7 @@ import com.utilsframework.android.threading.Cancelable;
 import com.utilsframework.android.time.TimeUtils;
 
 import java.util.Calendar;
+import java.util.Date;
 import java.util.GregorianCalendar;
 
 /**
@@ -344,6 +346,22 @@ public final class Alerts {
         return alertDialog;
     }
 
+    private static void fixUpDatePickerCalendarView(DatePicker datePicker, Calendar date) {
+        // Workaround for CalendarView bug relating to setMinDate():
+        // https://code.google.com/p/android/issues/detail?id=42750
+        // Set then reset the date on the calendar so that it properly
+        // shows today's date. The choice of 24 months is arbitrary.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+            final CalendarView cal = datePicker.getCalendarView();
+            if (cal != null) {
+                date.add(Calendar.MONTH, 24);
+                cal.setDate(date.getTimeInMillis(), false, true);
+                date.add(Calendar.MONTH, -24);
+                cal.setDate(date.getTimeInMillis(), false, true);
+            }
+        }
+    }
+
     public static AlertDialog showDatePickerAlert(Context context, final DateTimePickerSettings settings) {
         AlertDialog.Builder builder = setupPickerDialogBuilder(context, settings);
 
@@ -365,6 +383,7 @@ public final class Alerts {
         minimumDateCalendar.set(Calendar.SECOND, 0);
         minimumDateCalendar.set(Calendar.MILLISECOND, 0);
         datePicker.setMinDate(minimumDateCalendar.getTimeInMillis());
+        fixUpDatePickerCalendarView(datePicker, minimumDateCalendar);
 
         if (settings.clearTime) {
             calendar.set(Calendar.MINUTE, 0);
