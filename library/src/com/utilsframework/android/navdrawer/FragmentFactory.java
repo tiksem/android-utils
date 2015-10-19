@@ -8,6 +8,6 @@ import android.support.v4.app.Fragment;
  */
 public interface FragmentFactory {
     Fragment createFragmentBySelectedItem(int selectedItemId, int tabIndex, int navigationLevel);
-    void initTab(int currentSelectedItem, int tabIndex, int navigationLevel, TabLayout.Tab tab);
+    void initTab(int currentSelectedItem, int tabIndex, int navigationLevel, TabsAdapter.Tab tab);
     int getTabsCount(int selectedItemId, int navigationLevel);
 }

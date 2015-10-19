@@ -67,18 +67,8 @@ public abstract class NavigationDrawerActivity extends AppCompatActivity impleme
             }
 
             @Override
-            protected int getTabLayoutId() {
-                return NavigationDrawerActivity.this.getTabLayoutId();
-            }
-
-            @Override
             protected int getToolBarStubId() {
                 return R.id.toolbarStub;
-            }
-
-            @Override
-            protected int getTabsStubId() {
-                return R.id.tabsStub;
             }
 
             @Override
@@ -89,6 +79,11 @@ public abstract class NavigationDrawerActivity extends AppCompatActivity impleme
             @Override
             protected NavigationDrawerMenuAdapter createNavigationDrawerMenuAdapter(int navigationViewId) {
                 return NavigationDrawerActivity.this.createNavigationDrawerMenuAdapter(navigationViewId);
+            }
+
+            @Override
+            protected TabsAdapter createTabsAdapter() {
+                return NavigationDrawerActivity.this.createTabsAdapter();
             }
         };
         navigationDrawer.init();
@@ -160,4 +155,8 @@ public abstract class NavigationDrawerActivity extends AppCompatActivity impleme
     }
 
     protected abstract NavigationDrawerMenuAdapter createNavigationDrawerMenuAdapter(int navigationViewId);
+
+    protected TabsAdapter createTabsAdapter() {
+        return TabLayoutAdapter.fromViewStub(this, R.id.tabsStub, getTabLayoutId());
+    }
 }

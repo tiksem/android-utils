@@ -22,7 +22,6 @@ import java.util.*;
  */
 public abstract class NavigationFragmentDrawer {
     private final AppCompatActivity activity;
-    private final TabLayout tabLayout;
     private DrawerLayout drawerLayout;
     private FragmentFactory fragmentFactory;
     private int currentSelectedItem;
@@ -34,6 +33,7 @@ public abstract class NavigationFragmentDrawer {
     private Stack<Fragment> backStack = new LinkedStack<>();
     private NavigationDrawerMenuAdapter navigationDrawerMenuAdapter;
     private View navigationView;
+    private TabsAdapter tabsAdapter;
 
     private void clearBackStack() {
         FragmentManager fragmentManager = activity.getSupportFragmentManager();
@@ -53,7 +53,7 @@ public abstract class NavigationFragmentDrawer {
             return;
         }
 
-        tabLayout.removeAllTabs();
+        tabsAdapter.removeAllTabs();
         int tabsCount = fragmentFactory.getTabsCount(menuItemId, navigationLevel);
         if (tabsCount <= 1) {
             if (createFragment) {
@@ -62,9 +62,9 @@ public abstract class NavigationFragmentDrawer {
                 Fragment fragment = fragmentFactory.createFragmentBySelectedItem(menuItemId, 0, navigationLevel);
                 Fragments.replaceFragment(activity, getContentId(), fragment);
             }
-            tabLayout.setVisibility(View.GONE);
+            tabsAdapter.getView().setVisibility(View.GONE);
         } else {
-            tabLayout.setVisibility(View.VISIBLE);
+            tabsAdapter.getView().setVisibility(View.VISIBLE);
             initTabs(tabsCount, menuItemId, navigationLevel, createFragment, tabIndex);
         }
 
@@ -87,18 +87,18 @@ public abstract class NavigationFragmentDrawer {
                           final int navigationLevel,
                           final boolean createFragment,
                           final int selectedTabIndex) {
-        tabLayout.removeAllTabs();
-        tabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+        tabsAdapter.removeAllTabs();
+        tabsAdapter.setOnTabSelected(new TabsAdapter.OnTabSelected() {
             boolean shouldCreateFragment = createFragment;
 
             @Override
-            public void onTabSelected(TabLayout.Tab tab) {
+            public void onTabSelected(TabsAdapter.Tab tab) {
                 if (menuItemId != currentSelectedItem) {
                     clearBackStack();
                     Fragments.removeFragmentWithId(activity.getSupportFragmentManager(), getContentId());
                 }
 
-                int tabIndex = tab.getPosition();
+                int tabIndex = tab.getIndex();
                 if (shouldCreateFragment || selectedTabIndex != tabIndex) {
                     Fragment fragment =
                             fragmentFactory.createFragmentBySelectedItem(menuItemId, tabIndex,
@@ -109,32 +109,21 @@ public abstract class NavigationFragmentDrawer {
                 shouldCreateFragment = true;
                 currentSelectedTabIndex = tabIndex;
             }
-
-            @Override
-            public void onTabUnselected(TabLayout.Tab tab) {
-
-            }
-
-            @Override
-            public void onTabReselected(TabLayout.Tab tab) {
-
-            }
         });
 
         for (int i = 0; i < tabsCount; i++) {
-            TabLayout.Tab tab = tabLayout.newTab();
+            TabsAdapter.Tab tab = tabsAdapter.newTab(i == selectedTabIndex);
             fragmentFactory.initTab(menuItemId, i, navigationLevel, tab);
-            tabLayout.addTab(tab, i == selectedTabIndex);
         }
     }
 
     public void init() {
         int tabsCount = fragmentFactory.getTabsCount(currentSelectedItem, navigationLevel);
         if (tabsCount > 1) {
-            tabLayout.setVisibility(View.VISIBLE);
+            tabsAdapter.getView().setVisibility(View.VISIBLE);
             initTabs(tabsCount, currentSelectedItem, navigationLevel, true, 0);
         } else {
-            tabLayout.setVisibility(View.GONE);
+            tabsAdapter.getView().setVisibility(View.GONE);
             Fragments.replaceFragment(activity, getContentId(),
                     fragmentFactory.createFragmentBySelectedItem(currentSelectedItem, 0, navigationLevel));
         }
@@ -160,7 +149,7 @@ public abstract class NavigationFragmentDrawer {
     }
 
     public void selectTab(int index) {
-        tabLayout.getTabAt(index).select();
+        tabsAdapter.selectTab(index);
     }
 
     public NavigationFragmentDrawer(final AppCompatActivity activity,
@@ -172,9 +161,7 @@ public abstract class NavigationFragmentDrawer {
 
         drawerLayout = (DrawerLayout) activity.findViewById(getDrawerLayoutId());
 
-        ViewStub tabsStub = (ViewStub) activity.findViewById(getTabsStubId());
-        tabsStub.setLayoutResource(getTabLayoutId());
-        tabLayout = (TabLayout) tabsStub.inflate();
+        tabsAdapter = createTabsAdapter();
 
         ViewStub toolbarStub = (ViewStub) activity.findViewById(getToolBarStubId());
         toolbarStub.setLayoutResource(getToolbarLayoutId());
@@ -246,11 +233,10 @@ public abstract class NavigationFragmentDrawer {
     protected abstract int getDrawerLayoutId();
     protected abstract int getContentId();
     protected abstract int getNavigationViewId();
-    protected abstract int getTabsStubId();
-    protected abstract int getTabLayoutId();
     protected abstract int getToolBarStubId();
     protected abstract int getToolbarLayoutId();
     protected abstract NavigationDrawerMenuAdapter createNavigationDrawerMenuAdapter(int navigationViewId);
+    protected abstract TabsAdapter createTabsAdapter();
 
     protected String getActionBarTitle(int currentSelectedItem, int tabIndex, int navigationLevel) {
         return GuiUtilities.getApplicationName(activity);
