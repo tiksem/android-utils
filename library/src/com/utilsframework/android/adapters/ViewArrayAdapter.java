@@ -360,4 +360,9 @@ public abstract class ViewArrayAdapter<Element, ViewHolder> extends BaseAdapter 
     public boolean isEnabled(int position) {
         return getItemViewType(position) != NULL_VIEW_TYPE;
     }
+
+    @Override
+    public boolean areAllItemsEnabled() {
+        return false;
+    }
 }
