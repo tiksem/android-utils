@@ -10,6 +10,7 @@ public interface TabsAdapter {
         void setText(CharSequence text);
         void setText(int id);
         int getIndex();
+        Object getTabHandler();
     }
 
     interface OnTabSelected {

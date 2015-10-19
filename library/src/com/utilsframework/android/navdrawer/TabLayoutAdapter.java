@@ -32,6 +32,11 @@ public class TabLayoutAdapter implements TabsAdapter {
         public int getIndex() {
             return tab.getPosition();
         }
+
+        @Override
+        public Object getTabHandler() {
+            return tab;
+        }
     }
 
     private TabLayoutAdapter(Activity activity, int viewStubId, int tabLayoutId) {
