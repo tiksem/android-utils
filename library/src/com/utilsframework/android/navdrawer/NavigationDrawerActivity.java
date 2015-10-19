@@ -24,7 +24,7 @@ public abstract class NavigationDrawerActivity extends AppCompatActivity impleme
     }
 
     protected void init() {
-        setContentView(R.layout.navigation_drawable_activity);
+        setContentView(getRootLayoutId());
         FragmentFactory fragmentFactory = createFragmentFactory();
 
         navigationDrawer = new NavigationFragmentDrawer(this, fragmentFactory,
@@ -86,7 +86,11 @@ public abstract class NavigationDrawerActivity extends AppCompatActivity impleme
                 return NavigationDrawerActivity.this.createTabsAdapter();
             }
         };
-        navigationDrawer.init();
+        navigationDrawer.init(getNavigationMode());
+    }
+
+    protected int getRootLayoutId() {
+        return R.layout.navigation_drawable_activity;
     }
 
     @Override
@@ -162,5 +166,9 @@ public abstract class NavigationDrawerActivity extends AppCompatActivity impleme
 
     protected DrawerLayoutAdapter createDrawerLayoutAdapter() {
         return new AndroidSupportDrawerLayoutAdapter(this, R.id.drawer_layout);
+    }
+
+    public NavigationMode getNavigationMode() {
+        return NavigationMode.SHOW_BACK_FOR_NESTED_LEVELS;
     }
 }

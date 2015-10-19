@@ -1,5 +1,6 @@
 package com.utilsframework.android.navdrawer;
 
+import android.os.Handler;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -72,12 +73,17 @@ public abstract class NavigationFragmentDrawer {
         this.navigationLevel = navigationLevel;
         updateActionBarTitle();
 
-        if (navigationMode == NavigationMode.SHOW_BACK_FOR_NESTED_LEVELS) {
-            ActionBar actionBar = activity.getSupportActionBar();
-            if (navigationLevel == 0) {
-                actionBar.setHomeAsUpIndicator(getToggleIconResourceId());
-            } else {
-                actionBar.setHomeAsUpIndicator(null);
+        ActionBar actionBar = activity.getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(navigationLevel != 0 ||
+                    navigationMode != NavigationMode.NEVER_SHOW_NAVIGATION_TOGGLE);
+
+            if (navigationMode == NavigationMode.SHOW_BACK_FOR_NESTED_LEVELS) {
+                if (navigationLevel == 0) {
+                    actionBar.setHomeAsUpIndicator(getToggleIconResourceId());
+                } else {
+                    actionBar.setHomeAsUpIndicator(null);
+                }
             }
         }
     }
@@ -117,7 +123,7 @@ public abstract class NavigationFragmentDrawer {
         }
     }
 
-    public void init() {
+    public void init(NavigationMode navigationMode) {
         int tabsCount = fragmentFactory.getTabsCount(currentSelectedItem, navigationLevel);
         if (tabsCount > 1) {
             tabsAdapter.getView().setVisibility(View.VISIBLE);
@@ -169,7 +175,7 @@ public abstract class NavigationFragmentDrawer {
     }
 
     public void updateActionBarTitle() {
-        navigationView.post(new Runnable() {
+        activity.getWindow().getDecorView().post(new Runnable() {
             @Override
             public void run() {
                 ActionBar actionBar = activity.getSupportActionBar();
@@ -209,8 +215,10 @@ public abstract class NavigationFragmentDrawer {
         });
 
         ActionBar actionBar = activity.getSupportActionBar();
-        actionBar.setDisplayHomeAsUpEnabled(true);
-        actionBar.setHomeAsUpIndicator(getToggleIconResourceId());
+        if (actionBar != null && navigationMode != NavigationMode.NEVER_SHOW_NAVIGATION_TOGGLE) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setHomeAsUpIndicator(getToggleIconResourceId());
+        }
     }
 
     public void show() {

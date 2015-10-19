@@ -5,5 +5,6 @@ package com.utilsframework.android.navdrawer;
  */
 public enum NavigationMode {
     ALWAYS_SHOW_NAVIGATION_TOGGLE,
-    SHOW_BACK_FOR_NESTED_LEVELS
+    SHOW_BACK_FOR_NESTED_LEVELS,
+    NEVER_SHOW_NAVIGATION_TOGGLE
 }
