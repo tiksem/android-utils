@@ -30,8 +30,8 @@ public abstract class NavigationDrawerActivity extends AppCompatActivity impleme
         navigationDrawer = new NavigationFragmentDrawer(this, fragmentFactory,
                 getCurrentSelectedNavigationItemId()) {
             @Override
-            protected int getDrawerLayoutId() {
-                return R.id.drawer_layout;
+            protected DrawerLayoutAdapter createDrawerLayoutAdapter() {
+                return NavigationDrawerActivity.this.createDrawerLayoutAdapter();
             }
 
             @Override
@@ -158,5 +158,9 @@ public abstract class NavigationDrawerActivity extends AppCompatActivity impleme
 
     protected TabsAdapter createTabsAdapter() {
         return TabLayoutAdapter.fromViewStub(this, R.id.tabsStub, getTabLayoutId());
+    }
+
+    protected DrawerLayoutAdapter createDrawerLayoutAdapter() {
+        return new AndroidSupportDrawerLayoutAdapter(this, R.id.drawer_layout);
     }
 }

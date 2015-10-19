@@ -22,7 +22,6 @@ import java.util.*;
  */
 public abstract class NavigationFragmentDrawer {
     private final AppCompatActivity activity;
-    private DrawerLayout drawerLayout;
     private FragmentFactory fragmentFactory;
     private int currentSelectedItem;
     private int navigationLevel = 0;
@@ -34,6 +33,7 @@ public abstract class NavigationFragmentDrawer {
     private NavigationDrawerMenuAdapter navigationDrawerMenuAdapter;
     private View navigationView;
     private TabsAdapter tabsAdapter;
+    private DrawerLayoutAdapter drawerLayoutAdapter;
 
     private void clearBackStack() {
         FragmentManager fragmentManager = activity.getSupportFragmentManager();
@@ -159,8 +159,7 @@ public abstract class NavigationFragmentDrawer {
         this.currentSelectedItem = currentSelectedItem;
         this.activity = activity;
 
-        drawerLayout = (DrawerLayout) activity.findViewById(getDrawerLayoutId());
-
+        drawerLayoutAdapter = createDrawerLayoutAdapter();
         tabsAdapter = createTabsAdapter();
 
         ViewStub toolbarStub = (ViewStub) activity.findViewById(getToolBarStubId());
@@ -193,27 +192,19 @@ public abstract class NavigationFragmentDrawer {
     }
 
     private void initDrawableToggle() {
-        drawerLayout.setDrawerListener(new DrawerLayout.DrawerListener() {
+        drawerLayoutAdapter.setListener(new DrawerLayoutAdapter.Listener() {
             @Override
-            public void onDrawerSlide(View view, float v) {
-
-            }
-
             public void onDrawerClosed(View view) {
                 updateActionBarTitle();
             }
 
+            @Override
             public void onDrawerOpened(View drawerView) {
                 ActionBar actionBar = activity.getSupportActionBar();
                 if (actionBar != null) {
                     String title = getActionBarTitleWhenNavigationIsShown(currentSelectedItem);
                     actionBar.setTitle(title);
                 }
-            }
-
-            @Override
-            public void onDrawerStateChanged(int i) {
-
             }
         });
 
@@ -223,20 +214,20 @@ public abstract class NavigationFragmentDrawer {
     }
 
     public void show() {
-        drawerLayout.openDrawer(navigationView);
+        drawerLayoutAdapter.openDrawer(navigationView);
     }
 
     public void hide() {
-        drawerLayout.closeDrawer(navigationView);
+        drawerLayoutAdapter.closeDrawer(navigationView);
     }
 
-    protected abstract int getDrawerLayoutId();
     protected abstract int getContentId();
     protected abstract int getNavigationViewId();
     protected abstract int getToolBarStubId();
     protected abstract int getToolbarLayoutId();
     protected abstract NavigationDrawerMenuAdapter createNavigationDrawerMenuAdapter(int navigationViewId);
     protected abstract TabsAdapter createTabsAdapter();
+    protected abstract DrawerLayoutAdapter createDrawerLayoutAdapter();
 
     protected String getActionBarTitle(int currentSelectedItem, int tabIndex, int navigationLevel) {
         return GuiUtilities.getApplicationName(activity);
@@ -291,10 +282,10 @@ public abstract class NavigationFragmentDrawer {
     }
 
     public void toggleDrawer() {
-        if (drawerLayout.isDrawerOpen(navigationView)) {
-            drawerLayout.closeDrawers();
+        if (drawerLayoutAdapter.isDrawerOpened(navigationView)) {
+            drawerLayoutAdapter.closeDrawer(navigationView);
         } else {
-            drawerLayout.openDrawer(navigationView);
+            drawerLayoutAdapter.openDrawer(navigationView);
         }
     }
 
