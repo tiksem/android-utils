@@ -12,7 +12,7 @@ public class EventBusFragment extends Fragment {
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        eventBus = EventManager.getInstance().getBus();
+        eventBus = EventManager.getInstance().getBus(this);
     }
 
     @Override
@@ -21,11 +21,11 @@ public class EventBusFragment extends Fragment {
         eventBus.destroy();
     }
 
-    protected void addEventListener(EventId eventId, EventListener eventListener) {
+    protected void addEventListener(Class eventId, EventListener eventListener) {
         eventBus.addEventListener(eventId, eventListener);
     }
 
-    protected void removeEventListener(EventId eventId, EventListener eventListener) {
+    protected void removeEventListener(Class eventId, EventListener eventListener) {
         eventBus.removeEventListener(eventId, eventListener);
     }
 }

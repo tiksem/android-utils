@@ -6,6 +6,6 @@ import com.utils.framework.Destroyable;
  * Created by CM on 8/28/2015.
  */
 public interface EventBus extends Destroyable {
-    void addEventListener(EventId eventId, EventListener eventListener);
-    void removeEventListener(EventId eventId, EventListener eventListener);
+    void addEventListener(Class eventId, EventListener eventListener);
+    void removeEventListener(Class eventId, EventListener eventListener);
 }

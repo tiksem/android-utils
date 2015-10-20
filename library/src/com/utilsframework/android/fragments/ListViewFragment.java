@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
+import android.widget.AdapterView;
 import com.utilsframework.android.R;
 import com.utilsframework.android.adapters.ViewArrayAdapter;
 
@@ -23,6 +24,7 @@ public abstract class ListViewFragment<T> extends Fragment {
 
     protected abstract ViewArrayAdapter<T, ?> createAdapter();
     protected abstract List<T> createList();
+    protected abstract void onListItemClicked(T item, int position);
 
     protected void updateList() {
         adapter.setElements(createList());
@@ -52,6 +54,13 @@ public abstract class ListViewFragment<T> extends Fragment {
         if (listViewState != null) {
             listView.onRestoreInstanceState(savedInstanceState);
         }
+
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                onListItemClicked(adapter.getElement(position), position);
+            }
+        });
     }
 
     protected int getListViewId() {

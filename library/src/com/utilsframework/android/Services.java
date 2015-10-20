@@ -5,6 +5,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.os.Binder;
 import android.os.IBinder;
 
 /**
@@ -18,13 +19,21 @@ public class Services {
         context.startService(intent);
     }
 
-    public static interface Connection<BinderType> {
+    public interface UnBinder {
+        void unbind();
+    }
+
+    public static interface Connection<BinderType> extends UnBinder {
         BinderType getBinder();
         void unbind();
     }
 
     public static interface OnBind<BinderType> {
         public void onBind(Connection<BinderType> connection);
+    }
+
+    public interface OnUnbind {
+        void onUnbind();
     }
 
     public static <ServiceType extends Service,
@@ -46,6 +55,10 @@ public class Services {
 
                     @Override
                     public void unbind() {
+                        if (service instanceof OnUnbind) {
+                            ((OnUnbind) service).onUnbind();
+                        }
+
                         context.unbindService(serviceConnection);
                     }
                 });

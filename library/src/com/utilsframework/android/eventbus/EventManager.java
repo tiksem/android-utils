@@ -1,9 +1,12 @@
 package com.utilsframework.android.eventbus;
 
+import com.utils.framework.Reflection;
 import com.utils.framework.collections.map.MultiMap;
 import com.utils.framework.collections.map.MultiMapEntry;
 import com.utils.framework.collections.map.SetValuesHashMultiMap;
+import com.utilsframework.android.eventbus.annotations.Subscribe;
 
+import java.lang.reflect.Method;
 import java.util.*;
 
 /**
@@ -11,29 +14,26 @@ import java.util.*;
  */
 public class EventManager {
     private static EventManager instance;
-    private List<Set<EventListener>> listeners = new ArrayList<>();
+    private MultiMap<Class, EventListener> listeners = new SetValuesHashMultiMap<>();
 
     private class EventBusImpl implements EventBus {
-        private MultiMap<EventId, EventListener> registeredListeners = new SetValuesHashMultiMap<>();
+        private MultiMap<Class, EventListener> registeredListeners = new SetValuesHashMultiMap<>();
 
         @Override
         public void destroy() {
-            Iterator<MultiMapEntry<EventId, EventListener>> iterator = registeredListeners.iterator();
-            while (iterator.hasNext()) {
-                MultiMapEntry<EventId, EventListener> next = iterator.next();
-                listeners.get(next.key.id).remove(next.value);
-            }
+            listeners.removeAll(registeredListeners);
+            registeredListeners.clear();
         }
 
         @Override
-        public void addEventListener(EventId eventId, EventListener eventListener) {
-            listeners.get(eventId.id).add(eventListener);
+        public void addEventListener(Class eventId, EventListener eventListener) {
+            listeners.put(eventId, eventListener);
             registeredListeners.put(eventId, eventListener);
         }
 
         @Override
-        public void removeEventListener(EventId eventId, EventListener eventListener) {
-            listeners.get(eventId.id).remove(eventListener);
+        public void removeEventListener(Class eventId, EventListener eventListener) {
+            listeners.remove(eventId, eventListener);
             registeredListeners.remove(eventId, eventListener);
         }
     }
@@ -46,22 +46,27 @@ public class EventManager {
         return instance;
     }
 
-    public EventBus getBus() {
-        return new EventBusImpl();
-    }
-
-    public EventId nextId() {
-        listeners.add(new HashSet<EventListener>());
-        return new EventId();
-    }
-
-    public void fire(EventId eventId, Object data) {
-        for (EventListener eventListener : listeners.get(eventId.id)) {
-            eventListener.onEvent(eventId, data);
+    public EventBus getBus(final Object subscriber) {
+        EventBusImpl eventBus = new EventBusImpl();
+        Method[] methods = subscriber.getClass().getMethods();
+        for (final Method method : methods) {
+            final Subscribe subscribe = method.getAnnotation(Subscribe.class);
+            if (subscribe != null) {
+                eventBus.addEventListener(method.getParameterTypes()[0], new EventListener() {
+                    @Override
+                    public void onEvent(Object event) {
+                        Reflection.executeMethod(subscriber, method, event);
+                    }
+                });
+            }
         }
+
+        return eventBus;
     }
 
-    public void fire(EventId eventId) {
-        fire(eventId, null);
+    public void fire(Object event) {
+        for (EventListener eventListener : listeners.getValues(event.getClass())) {
+            eventListener.onEvent(event);
+        }
     }
 }
