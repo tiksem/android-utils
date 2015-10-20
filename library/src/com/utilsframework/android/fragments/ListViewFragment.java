@@ -76,4 +76,8 @@ public abstract class ListViewFragment<T> extends Fragment {
         super.onDestroyView();
         listViewState = listView.onSaveInstanceState();
     }
+
+    public AbsListView getListView() {
+        return listView;
+    }
 }
