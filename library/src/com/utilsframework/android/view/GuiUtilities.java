@@ -534,4 +534,10 @@ public class GuiUtilities {
         return context.getString(stringId);
     }
 
+    public static void setEnabledForChildren(ViewGroup viewGroup, boolean enabled) {
+        int childCount = viewGroup.getChildCount();
+        for (int i = 0; i < childCount; i++) {
+            viewGroup.getChildAt(i).setEnabled(enabled);
+        }
+    }
 }
