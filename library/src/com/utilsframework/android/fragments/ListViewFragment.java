@@ -52,7 +52,7 @@ public abstract class ListViewFragment<T> extends Fragment {
         listView.setAdapter(adapter);
 
         if (listViewState != null) {
-            listView.onRestoreInstanceState(savedInstanceState);
+            listView.onRestoreInstanceState(listViewState);
         }
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {

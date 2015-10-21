@@ -263,6 +263,11 @@ public abstract class NavigationFragmentDrawer {
     public void replaceFragment(Fragment newFragment, final int navigationLevel) {
         final int lastNavigationLevel = this.navigationLevel;
         final int lastTabIndex = currentSelectedTabIndex;
+
+        if (newFragment == null) {
+            newFragment = fragmentFactory.createFragmentBySelectedItem(currentSelectedItem, 0, navigationLevel);
+        }
+
         FragmentManager.OnBackStackChangedListener onBackStackChangedListener =
                 Fragments.replaceFragmentAndAddToBackStack(activity, R.id.content, newFragment,
                 new Fragments.OnBack() {
@@ -275,6 +280,10 @@ public abstract class NavigationFragmentDrawer {
         backStackChangedListeners.add(onBackStackChangedListener);
         backStack.push(getCurrentFragment());
         selectFragment(currentSelectedItem, navigationLevel, 0, false);
+    }
+
+    public void replaceFragment(final int navigationLevel) {
+        replaceFragment(null, navigationLevel);
     }
 
     public int getCurrentSelectedItem() {

@@ -7,5 +7,7 @@ import android.support.v4.app.Fragment;
  */
 public interface NavigationActivityInterface {
     void replaceFragment(Fragment newFragment, int navigationLevel);
+    void replaceFragment(int navigationLevel);
     Fragment getLatestBackStackFragment();
+    Fragment getCurrentFragment();
 }

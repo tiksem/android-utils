@@ -99,4 +99,14 @@ public class OneFragmentActivity extends AppCompatActivity implements Navigation
     public Fragment getLatestBackStackFragment() {
         return latestBackStackFragment;
     }
+
+    @Override
+    public void replaceFragment(int navigationLevel) {
+
+    }
+
+    @Override
+    public Fragment getCurrentFragment() {
+        return getSupportFragmentManager().findFragmentById(R.id.one);
+    }
 }

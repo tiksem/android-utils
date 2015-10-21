@@ -114,6 +114,12 @@ public abstract class NavigationDrawerActivity extends AppCompatActivity impleme
         navigationDrawer.replaceFragment(newFragment, navigationLevel);
     }
 
+    @Override
+    public void replaceFragment(int navigationLevel) {
+        navigationDrawer.replaceFragment(navigationLevel);
+    }
+
+    @Override
     public Fragment getCurrentFragment() {
         return navigationDrawer.getCurrentFragment();
     }
