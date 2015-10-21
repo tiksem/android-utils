@@ -7,6 +7,8 @@ import com.utils.framework.Predicate;
 import com.utils.framework.collections.map.MultiMap;
 import com.utils.framework.collections.map.SetValuesHashMultiMap;
 
+import java.util.Collection;
+
 /**
  * Created by CM on 2/25/2015.
  */
@@ -37,11 +39,26 @@ public class MenuManager {
     }
 
     public MenuItem getFirstCheckedItemOfGroup(int groupId) {
-        return CollectionUtils.find(itemsByGroups.getValues(groupId), new Predicate<MenuItem>() {
-            @Override
-            public boolean check(MenuItem item) {
-                return item.isChecked();
-            }
-        });
+        Collection<MenuItem> items = itemsByGroups.getValues(groupId);
+        if (items != null) {
+            return CollectionUtils.find(items, new Predicate<MenuItem>() {
+                @Override
+                public boolean check(MenuItem item) {
+                    return item.isChecked();
+                }
+            });
+        }
+
+        return null;
+    }
+
+    public Collection<MenuItem> getItemsByGroup(int groupId) {
+        return itemsByGroups.getValues(groupId);
+    }
+
+    public void setOnClickListenersForAllItemsInGroup(int groupId, MenuItem.OnMenuItemClickListener listener) {
+        for (MenuItem menuItem : getItemsByGroup(groupId)) {
+            menuItem.setOnMenuItemClickListener(listener);
+        }
     }
 }
