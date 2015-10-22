@@ -134,68 +134,26 @@ public class Fragments {
         void onBack();
     }
 
-    public static FragmentManager.OnBackStackChangedListener
-    replaceFragmentAndAddToBackStack(Activity activity, final int id,
-                                                        Fragment newFragment, final OnBack onBack) {
+    public static void replaceFragmentAndAddToBackStack(Activity activity, final int id,
+                                                        Fragment newFragment) {
         final FragmentManager fragmentManager = activity.getFragmentManager();
         final Fragment currentFragment = fragmentManager.findFragmentById(id);
         if(currentFragment == null){
             throw new IllegalStateException("Unable to replace fragment, fragment doesn't exist");
         }
 
-        FragmentManager.OnBackStackChangedListener result = null;
-        if (onBack != null) {
-            final int count = fragmentManager.getBackStackEntryCount();
-            result = new FragmentManager.OnBackStackChangedListener() {
-                @Override
-                public void onBackStackChanged() {
-                    int backStackEntryCount = fragmentManager.getBackStackEntryCount();
-                    if(fragmentManager.findFragmentById(id) == currentFragment && count == backStackEntryCount) {
-                        onBack.onBack();
-                    }
-
-                    if(backStackEntryCount <= count){
-                        fragmentManager.removeOnBackStackChangedListener(this);
-                    }
-                }
-            };
-            fragmentManager.addOnBackStackChangedListener(result);
-        }
-
         fragmentManager.beginTransaction().replace(id, newFragment).addToBackStack(null).commit();
-        return result;
     }
 
-    public static android.support.v4.app.FragmentManager.OnBackStackChangedListener
-    replaceFragmentAndAddToBackStack(AppCompatActivity activity, final int id,
-                                     android.support.v4.app.Fragment newFragment, final OnBack onBack) {
+    public static void replaceFragmentAndAddToBackStack(AppCompatActivity activity, final int id,
+                                     android.support.v4.app.Fragment newFragment) {
         final android.support.v4.app.FragmentManager fragmentManager = activity.getSupportFragmentManager();
         final android.support.v4.app.Fragment currentFragment = fragmentManager.findFragmentById(id);
         if(currentFragment == null){
             throw new IllegalStateException("Unable to replace fragment, fragment doesn't exist");
         }
 
-        android.support.v4.app.FragmentManager.OnBackStackChangedListener result = null;
-        if (onBack != null) {
-            final int count = fragmentManager.getBackStackEntryCount();
-            result = new android.support.v4.app.FragmentManager.OnBackStackChangedListener() {
-                @Override
-                public void onBackStackChanged() {
-                    int backStackEntryCount = fragmentManager.getBackStackEntryCount();
-                    if(fragmentManager.findFragmentById(id) == currentFragment && count == backStackEntryCount) {
-                        onBack.onBack();
-                    }
-
-                    if(backStackEntryCount <= count){
-                        fragmentManager.removeOnBackStackChangedListener(this);
-                    }
-                }
-            };
-            fragmentManager.addOnBackStackChangedListener(result);
-        }
-
         fragmentManager.beginTransaction().replace(id, newFragment).addToBackStack(null).commit();
-        return result;
     }
 
 

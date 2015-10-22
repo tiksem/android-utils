@@ -268,18 +268,30 @@ public abstract class NavigationFragmentDrawer {
             newFragment = fragmentFactory.createFragmentBySelectedItem(currentSelectedItem, 0, navigationLevel);
         }
 
+        final int backStackEntryCount = activity.getSupportFragmentManager().getBackStackEntryCount();
+        Fragments.replaceFragmentAndAddToBackStack(activity, R.id.content, newFragment);
+        selectFragment(currentSelectedItem, navigationLevel, 0, false);
+
         FragmentManager.OnBackStackChangedListener onBackStackChangedListener =
-                Fragments.replaceFragmentAndAddToBackStack(activity, R.id.content, newFragment,
-                new Fragments.OnBack() {
-                    @Override
-                    public void onBack() {
-                        backStack.pop();
-                        selectFragment(currentSelectedItem, lastNavigationLevel, lastTabIndex, false);
+                new FragmentManager.OnBackStackChangedListener() {
+            @Override
+            public void onBackStackChanged() {
+                if (NavigationFragmentDrawer.this.navigationLevel == navigationLevel) {
+                    if (backStackEntryCount != activity.getSupportFragmentManager().getBackStackEntryCount()) {
+                        return;
                     }
-                });
+
+                    backStack.pop();
+                    selectFragment(currentSelectedItem, lastNavigationLevel, lastTabIndex, false);
+                    activity.getSupportFragmentManager().removeOnBackStackChangedListener(this);
+                    backStackChangedListeners.remove(this);
+                }
+            }
+        };
+        activity.getSupportFragmentManager().addOnBackStackChangedListener(
+                onBackStackChangedListener);
         backStackChangedListeners.add(onBackStackChangedListener);
         backStack.push(getCurrentFragment());
-        selectFragment(currentSelectedItem, navigationLevel, 0, false);
     }
 
     public void replaceFragment(final int navigationLevel) {
