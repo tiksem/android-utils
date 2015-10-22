@@ -122,11 +122,13 @@ public class Fragments {
 
     public static void replaceFragment(Activity activity, int id, Fragment newFragment) {
         FragmentManager fragmentManager = activity.getFragmentManager();
+        removeFragmentWithId(fragmentManager, id);
         fragmentManager.beginTransaction().replace(id, newFragment).commit();
     }
 
     public static void replaceFragment(FragmentActivity activity, int id, android.support.v4.app.Fragment newFragment) {
         android.support.v4.app.FragmentManager fragmentManager = activity.getSupportFragmentManager();
+        removeFragmentWithId(fragmentManager, id);
         fragmentManager.beginTransaction().replace(id, newFragment).commit();
     }
 
@@ -171,12 +173,16 @@ public class Fragments {
 
     public static void removeFragmentWithId(FragmentManager fragmentManager, int id) {
         Fragment fragment = fragmentManager.findFragmentById(id);
-        fragmentManager.beginTransaction().remove(fragment).commit();
+        if (fragment != null) {
+            fragmentManager.beginTransaction().remove(fragment).commit();
+        }
     }
 
     public static void removeFragmentWithId(android.support.v4.app.FragmentManager fragmentManager, int id) {
         android.support.v4.app.Fragment fragment = fragmentManager.findFragmentById(id);
-        fragmentManager.beginTransaction().remove(fragment).commit();
+        if (fragment != null) {
+            fragmentManager.beginTransaction().remove(fragment).commit();
+        }
     }
 
     public static void clearBackStack(Activity activity) {

@@ -252,12 +252,12 @@ public abstract class NavigationFragmentDrawer {
 
     public void onBackPressed() {
         if(currentSelectedTabIndex != 0){
-            Fragments.removeFragmentWithId(activity.getSupportFragmentManager(), R.id.content);
+            Fragments.removeFragmentWithId(activity.getSupportFragmentManager(), getContentId());
         }
     }
 
     public Fragment getCurrentFragment() {
-        return activity.getSupportFragmentManager().findFragmentById(R.id.content);
+        return activity.getSupportFragmentManager().findFragmentById(getContentId());
     }
 
     public void replaceFragment(Fragment newFragment, final int navigationLevel) {
@@ -269,7 +269,7 @@ public abstract class NavigationFragmentDrawer {
         }
 
         final int backStackEntryCount = activity.getSupportFragmentManager().getBackStackEntryCount();
-        Fragments.replaceFragmentAndAddToBackStack(activity, R.id.content, newFragment);
+        Fragments.replaceFragmentAndAddToBackStack(activity, getContentId(), newFragment);
         selectFragment(currentSelectedItem, navigationLevel, 0, false);
 
         FragmentManager.OnBackStackChangedListener onBackStackChangedListener =
