@@ -40,7 +40,6 @@ public abstract class NavigationListFragment<T, RequestManagerImpl extends Reque
     private SwipeRefreshLayout swipeRefreshLayout;
     private OneVisibleViewInGroupToggle viewsVisibilityToggle;
     private SortMenuAction sortAction;
-    private boolean swipeRefreshingEnabled = true;
 
     @Override
     public void onAttach(Activity activity) {
@@ -71,6 +70,12 @@ public abstract class NavigationListFragment<T, RequestManagerImpl extends Reque
             setupSwipeLayout(view);
         }
         setupRetryLoadingButton();
+
+        if (elements == null) {
+            elements = getNavigationList(getRequestManager(), null);
+        }
+
+        updateAdapterAndViewsState();
     }
 
     private void setupListViewListenersAndAdapter() {
@@ -262,19 +267,6 @@ public abstract class NavigationListFragment<T, RequestManagerImpl extends Reque
             sortAction = new SortMenuAction(menu, getSortMenuGroupId());
             sortAction.setSortListener(this);
         }
-
-        Fragments.executeWhenViewCreated(this, new GuiUtilities.OnViewCreated() {
-            @Override
-            public void onViewCreated(View view) {
-                if (adapter.getElements() == null) {
-                    if (elements == null) {
-                        elements = getNavigationList(getRequestManager(), null);
-                    }
-
-                    updateAdapterAndViewsState();
-                }
-            }
-        });
     }
 
     public String getLastFilter() {
