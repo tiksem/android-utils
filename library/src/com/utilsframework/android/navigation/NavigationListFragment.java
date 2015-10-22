@@ -139,6 +139,14 @@ public abstract class NavigationListFragment<T, RequestManagerImpl extends Reque
             }
         });
 
+        elements.setOnError(new OnError() {
+            @Override
+            public void onError(Throwable e) {
+                handleNavigationListError(e);
+                swipeRefreshLayout.setRefreshing(false);
+            }
+        });
+
         //load first page
         elements.get(0);
         listViewState = null;
