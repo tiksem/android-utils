@@ -3,7 +3,6 @@ package com.utilsframework.android.navigation;
 import android.app.Activity;
 import android.os.Bundle;
 import android.os.Parcelable;
-import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.*;
 import android.widget.AbsListView;
@@ -16,6 +15,8 @@ import com.utilsframework.android.fragments.Fragments;
 import com.utilsframework.android.fragments.RequestManagerFragment;
 import com.utilsframework.android.menu.SearchListener;
 import com.utilsframework.android.menu.SearchMenuAction;
+import com.utilsframework.android.menu.SortListener;
+import com.utilsframework.android.menu.SortMenuAction;
 import com.utilsframework.android.network.RequestManager;
 import com.utilsframework.android.view.GuiUtilities;
 import com.utilsframework.android.view.OneVisibleViewInGroupToggle;
@@ -28,7 +29,7 @@ import java.util.List;
  * Created by CM on 6/21/2015.
  */
 public abstract class NavigationListFragment<T, RequestManagerImpl extends RequestManager>
-        extends RequestManagerFragment<RequestManagerImpl> {
+        extends RequestManagerFragment<RequestManagerImpl> implements SortListener {
     private ViewArrayAdapter<T, ?> adapter;
     private AbsListView listView;
     private NavigationList<T> elements;
@@ -38,6 +39,8 @@ public abstract class NavigationListFragment<T, RequestManagerImpl extends Reque
     private View noConnectionView;
     private SwipeRefreshLayout swipeRefreshLayout;
     private OneVisibleViewInGroupToggle viewsVisibilityToggle;
+    private SortMenuAction sortAction;
+    private boolean swipeRefreshingEnabled = true;
 
     @Override
     public void onAttach(Activity activity) {
@@ -49,9 +52,13 @@ public abstract class NavigationListFragment<T, RequestManagerImpl extends Reque
                              Bundle savedInstanceState) {
         setHasOptionsMenu(true);
         View view = inflater.inflate(getRootLayout(), null);
-        SwipeRefreshLayout swipeRefreshLayout = new SwipeRefreshLayout(getActivity());
-        swipeRefreshLayout.addView(view);
-        return swipeRefreshLayout;
+        if (useSwipeRefresh()) {
+            SwipeRefreshLayout swipeRefreshLayout = new SwipeRefreshLayout(getActivity());
+            swipeRefreshLayout.addView(view);
+            return swipeRefreshLayout;
+        } else {
+            return view;
+        }
     }
 
     @Override
@@ -60,7 +67,9 @@ public abstract class NavigationListFragment<T, RequestManagerImpl extends Reque
 
         setupViews(view);
         setupListViewListenersAndAdapter();
-        setupSwipeLayout(view);
+        if (useSwipeRefresh()) {
+            setupSwipeLayout(view);
+        }
         setupRetryLoadingButton();
     }
 
@@ -73,7 +82,7 @@ public abstract class NavigationListFragment<T, RequestManagerImpl extends Reque
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 T item = adapter.getElementOfView(view);
                 if (item != null) {
-                    onListItemClicked(item);
+                    onListItemClicked(item, position);
                 }
             }
         });
@@ -147,7 +156,7 @@ public abstract class NavigationListFragment<T, RequestManagerImpl extends Reque
     protected abstract ViewArrayAdapter<T, ? extends Object> createAdapter(RequestManagerImpl requestManager);
     protected abstract NavigationList<T> getNavigationList(RequestManagerImpl requestManager, String filter);
 
-    protected abstract void onListItemClicked(T item);
+    protected abstract void onListItemClicked(T item, int position);
 
     protected abstract int getRootLayout();
 
@@ -174,7 +183,9 @@ public abstract class NavigationListFragment<T, RequestManagerImpl extends Reque
 
     private void showView(View view) {
         viewsVisibilityToggle.makeVisible(view);
-        swipeRefreshLayout.setEnabled(view == listView);
+        if (swipeRefreshLayout != null) {
+            swipeRefreshLayout.setEnabled(view == listView);
+        }
 
         if (view == listView) {
             onListViewIsShown();
@@ -245,6 +256,13 @@ public abstract class NavigationListFragment<T, RequestManagerImpl extends Reque
 
         super.onCreateOptionsMenu(menu, inflater);
 
+        int sortMenuId = getSortMenuId();
+        if (sortMenuId != 0) {
+            inflater.inflate(sortMenuId, menu);
+            sortAction = new SortMenuAction(menu, getSortMenuGroupId());
+            sortAction.setSortListener(this);
+        }
+
         Fragments.executeWhenViewCreated(this, new GuiUtilities.OnViewCreated() {
             @Override
             public void onViewCreated(View view) {
@@ -273,5 +291,34 @@ public abstract class NavigationListFragment<T, RequestManagerImpl extends Reque
 
     public View getNoConnectionView() {
         return noConnectionView;
+    }
+
+    @Override
+    public void onSortOrderChanged(int newSortOrder) {
+        updateNavigationListWithLastFilter();
+    }
+
+    protected int getSortMenuId() {
+        return 0;
+    }
+
+    protected int getSortMenuGroupId() {
+        return 0;
+    }
+
+    protected final int getSortOrder() {
+        if (sortAction == null) {
+            return 0;
+        }
+
+        return sortAction.getSortOrder();
+    }
+
+    public void notifyDataSetChanged() {
+        adapter.notifyDataSetChanged();
+    }
+
+    protected boolean useSwipeRefresh() {
+        return true;
     }
 }

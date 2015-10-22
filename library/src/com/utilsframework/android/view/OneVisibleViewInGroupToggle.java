@@ -12,6 +12,7 @@ import java.util.Set;
  */
 public class OneVisibleViewInGroupToggle {
     private Set<View> views;
+    private View visible;
 
     public OneVisibleViewInGroupToggle(View visible, View... views) {
         this.views = new LinkedHashSet<>(Arrays.asList(views));
@@ -31,5 +32,11 @@ public class OneVisibleViewInGroupToggle {
                 view.setVisibility(View.INVISIBLE);
             }
         }
+
+        visible = visibleView;
+    }
+
+    public View getVisible() {
+        return visible;
     }
 }
