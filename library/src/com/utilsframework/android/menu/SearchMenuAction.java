@@ -47,6 +47,7 @@ public class SearchMenuAction {
         MenuItemCompat.setOnActionExpandListener(searchItem, new MenuItemCompat.OnActionExpandListener() {
             @Override
             public boolean onMenuItemActionExpand(MenuItem item) {
+                onExpandCollapse(true);
                 return true;
             }
 
@@ -56,6 +57,7 @@ public class SearchMenuAction {
                     searchListener.onSearch(null);
                 }
 
+                onExpandCollapse(false);
                 return true;
             }
         });
@@ -63,5 +65,9 @@ public class SearchMenuAction {
 
     protected int getSearchMenuId() {
         return R.menu.search;
+    }
+
+    protected void onExpandCollapse(boolean expanded) {
+
     }
 }

@@ -256,9 +256,14 @@ public abstract class NavigationListFragment<T, RequestManagerImpl extends Reque
     }
 
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+    public void onCreateOptionsMenu(final Menu menu, MenuInflater inflater) {
         if(hasSearchMenu()){
-            SearchMenuAction search = new SearchMenuAction(inflater, menu);
+            SearchMenuAction search = new SearchMenuAction(inflater, menu) {
+                @Override
+                protected void onExpandCollapse(boolean expanded) {
+                    onSearchViewExpandCollapse(menu, expanded);
+                }
+            };
             search.setSearchListener(new SearchListener() {
                 @Override
                 public void onSearch(String filter) {
@@ -320,5 +325,9 @@ public abstract class NavigationListFragment<T, RequestManagerImpl extends Reque
 
     protected boolean useSwipeRefresh() {
         return true;
+    }
+
+    protected void onSearchViewExpandCollapse(Menu menu, boolean expanded) {
+
     }
 }
