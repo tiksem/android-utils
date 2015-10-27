@@ -207,6 +207,8 @@ public abstract class ViewArrayAdapter<Element, ViewHolder> extends BaseAdapter 
         return header;
     }
 
+    /* Use ListView setHeader instead */
+    @Deprecated
     public void setHeader(View header) {
         this.header = header;
         notifyDataSetChanged();

@@ -115,16 +115,15 @@ public final class Alerts {
     }
 
     public static class InputAlertSettings {
-        public CharSequence message;
-        public CharSequence title;
-        public CharSequence initialText;
-        public CharSequence okButtonText = "OK";
-        public CharSequence cancelButtonText = "Cancel";
+        public int message;
+        public int title;
+        public int ok = R.string.ok;
+        public int cancel = R.string.cancel;
         public OnInputOk onInputOk;
     }
 
     public interface OnInputOk {
-        public void onOk(String value);
+        void onOk(String value);
     }
 
     public static AlertDialog showAlertWithInput(Context context, final InputAlertSettings settings) {
@@ -133,7 +132,7 @@ public final class Alerts {
         final EditText editText = new EditText(context);
         builder.setView(editText);
 
-        builder.setPositiveButton(settings.okButtonText, new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(settings.ok, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 if (settings.onInputOk != null) {
@@ -142,15 +141,21 @@ public final class Alerts {
             }
         });
 
-        builder.setNegativeButton(settings.cancelButtonText, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-            }
-        });
+        if (settings.cancel != 0) {
+            builder.setNegativeButton(settings.cancel, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
+                }
+            });
+        }
 
-        builder.setTitle(settings.title);
-        builder.setMessage(settings.message);
+        if (settings.title != 0) {
+            builder.setTitle(settings.title);
+        }
+        if (settings.message != 0) {
+            builder.setMessage(settings.message);
+        }
 
         final AlertDialog alertDialog = builder.create();
         alertDialog.show();

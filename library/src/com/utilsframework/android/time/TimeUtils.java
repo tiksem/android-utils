@@ -89,4 +89,15 @@ public class TimeUtils {
         calendar.set(Calendar.MILLISECOND, 0);
         return calendar.getTimeInMillis();
     }
+
+    public static long getCurrentHumanReadableDateAndTimeAsLong() {
+        GregorianCalendar calendar = new GregorianCalendar();
+        long year = calendar.get(Calendar.YEAR);
+        long month = calendar.get(Calendar.MONTH);
+        long day = calendar.get(Calendar.DAY_OF_MONTH);
+        long hour = calendar.get(Calendar.HOUR_OF_DAY);
+        long minutes = calendar.get(Calendar.MINUTE);
+
+        return year * 100000000 + month * 1000000 + day * 10000 + hour * 100 + minutes;
+    }
 }

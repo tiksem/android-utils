@@ -17,5 +17,6 @@ import java.io.IOException;
 public interface RequestManager {
     <Result> AsyncTask execute(Threading.Task<IOException, Result> task);
     void execute(ThrowingRunnable<IOException> runnable, OnFinish<IOException> onFinish);
+    void execute(Runnable runnable);
     void cancelAll();
 }

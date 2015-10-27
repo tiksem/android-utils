@@ -25,4 +25,9 @@ public class EmptyRequestManager implements RequestManager {
     public void cancelAll() {
 
     }
+
+    @Override
+    public void execute(Runnable runnable) {
+        throw new UnsupportedOperationException();
+    }
 }

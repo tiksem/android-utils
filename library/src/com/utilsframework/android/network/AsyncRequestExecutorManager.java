@@ -69,7 +69,25 @@ public class AsyncRequestExecutorManager implements RequestManager {
 
             @Override
             public void onComplete(Object o, IOException error) {
-                onFinish.onFinish(error);
+                if (onFinish != null) {
+                    onFinish.onFinish(error);
+                }
+            }
+        });
+    }
+
+    @Override
+    public void execute(final Runnable runnable) {
+        execute(new Threading.Task<IOException, Object>() {
+            @Override
+            public Object runOnBackground() throws IOException {
+                runnable.run();
+                return null;
+            }
+
+            @Override
+            public void onComplete(Object o, IOException error) {
+
             }
         });
     }
