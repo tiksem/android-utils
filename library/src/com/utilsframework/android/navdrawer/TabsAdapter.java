@@ -9,6 +9,7 @@ public interface TabsAdapter {
     interface Tab {
         void setText(CharSequence text);
         void setText(int id);
+        void setIcon(int resourceId);
         int getIndex();
         Object getTabHandler();
     }

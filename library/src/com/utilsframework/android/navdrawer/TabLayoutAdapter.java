@@ -37,6 +37,11 @@ public class TabLayoutAdapter implements TabsAdapter {
         public Object getTabHandler() {
             return tab;
         }
+
+        @Override
+        public void setIcon(int resourceId) {
+            tab.setIcon(resourceId);
+        }
     }
 
     private TabLayoutAdapter(Activity activity, int viewStubId, int tabLayoutId) {
