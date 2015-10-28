@@ -6,12 +6,14 @@ import com.utilsframework.android.threading.*;
 import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.Queue;
+import java.util.concurrent.Executor;
 
 /**
  * Created by stykhonenko on 12.10.15.
  */
 public class AsyncRequestExecutorManager implements RequestManager {
     private Queue<AsyncTask> runningRequests = new ArrayDeque<>();
+    private Executor executor;
 
     @Override
     public <Result> AsyncTask execute(final Threading.Task<IOException, Result> task) {
@@ -48,9 +50,20 @@ public class AsyncRequestExecutorManager implements RequestManager {
         return asyncTask;
     }
 
+    public AsyncRequestExecutorManager(Executor executor) {
+        this.executor = executor;
+    }
+
+    public AsyncRequestExecutorManager() {
+    }
+
     private <Result> void executeAsyncTask(final AsyncTask<Void, Void, Result> asyncTask) {
         runningRequests.add(asyncTask);
-        asyncTask.execute();
+        if (executor == null) {
+            asyncTask.execute();
+        } else {
+            asyncTask.executeOnExecutor(executor);
+        }
     }
 
     @Override
