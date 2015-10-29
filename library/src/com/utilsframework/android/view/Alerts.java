@@ -126,6 +126,13 @@ public final class Alerts {
         void onOk(String value);
     }
 
+    public static AlertDialog showAlertWithInput(Context context, int message, OnInputOk onInputOk) {
+        InputAlertSettings settings = new Alerts.InputAlertSettings();
+        settings.message = message;
+        settings.onInputOk = onInputOk;
+        return showAlertWithInput(context, settings);
+    }
+
     public static AlertDialog showAlertWithInput(Context context, final InputAlertSettings settings) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
 
