@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.util.SparseBooleanArray;
 import android.view.*;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
@@ -23,6 +24,7 @@ import com.utilsframework.android.view.OneVisibleViewInGroupToggle;
 import com.utilsframework.android.view.Toasts;
 import com.utilsframework.android.view.listview.SwipeLayoutListViewTouchListener;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -329,5 +331,17 @@ public abstract class NavigationListFragment<T, RequestManagerImpl extends Reque
 
     protected void onSearchViewExpandCollapse(Menu menu, boolean expanded) {
 
+    }
+
+    public List<T> getSelectedItems() {
+        List<T> result = new ArrayList<>();
+        SparseBooleanArray positions = getListView().getCheckedItemPositions();
+        for (int i = 0; i < adapter.getCount(); i++) {
+            if (positions.get(i)) {
+                result.add(adapter.getElement(i));
+            }
+        }
+
+        return result;
     }
 }
