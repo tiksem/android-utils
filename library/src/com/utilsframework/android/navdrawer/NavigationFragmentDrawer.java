@@ -251,9 +251,7 @@ public abstract class NavigationFragmentDrawer {
     }
 
     public void onBackPressed() {
-        if(currentSelectedTabIndex != 0){
-            Fragments.removeFragmentWithId(activity.getSupportFragmentManager(), getContentId());
-        }
+        Fragments.removeFragmentWithId(activity.getSupportFragmentManager(), getContentId());
     }
 
     public Fragment getCurrentFragment() {

@@ -155,7 +155,7 @@ public class Fragments {
             throw new IllegalStateException("Unable to replace fragment, fragment doesn't exist");
         }
 
-        fragmentManager.beginTransaction().replace(id, newFragment).addToBackStack(null).commit();
+        fragmentManager.beginTransaction().remove(currentFragment).add(id, newFragment).addToBackStack(null).commit();
     }
 
 
