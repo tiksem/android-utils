@@ -1,7 +1,7 @@
 package com.utilsframework.android.image.task;
 
 import android.net.Uri;
-import com.utilsframework.android.file.IoUtils;
+import com.utils.framework.io.IOUtilities;
 
 import java.io.*;
 
@@ -17,10 +17,10 @@ public class ImageUriProcessAsyncTask extends ImageProcessAsyncTask<Uri> {
             InputStream inStream = new FileInputStream(params[0].getPath());
             OutputStream outStream = new FileOutputStream(outImageUri.getPath());
 
-            IoUtils.copyStream(inStream, outStream);
+            IOUtilities.copyStream(inStream, outStream);
 
-            IoUtils.closeSilently(inStream);
-            IoUtils.closeSilently(outStream);
+            IOUtilities.closeSilently(inStream);
+            IOUtilities.closeSilently(outStream);
         } catch (IOException ex) {
             executionListener.onImageProcessedWithError(params[0]);
         }

@@ -2,7 +2,7 @@ package com.utilsframework.android.image.task;
 
 import android.graphics.Bitmap;
 import android.net.Uri;
-import com.utilsframework.android.file.IoUtils;
+import com.utils.framework.io.IOUtilities;
 
 import java.io.FileOutputStream;
 import java.io.OutputStream;
@@ -23,7 +23,7 @@ public class ImageBitmapProcessAsyncTask extends ImageProcessAsyncTask<Bitmap> {
                 inputBmp.compress(Bitmap.CompressFormat.JPEG, 100, outStream);
             }
 
-            IoUtils.closeSilently(outStream);
+            IOUtilities.closeSilently(outStream);
         } catch (Exception ex) {
             executionListener.onImageProcessedWithError(params[0]);
         }

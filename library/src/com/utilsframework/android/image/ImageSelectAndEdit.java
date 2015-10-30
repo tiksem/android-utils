@@ -3,9 +3,9 @@ package com.utilsframework.android.image;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Environment;
+import com.utils.framework.io.IOUtilities;
 import com.utilsframework.android.bitmap.BitmapUtilities;
 import com.utilsframework.android.file.FileUtils;
-import com.utilsframework.android.file.IoUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -45,7 +45,7 @@ public class ImageSelectAndEdit {
                     String selectedImagePath = selectedImage.getAbsolutePath();
                     outputFile = new File(Environment.getExternalStorageDirectory(), "temp." +
                     FileUtils.getExtension(selectedImagePath));
-                    IoUtils.copyFile(selectedImagePath, outputFile.getAbsolutePath());
+                    IOUtilities.copyFile(selectedImagePath, outputFile.getAbsolutePath());
 
                     Intent editIntent = new Intent(Intent.ACTION_EDIT);
                     editIntent.setDataAndType(BitmapUtilities.getImageContentUri(activity, outputFile), "image/*");
