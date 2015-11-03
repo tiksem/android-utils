@@ -133,6 +133,7 @@ public abstract class NavigationListFragment<T, RequestManagerImpl extends Reque
 
     private void requestGetNavigationList(String filter) {
         elements = getNavigationList(getRequestManager(), filter);
+        sort(elements.getElements());
         onNavigationListChanged(elements);
     }
 
@@ -352,5 +353,16 @@ public abstract class NavigationListFragment<T, RequestManagerImpl extends Reque
 
     protected void onNavigationListChanged(NavigationList<T> navigationList) {
 
+    }
+
+    private void sort(List<T> items) {
+        int sortOrder = getSortOrder();
+        if (sortOrder != 0) {
+            sort(items, sortOrder);
+        }
+    }
+
+    protected void sort(List<T> items, int sortingOrder) {
+        throw new UnsupportedOperationException();
     }
 }
