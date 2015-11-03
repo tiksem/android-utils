@@ -74,7 +74,7 @@ public abstract class NavigationListFragment<T, RequestManagerImpl extends Reque
         setupRetryLoadingButton();
 
         if (elements == null) {
-            elements = getNavigationList(getRequestManager(), null);
+            requestGetNavigationList(null);
         }
 
         updateAdapterAndViewsState();
@@ -131,8 +131,13 @@ public abstract class NavigationListFragment<T, RequestManagerImpl extends Reque
         updateNavigationListWithLastFilter();
     }
 
+    private void requestGetNavigationList(String filter) {
+        elements = getNavigationList(getRequestManager(), filter);
+        onNavigationListChanged(elements);
+    }
+
     private void onSwipeRefresh() {
-        elements = getNavigationList(getRequestManager(), lastFilter);
+        requestGetNavigationList(lastFilter);
         elements.setOnPageLoadingFinished(new NavigationList.OnPageLoadingFinished<T>() {
             @Override
             public void onLoadingFinished(List<T> elements) {
@@ -183,7 +188,7 @@ public abstract class NavigationListFragment<T, RequestManagerImpl extends Reque
 
     public void updateNavigationList(String filter) {
         lastFilter = filter;
-        elements = getNavigationList(getRequestManager(), filter);
+        requestGetNavigationList(filter);
         listViewState = null;
         updateAdapterAndViewsState();
     }
@@ -343,5 +348,9 @@ public abstract class NavigationListFragment<T, RequestManagerImpl extends Reque
         }
 
         return result;
+    }
+
+    protected void onNavigationListChanged(NavigationList<T> navigationList) {
+
     }
 }

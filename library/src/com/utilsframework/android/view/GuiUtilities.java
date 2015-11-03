@@ -468,16 +468,6 @@ public class GuiUtilities {
         }
     }
 
-    public static void scrollListViewToPosition(AbsListView listView, int position){
-        if(position == 0){
-            position = 1;
-        } else if(position < 0) {
-            return;
-        }
-
-        listView.setSelection(position - 1);
-    }
-
     public static int getChildrenHeight(ViewGroup viewGroup) {
         if (viewGroup.getChildCount() > 0) {
             View first = viewGroup.getChildAt(0);
