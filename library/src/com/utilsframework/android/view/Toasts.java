@@ -52,7 +52,6 @@ public class Toasts {
     }
 
     public static void messageAtCenter(Context context, CharSequence message) {
-
         View view = LayoutInflater.from(context).inflate(R.layout.centered_toast, null);
         TextView messageView = (TextView) view.findViewById(R.id.toast_text);
         messageView.setText(message);
@@ -62,5 +61,17 @@ public class Toasts {
         toast.setGravity(Gravity.CENTER, 0, 0);
         toast.setView(view);
         toast.show();
+    }
+
+    public static void customView(View view) {
+        Toast toast = new Toast(view.getContext());
+        toast.setDuration(Toast.LENGTH_SHORT);
+        toast.setView(view);
+        toast.show();
+    }
+
+    public static void customView(Context context, int layoutId) {
+        View view = View.inflate(context, layoutId, null);
+        customView(view);
     }
 }
