@@ -120,7 +120,7 @@ public final class Threading {
 
     public static abstract class Task<ErrorType extends Throwable, Result> {
         public abstract Result runOnBackground() throws ErrorType;
-        public abstract void onComplete(Result result, ErrorType error);
+        public void onComplete(Result result, ErrorType error) {}
         public void onCancelled(Result result, ErrorType error) {}
         public void onAfterCompleteOrCancelled() {}
     }
