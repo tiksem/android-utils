@@ -85,6 +85,11 @@ public abstract class NavigationDrawerActivity extends AppCompatActivity impleme
             protected TabsAdapter createTabsAdapter() {
                 return NavigationDrawerActivity.this.createTabsAdapter();
             }
+
+            @Override
+            protected void onTabsInit(int tabsCount, int navigationLevel) {
+                NavigationDrawerActivity.this.onTabsInit(tabsCount, navigationLevel);
+            }
         };
         navigationDrawer.init(getNavigationMode());
     }
@@ -167,7 +172,11 @@ public abstract class NavigationDrawerActivity extends AppCompatActivity impleme
     protected abstract NavigationDrawerMenuAdapter createNavigationDrawerMenuAdapter(int navigationViewId);
 
     protected TabsAdapter createTabsAdapter() {
-        return TabLayoutAdapter.fromViewStub(this, R.id.tabsStub, getTabLayoutId());
+        return TabLayoutAdapter.fromViewStub(this, getTabsStub(), getTabLayoutId());
+    }
+
+    protected int getTabsStub() {
+        return R.id.tabsStub;
     }
 
     protected DrawerLayoutAdapter createDrawerLayoutAdapter() {
@@ -176,5 +185,9 @@ public abstract class NavigationDrawerActivity extends AppCompatActivity impleme
 
     public NavigationMode getNavigationMode() {
         return NavigationMode.SHOW_BACK_FOR_NESTED_LEVELS;
+    }
+
+    protected void onTabsInit(int tabsCount, int navigationLevel) {
+
     }
 }

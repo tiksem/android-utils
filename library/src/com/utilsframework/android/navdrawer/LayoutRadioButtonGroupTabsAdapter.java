@@ -1,6 +1,7 @@
 package com.utilsframework.android.navdrawer;
 
 import android.app.Activity;
+import android.content.Context;
 import android.support.design.widget.TabLayout;
 import android.view.View;
 import android.view.ViewStub;
@@ -8,10 +9,12 @@ import com.utilsframework.android.view.LayoutRadioButtonGroup;
 
 /**
  * Created by stykhonenko on 28.10.15.
- * Not implemented, don't use
+ * Use this only if you want to create static tabs layout which would not change.
  */
 public class LayoutRadioButtonGroupTabsAdapter implements TabsAdapter {
     private final LayoutRadioButtonGroup radioButtonGroup;
+
+    private int newTabIndex = 0;
 
     private LayoutRadioButtonGroupTabsAdapter(Activity activity,
                                               int viewStubId,
@@ -22,11 +25,22 @@ public class LayoutRadioButtonGroupTabsAdapter implements TabsAdapter {
         radioButtonGroup = (LayoutRadioButtonGroup) viewStub.inflate().findViewById(idInLayout);
     }
 
+    private LayoutRadioButtonGroupTabsAdapter(Context context,
+                                              int layoutId,
+                                              int inLayoutId) {
+        View view = View.inflate(context, layoutId, null);
+        radioButtonGroup = (LayoutRadioButtonGroup) view.findViewById(inLayoutId);
+    }
+
     public static LayoutRadioButtonGroupTabsAdapter fromViewStub(Activity activity,
                                                 int viewStubId,
                                                 int layoutId,
                                                 int idInLayout) {
         return new LayoutRadioButtonGroupTabsAdapter(activity, viewStubId, layoutId, idInLayout);
+    }
+
+    public static LayoutRadioButtonGroupTabsAdapter fromLayoutId(Context context, int layoutId, int inLayoutId) {
+        return new LayoutRadioButtonGroupTabsAdapter(context, layoutId, inLayoutId);
     }
 
     private class TabHolder implements Tab {
@@ -38,22 +52,22 @@ public class LayoutRadioButtonGroupTabsAdapter implements TabsAdapter {
 
         @Override
         public void setText(CharSequence text) {
-
+            throw new UnsupportedOperationException();
         }
 
         @Override
         public void setText(int id) {
-
+            throw new UnsupportedOperationException();
         }
 
         @Override
         public void setIcon(int resourceId) {
-
+            throw new UnsupportedOperationException();
         }
 
         @Override
         public int getIndex() {
-            return 0;
+            return radioButton.getIndex();
         }
 
         @Override
@@ -75,21 +89,27 @@ public class LayoutRadioButtonGroupTabsAdapter implements TabsAdapter {
 
     @Override
     public Tab newTab(boolean isSelected) {
-        return null;
+        LayoutRadioButtonGroup.LayoutRadioButton button = radioButtonGroup.getItemByIndex(newTabIndex++);
+        if (isSelected) {
+            button.select();
+        }
+
+        return new TabHolder(button);
     }
 
+    // Will not actually remove tabs, just emulate
     @Override
     public void removeAllTabs() {
-
+        newTabIndex = 0;
     }
 
     @Override
     public void selectTab(int index) {
-
+        radioButtonGroup.setSelectedItemIndex(index);
     }
 
     @Override
     public View getView() {
-        return null;
+        return (View) radioButtonGroup.getParent();
     }
 }

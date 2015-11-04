@@ -1,6 +1,7 @@
 package com.utilsframework.android.navdrawer;
 
 import android.app.Activity;
+import android.content.Context;
 import android.support.design.widget.TabLayout;
 import android.view.View;
 import android.view.ViewStub;
@@ -52,6 +53,14 @@ public class TabLayoutAdapter implements TabsAdapter {
 
     public static TabLayoutAdapter fromViewStub(Activity activity, int viewStubId, int tabLayoutId) {
         return new TabLayoutAdapter(activity, viewStubId, tabLayoutId);
+    }
+
+    private TabLayoutAdapter(Context context, int tabLayoutId) {
+        tabLayout = (TabLayout) View.inflate(context, tabLayoutId, null);
+    }
+
+    public static TabLayoutAdapter fromLayoutId(Context context, int layoutId) {
+        return new TabLayoutAdapter(context, layoutId);
     }
 
     @Override

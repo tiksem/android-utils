@@ -45,6 +45,10 @@ public class LayoutRadioButtonGroup extends LinearLayout {
         childToSelect.isSelected = true;
     }
 
+    public void setSelectedItemIndex(int selectedItemIndex) {
+        setSelectedItemIndex(selectedItemIndex, false);
+    }
+
     private void setSelectedItemIndex(int selectedItemIndex,boolean fromUser) {
         if(selectedItemIndex != this.selectedItemIndex){
             LayoutRadioButton old = getSelectedItem();
@@ -87,6 +91,10 @@ public class LayoutRadioButtonGroup extends LinearLayout {
         throw new ItemNotFoundException();
     }
 
+    public LayoutRadioButton getItemByIndex(int index) {
+        return (LayoutRadioButton) getChildAt(index);
+    }
+
     public LayoutRadioButton getSelectedItem(){
         return (LayoutRadioButton)getChildAt(selectedItemIndex);
     }
@@ -96,13 +104,13 @@ public class LayoutRadioButtonGroup extends LinearLayout {
         return selectedItem.getId();
     }
 
-    private void setSelectedItem(LayoutRadioButton item,boolean fromUser) throws ItemNotFoundException{
+    private void setSelectedItem(LayoutRadioButton item, boolean fromUser) throws ItemNotFoundException{
         int index = getItemIndex(item);
         setSelectedItemIndex(index,fromUser);
     }
 
     public void setSelectedItem(LayoutRadioButton item) throws ItemNotFoundException{
-        setSelectedItem(item,false);
+        setSelectedItem(item, false);
     }
 
     private static final int[] IS_SELECTED = {R.attr.is_selected};

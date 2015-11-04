@@ -173,7 +173,9 @@ public class GuiUtilities {
 
     public static void removeView(View view) {
         ViewParent parent = view.getParent();
-        ((ViewGroup)parent).removeView(view);
+        if (parent != null) {
+            ((ViewGroup)parent).removeView(view);
+        }
     }
 
     public static void removeAllViews(Iterable<? extends View> views) {
@@ -529,5 +531,13 @@ public class GuiUtilities {
         for (int i = 0; i < childCount; i++) {
             viewGroup.getChildAt(i).setEnabled(enabled);
         }
+    }
+
+    public static void replaceView(View currentView, View newView) {
+        ViewGroup parent = (ViewGroup) currentView.getParent();
+        int indexOfChild = parent.indexOfChild(currentView);
+        parent.removeView(currentView);
+        GuiUtilities.removeView(newView);
+        parent.addView(newView, indexOfChild);
     }
 }

@@ -56,6 +56,7 @@ public abstract class NavigationFragmentDrawer {
 
         tabsAdapter.removeAllTabs();
         int tabsCount = fragmentFactory.getTabsCount(menuItemId, navigationLevel);
+        onTabsInit(tabsCount, navigationLevel);
         if (tabsCount <= 1) {
             if (createFragment) {
                 clearBackStack();
@@ -123,8 +124,11 @@ public abstract class NavigationFragmentDrawer {
         }
     }
 
+    protected abstract void onTabsInit(int tabsCount, int navigationLevel);
+
     public void init(NavigationMode navigationMode) {
         int tabsCount = fragmentFactory.getTabsCount(currentSelectedItem, navigationLevel);
+        onTabsInit(tabsCount, navigationLevel);
         if (tabsCount > 1) {
             tabsAdapter.getView().setVisibility(View.VISIBLE);
             initTabs(tabsCount, currentSelectedItem, navigationLevel, true, 0);
