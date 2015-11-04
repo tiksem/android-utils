@@ -127,6 +127,8 @@ public abstract class NavigationFragmentDrawer {
     protected abstract void onTabsInit(int tabsCount, int navigationLevel);
 
     public void init(NavigationMode navigationMode) {
+        this.navigationMode = navigationMode;
+
         int tabsCount = fragmentFactory.getTabsCount(currentSelectedItem, navigationLevel);
         onTabsInit(tabsCount, navigationLevel);
         if (tabsCount > 1) {
