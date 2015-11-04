@@ -21,7 +21,7 @@ public class LayoutRadioButtonGroup extends LinearLayout {
     public LayoutRadioButtonGroup(Context context, AttributeSet attrs) {
         super(context, attrs);
         TypedArray array = context.obtainStyledAttributes(attrs,R.styleable.LayoutRadioButtonGroup);
-        selectedItemIndex = array.getInt(R.styleable.LayoutRadioButtonGroup_selected_index,0);
+        selectedItemIndex = array.getInt(R.styleable.LayoutRadioButtonGroup_selected_index, -1);
         array.recycle();
     }
 
@@ -41,8 +41,10 @@ public class LayoutRadioButtonGroup extends LinearLayout {
             LayoutRadioButton child = (LayoutRadioButton) getChildAt(i);
             child.isSelected = false;
         }
-        LayoutRadioButton childToSelect = (LayoutRadioButton)getChildAt(selectedItemIndex);
-        childToSelect.isSelected = true;
+        if (selectedItemIndex >= 0) {
+            LayoutRadioButton childToSelect = (LayoutRadioButton)getChildAt(selectedItemIndex);
+            childToSelect.isSelected = true;
+        }
     }
 
     public void setSelectedItemIndex(int selectedItemIndex) {
@@ -64,7 +66,9 @@ public class LayoutRadioButtonGroup extends LinearLayout {
             this.selectedItemIndex = selectedItemIndex;
             internalSetSelectedItemIndex();
 
-            old.refreshDrawableState();
+            if (old != null) {
+                old.refreshDrawableState();
+            }
             item.refreshDrawableState();
         }
     }
@@ -96,7 +100,11 @@ public class LayoutRadioButtonGroup extends LinearLayout {
     }
 
     public LayoutRadioButton getSelectedItem(){
-        return (LayoutRadioButton)getChildAt(selectedItemIndex);
+        if (selectedItemIndex >= 0) {
+            return (LayoutRadioButton)getChildAt(selectedItemIndex);
+        } else {
+            return null;
+        }
     }
 
     public int getSelectedItemId(){
