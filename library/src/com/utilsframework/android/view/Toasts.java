@@ -7,7 +7,9 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.utils.framework.Cancelable;
 import com.utilsframework.android.R;
+import com.utilsframework.android.UiLoopEvent;
 
 /**
  * Created by Tikhonenko.S on 20.09.13.
@@ -63,15 +65,79 @@ public class Toasts {
         toast.show();
     }
 
-    public static void customView(View view) {
+    public static Toast customView(View view, int length) {
         Toast toast = new Toast(view.getContext());
-        toast.setDuration(Toast.LENGTH_SHORT);
+        toast.setDuration(length);
         toast.setView(view);
         toast.show();
+        return toast;
     }
 
-    public static void customView(Context context, int layoutId) {
+    public static Toast customView(Context context, int layoutId, int length) {
         View view = View.inflate(context, layoutId, null);
-        customView(view);
+        return customView(view, length);
+    }
+
+    public static Toast customViewAtCenter(View view, int length) {
+        Toast toast = new Toast(view.getContext());
+        toast.setDuration(length);
+        toast.setGravity(Gravity.CENTER, 0, 0);
+        toast.setView(view);
+        toast.show();
+        return toast;
+    }
+
+    public static Toast customViewAtCenter(Context context, int layoutId, int length) {
+        View view = View.inflate(context, layoutId, null);
+        return customViewAtCenter(view, length);
+    }
+
+    // Note: don't forget to cancel the toast in onDestroy/onViewDestroyed e.t.c.
+    public static Controller makeInfinite(final Toast toast) {
+        final UiLoopEvent uiLoopEvent = new UiLoopEvent(1000);
+        uiLoopEvent.run(new Runnable() {
+            @Override
+            public void run() {
+                toast.setDuration(Toast.LENGTH_LONG);
+                toast.show();
+            }
+        });
+
+        return new Controller() {
+            @Override
+            public void dismiss() {
+                toast.cancel();
+                uiLoopEvent.stop();
+            }
+
+            @Override
+            public void pauseShowing() {
+                toast.cancel();
+                uiLoopEvent.pause();
+            }
+
+            @Override
+            public void resumeShowing() {
+                toast.setDuration(Toast.LENGTH_LONG);
+                toast.show();
+                uiLoopEvent.resume();
+            }
+        };
+    }
+
+    public interface Controller {
+        void dismiss();
+        void pauseShowing();
+        void resumeShowing();
+    }
+
+    public static Controller infiniteCustomViewAtCenter(View view) {
+        Toast toast = customViewAtCenter(view, Toast.LENGTH_LONG);
+        return makeInfinite(toast);
+    }
+
+    public static Controller infiniteCustomViewAtCenter(Context context, int layoutId) {
+        View view = View.inflate(context, layoutId, null);
+        return infiniteCustomViewAtCenter(view);
     }
 }
