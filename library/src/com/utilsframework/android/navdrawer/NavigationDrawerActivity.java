@@ -36,7 +36,7 @@ public abstract class NavigationDrawerActivity extends AppCompatActivity impleme
 
             @Override
             protected int getContentId() {
-                return R.id.content;
+                return NavigationDrawerActivity.this.getContentId();
             }
 
             @Override
@@ -92,6 +92,10 @@ public abstract class NavigationDrawerActivity extends AppCompatActivity impleme
             }
         };
         navigationDrawer.init(getNavigationMode());
+    }
+
+    protected int getContentId() {
+        return R.id.content;
     }
 
     protected int getRootLayoutId() {
