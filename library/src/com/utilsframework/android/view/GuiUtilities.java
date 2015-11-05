@@ -527,9 +527,8 @@ public class GuiUtilities {
     }
 
     public static void setEnabledForChildren(ViewGroup viewGroup, boolean enabled) {
-        int childCount = viewGroup.getChildCount();
-        for (int i = 0; i < childCount; i++) {
-            viewGroup.getChildAt(i).setEnabled(enabled);
+        for (View child : getAllChildrenRecursive(viewGroup)) {
+            child.setEnabled(enabled);
         }
     }
 
