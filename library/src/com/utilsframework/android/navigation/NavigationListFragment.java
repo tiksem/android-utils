@@ -227,7 +227,9 @@ public abstract class NavigationListFragment<T, RequestManagerImpl extends Reque
                     showView(listView);
                 }
 
-                adapter.notifyDataSetChanged();
+                if (!page.isEmpty()) {
+                    adapter.notifyDataSetChanged();
+                }
             }
         });
 
