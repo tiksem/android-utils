@@ -9,6 +9,7 @@ import android.os.Build;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.*;
 import com.utilsframework.android.R;
 import com.utilsframework.android.threading.AsyncOperationCallback;
@@ -119,6 +120,8 @@ public final class Alerts {
         public int title;
         public int ok = R.string.ok;
         public int cancel = R.string.cancel;
+        public int layoutId = R.layout.input_alert;
+        public int hint = 0;
         public OnInputOk onInputOk;
     }
 
@@ -136,8 +139,9 @@ public final class Alerts {
     public static AlertDialog showAlertWithInput(Context context, final InputAlertSettings settings) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
 
-        final EditText editText = new EditText(context);
-        builder.setView(editText);
+        View root = View.inflate(context, settings.layoutId, null);
+        final EditText editText = GuiUtilities.getFirstChildWithTypeRecursive(root, EditText.class);
+        builder.setView(root);
 
         builder.setPositiveButton(settings.ok, new DialogInterface.OnClickListener() {
             @Override
@@ -162,6 +166,10 @@ public final class Alerts {
         }
         if (settings.message != 0) {
             builder.setMessage(settings.message);
+        }
+
+        if (settings.hint != 0) {
+            editText.setHint(settings.hint);
         }
 
         final AlertDialog alertDialog = builder.create();
