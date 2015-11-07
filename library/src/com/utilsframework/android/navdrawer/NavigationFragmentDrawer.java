@@ -122,6 +122,8 @@ public abstract class NavigationFragmentDrawer {
             TabsAdapter.Tab tab = tabsAdapter.newTab(i == selectedTabIndex);
             fragmentFactory.initTab(menuItemId, i, navigationLevel, tab);
         }
+
+        currentSelectedTabIndex = selectedTabIndex;
     }
 
     protected abstract void onTabsInit(int tabsCount, int navigationLevel);
