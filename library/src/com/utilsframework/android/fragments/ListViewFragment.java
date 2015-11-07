@@ -100,7 +100,7 @@ public abstract class ListViewFragment<T> extends Fragment implements SortListen
         int sortMenuId = getSortMenuId();
         if (sortMenuId != 0) {
             inflater.inflate(sortMenuId, menu);
-            sortAction = new SortMenuAction(menu, getSortMenuGroupId());
+            sortAction = new SortMenuAction(menu, getSortMenuGroupId(), getInitialSortOrder());
             sortAction.setSortListener(this);
         }
 
@@ -112,6 +112,10 @@ public abstract class ListViewFragment<T> extends Fragment implements SortListen
     }
 
     protected int getSortMenuGroupId() {
+        return 0;
+    }
+
+    protected int getInitialSortOrder() {
         return 0;
     }
 }

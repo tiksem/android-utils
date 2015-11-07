@@ -11,9 +11,14 @@ public class SortMenuAction {
     private SortListener sortListener;
     private int sortOrder;
 
-    public SortMenuAction(Menu menu, int sortGroupId) {
+    public SortMenuAction(Menu menu, int sortGroupId, int initialSortOrder) {
         MenuManager menuManager = new MenuManager(menu);
-        sortOrder = menuManager.getFirstCheckedItemOfGroup(sortGroupId).getItemId();
+        if (initialSortOrder == 0) {
+            sortOrder = menuManager.getFirstCheckedItemOfGroup(sortGroupId).getItemId();
+        } else {
+            sortOrder = initialSortOrder;
+            menu.findItem(initialSortOrder).setChecked(true);
+        }
 
         menuManager.setOnClickListenersForAllItemsInGroup(sortGroupId, new MenuItem.OnMenuItemClickListener() {
             @Override

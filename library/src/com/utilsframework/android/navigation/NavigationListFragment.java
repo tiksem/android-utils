@@ -287,7 +287,7 @@ public abstract class NavigationListFragment<T, RequestManagerImpl extends Reque
         int sortMenuId = getSortMenuId();
         if (sortMenuId != 0) {
             inflater.inflate(sortMenuId, menu);
-            sortAction = new SortMenuAction(menu, getSortMenuGroupId());
+            sortAction = new SortMenuAction(menu, getSortMenuGroupId(), getInitialSortOrder());
             sortAction.setSortListener(this);
         }
     }
@@ -311,6 +311,10 @@ public abstract class NavigationListFragment<T, RequestManagerImpl extends Reque
     @Override
     public void onSortOrderChanged(int newSortOrder) {
         updateNavigationListWithLastFilter();
+    }
+
+    protected int getInitialSortOrder() {
+        return 0;
     }
 
     protected int getSortMenuId() {
