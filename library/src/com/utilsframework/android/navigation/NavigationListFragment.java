@@ -34,6 +34,7 @@ public abstract class NavigationListFragment<T, RequestManagerImpl extends Reque
         extends RequestManagerFragment<RequestManagerImpl> implements SortListener {
     private ViewArrayAdapter<T, ?> adapter;
     private AbsListView listView;
+    private View emptyView;
     private NavigationList<T> elements;
     private Parcelable listViewState;
     private String lastFilter;
@@ -100,7 +101,15 @@ public abstract class NavigationListFragment<T, RequestManagerImpl extends Reque
         loadingView = view.findViewById(getLoadingResourceId());
         noConnectionView = view.findViewById(getNoInternetConnectionViewId());
 
-        viewsVisibilityToggle = new OneVisibleViewInGroupToggle(loadingView, listView, noConnectionView);
+        int emptyListResourceId = getEmptyListResourceId();
+        if (emptyListResourceId != 0) {
+            emptyView = view.findViewById(emptyListResourceId);
+            if (emptyView == null) {
+                throw new NullPointerException("emptyView not found");
+            }
+        }
+
+        viewsVisibilityToggle = new OneVisibleViewInGroupToggle(loadingView, listView, noConnectionView, emptyView);
     }
 
     private void setupRetryLoadingButton() {
@@ -183,6 +192,10 @@ public abstract class NavigationListFragment<T, RequestManagerImpl extends Reque
 
     protected abstract int getNoInternetConnectionViewId();
 
+    protected int getEmptyListResourceId() {
+        return 0;
+    }
+
     protected int getRetryLoadingButtonId() {
         return 0;
     }
@@ -203,14 +216,24 @@ public abstract class NavigationListFragment<T, RequestManagerImpl extends Reque
     }
 
     private void showView(View view) {
+        if (view == null) {
+            throw new NullPointerException();
+        }
+
         viewsVisibilityToggle.makeVisible(view);
         if (swipeRefreshLayout != null) {
-            swipeRefreshLayout.setEnabled(view == listView);
+            swipeRefreshLayout.setEnabled(view == listView || view == emptyView);
         }
 
         if (view == listView) {
             onListViewIsShown();
+        } else if(view == emptyView) {
+            onEmptyViewIsShown();
         }
+    }
+
+    protected void onEmptyViewIsShown() {
+
     }
 
     protected void onListViewIsShown() {
@@ -224,7 +247,7 @@ public abstract class NavigationListFragment<T, RequestManagerImpl extends Reque
             @Override
             public void onLoadingFinished(List<T> page) {
                 if (elements.getElementsCount() > 0 || elements.isAllDataLoaded()) {
-                    showView(listView);
+                    showListViewOrEmptyView();
                 }
 
                 if (!page.isEmpty()) {
@@ -245,12 +268,21 @@ public abstract class NavigationListFragment<T, RequestManagerImpl extends Reque
             elements.get(0);
             showView(loadingView);
         } else {
-            showView(listView);
+            showListViewOrEmptyView();
         }
 
         if (listViewState != null) {
             listView.onRestoreInstanceState(listViewState);
         }
+    }
+
+    private void showListViewOrEmptyView() {
+        if (emptyView != null && elements.isAllDataLoaded() && elements.isEmpty()) {
+            showView(emptyView);
+            return;
+        }
+
+        showView(listView);
     }
 
     protected void handleNavigationListError(Throwable e) {
@@ -306,6 +338,10 @@ public abstract class NavigationListFragment<T, RequestManagerImpl extends Reque
 
     public View getNoConnectionView() {
         return noConnectionView;
+    }
+
+    public View getEmptyView() {
+        return emptyView;
     }
 
     @Override

@@ -1,6 +1,7 @@
 package com.utilsframework.android.view;
 
 import android.view.View;
+import com.utils.framework.CollectionUtils;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -15,7 +16,7 @@ public class OneVisibleViewInGroupToggle {
     private View visible;
 
     public OneVisibleViewInGroupToggle(View visible, View... views) {
-        this.views = new LinkedHashSet<>(Arrays.asList(views));
+        this.views = CollectionUtils.asLinkedHashSetRemoveNulls(views);
         this.views.add(visible);
         makeVisible(visible);
     }
