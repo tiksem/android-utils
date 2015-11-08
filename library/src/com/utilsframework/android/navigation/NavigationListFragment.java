@@ -32,6 +32,9 @@ import java.util.List;
  */
 public abstract class NavigationListFragment<T, RequestManagerImpl extends RequestManager>
         extends RequestManagerFragment<RequestManagerImpl> implements SortListener {
+    private static final String LIST_VIEW_STATE = "LIST_VIEW_STATE";
+    private static final String SORT_ORDER = "SORT_ORDER";
+
     private ViewArrayAdapter<T, ?> adapter;
     private AbsListView listView;
     private View emptyView;
@@ -43,6 +46,7 @@ public abstract class NavigationListFragment<T, RequestManagerImpl extends Reque
     private SwipeRefreshLayout swipeRefreshLayout;
     private OneVisibleViewInGroupToggle viewsVisibilityToggle;
     private SortMenuAction sortAction;
+    private int restoredSortOrder = 0;
 
     @Override
     public void onAttach(Activity activity) {
@@ -173,6 +177,27 @@ public abstract class NavigationListFragment<T, RequestManagerImpl extends Reque
     public void onDestroyView() {
         super.onDestroyView();
         listViewState = listView.onSaveInstanceState();
+        restoredSortOrder = getSortOrder();
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        Parcelable listViewState = listView.onSaveInstanceState();
+        if (listViewState != null) {
+            outState.putParcelable(LIST_VIEW_STATE, listViewState);
+        }
+
+        outState.putInt(SORT_ORDER, getSortOrder());
+    }
+
+    @Override
+    public void onViewStateRestored(Bundle savedInstanceState) {
+        super.onViewStateRestored(savedInstanceState);
+        if (savedInstanceState != null) {
+            listViewState = savedInstanceState.getParcelable(LIST_VIEW_STATE);
+            restoredSortOrder = savedInstanceState.getInt(SORT_ORDER, 0);
+        }
     }
 
     public ViewArrayAdapter<T, ?> getAdapter() {
@@ -319,7 +344,12 @@ public abstract class NavigationListFragment<T, RequestManagerImpl extends Reque
         int sortMenuId = getSortMenuId();
         if (sortMenuId != 0) {
             inflater.inflate(sortMenuId, menu);
-            sortAction = new SortMenuAction(menu, getSortMenuGroupId(), getInitialSortOrder());
+            int sortOrder = restoredSortOrder;
+            if (sortOrder == 0) {
+                sortOrder = getInitialSortOrder();
+            }
+
+            sortAction = new SortMenuAction(menu, getSortMenuGroupId(), sortOrder);
             sortAction.setSortListener(this);
         }
     }
