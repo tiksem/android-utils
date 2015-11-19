@@ -738,4 +738,21 @@ public class BitmapUtilities {
             return null;
         }
     }
+
+    public static Bitmap createSquareBitmapCropToCenter(Bitmap bitmap) {
+        int width = bitmap.getWidth();
+        int height = bitmap.getHeight();
+
+        if (width > height) {
+            int x = (width - height) / 2;
+            int y = 0;
+            return Bitmap.createBitmap(bitmap, x, y, height, height);
+        } else if (height > width) {
+            int y = (height - width) / 2;
+            int x = 0;
+            return Bitmap.createBitmap(bitmap, x, y, width, width);
+        } else {
+            return bitmap;
+        }
+    }
 }
