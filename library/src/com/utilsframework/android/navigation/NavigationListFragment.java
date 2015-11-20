@@ -354,23 +354,23 @@ public abstract class NavigationListFragment<T, RequestManagerImpl extends Reque
         }
     }
 
-    public String getLastFilter() {
+    public final String getLastFilter() {
         return lastFilter;
     }
 
-    public AbsListView getListView() {
+    public final AbsListView getListView() {
         return listView;
     }
 
-    public View getLoadingView() {
+    public final View getLoadingView() {
         return loadingView;
     }
 
-    public View getNoConnectionView() {
+    public final View getNoConnectionView() {
         return noConnectionView;
     }
 
-    public View getEmptyView() {
+    public final View getEmptyView() {
         return emptyView;
     }
 
