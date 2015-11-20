@@ -34,6 +34,7 @@ public abstract class NavigationListFragment<T, RequestManagerImpl extends Reque
         extends RequestManagerFragment<RequestManagerImpl> implements SortListener {
     private static final String LIST_VIEW_STATE = "LIST_VIEW_STATE";
     private static final String SORT_ORDER = "SORT_ORDER";
+    private static final int SHOW_TOAST_MAX_ERROR_COUNT = 1;
 
     private ViewArrayAdapter<T, ?> adapter;
     private AbsListView listView;
@@ -160,11 +161,10 @@ public abstract class NavigationListFragment<T, RequestManagerImpl extends Reque
             }
         });
 
-        elements.setOnError(new OnError() {
+        elements.setOnError(new NavigationList.PageLoadingError() {
             @Override
-            public void onError(Throwable e) {
-                handleNavigationListError(e);
-                swipeRefreshLayout.setRefreshing(false);
+            public void onError(int errorCount, Throwable error) {
+                handleNavigationListError(errorCount, error);
             }
         });
 
@@ -281,10 +281,10 @@ public abstract class NavigationListFragment<T, RequestManagerImpl extends Reque
             }
         });
 
-        elements.setOnError(new OnError() {
+        elements.setOnError(new NavigationList.PageLoadingError() {
             @Override
-            public void onError(Throwable e) {
-                handleNavigationListError(e);
+            public void onError(int errorCount, Throwable error) {
+                handleNavigationListError(errorCount, error);
             }
         });
 
@@ -310,10 +310,10 @@ public abstract class NavigationListFragment<T, RequestManagerImpl extends Reque
         showView(listView);
     }
 
-    protected void handleNavigationListError(Throwable e) {
+    protected void handleNavigationListError(int errorCount, Throwable e) {
         if (elements.getElementsCount() == 0) {
             showView(noConnectionView);
-        } else {
+        } else if(errorCount <= SHOW_TOAST_MAX_ERROR_COUNT) {
             Toasts.error(listView.getContext(), R.string.no_internet_connection);
         }
     }
