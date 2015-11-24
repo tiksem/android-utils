@@ -68,7 +68,7 @@ public abstract class NavigationDrawerActivity extends AppCompatActivity impleme
 
             @Override
             protected int getToolBarStubId() {
-                return R.id.toolbarStub;
+                return NavigationDrawerActivity.this.getToolBarStubId();
             }
 
             @Override
@@ -193,5 +193,9 @@ public abstract class NavigationDrawerActivity extends AppCompatActivity impleme
 
     protected void onTabsInit(int tabsCount, int navigationLevel) {
 
+    }
+
+    protected int getToolBarStubId() {
+        return R.id.toolbarStub;
     }
 }

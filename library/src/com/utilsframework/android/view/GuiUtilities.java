@@ -48,7 +48,7 @@ public class GuiUtilities {
 
     public static List<View> getAllChildrenRecursive(View view){
         if(!(view instanceof ViewGroup)){
-            return new ArrayList<View>();
+            return Collections.emptyList();
         }
 
         List<View> result = new ArrayList<View>();
