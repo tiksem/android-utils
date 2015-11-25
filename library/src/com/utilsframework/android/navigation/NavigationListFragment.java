@@ -330,6 +330,11 @@ public abstract class NavigationListFragment<T, RequestManagerImpl extends Reque
                 protected void onExpandCollapse(boolean expanded) {
                     onSearchViewExpandCollapse(menu, expanded);
                 }
+
+                @Override
+                protected int getSearchMenuId() {
+                    return NavigationListFragment.this.getSearchMenuId();
+                }
             };
             search.setSearchListener(new SearchListener() {
                 @Override
@@ -352,6 +357,10 @@ public abstract class NavigationListFragment<T, RequestManagerImpl extends Reque
             sortAction = new SortMenuAction(menu, getSortMenuGroupId(), sortOrder);
             sortAction.setSortListener(this);
         }
+    }
+
+    protected int getSearchMenuId() {
+        return R.menu.search;
     }
 
     public final String getLastFilter() {
