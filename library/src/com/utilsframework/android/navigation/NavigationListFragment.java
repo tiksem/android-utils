@@ -301,9 +301,13 @@ public abstract class NavigationListFragment<T, RequestManagerImpl extends Reque
         }
     }
 
+    protected void onEmptyResults() {
+        showView(emptyView);
+    }
+
     private void showListViewOrEmptyView() {
         if (emptyView != null && elements.isAllDataLoaded() && elements.isEmpty()) {
-            showView(emptyView);
+            onEmptyResults();
             return;
         }
 
