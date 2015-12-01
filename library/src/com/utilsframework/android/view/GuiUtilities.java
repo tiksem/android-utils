@@ -21,6 +21,7 @@ import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.support.design.widget.TabLayout;
+import android.support.v4.graphics.drawable.DrawableCompat;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -562,5 +563,13 @@ public class GuiUtilities {
         Drawable thumb = seekBar.getSeekBarThumb();
         thumb.mutate().setColorFilter(color, PorterDuff.Mode.SRC_IN);
         seekBar.setThumb(thumb);
+    }
+
+    public static void setButtonTintColors(Button button, int colorResourceId) {
+        Drawable background = button.getBackground();
+        background = DrawableCompat.wrap(background);
+        DrawableCompat.setTintList(background, button.getContext().getResources().
+                getColorStateList(colorResourceId));
+        button.setBackgroundDrawable(background);
     }
 }
