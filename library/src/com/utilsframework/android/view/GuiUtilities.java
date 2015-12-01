@@ -14,6 +14,8 @@ import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Point;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
@@ -25,10 +27,7 @@ import android.util.Log;
 import android.view.*;
 
 import android.view.inputmethod.InputMethodManager;
-import android.widget.AbsListView;
-import android.widget.EditText;
-import android.widget.FrameLayout;
-import android.widget.ImageView;
+import android.widget.*;
 import com.utils.framework.CollectionUtils;
 import com.utils.framework.Predicate;
 import com.utils.framework.predicates.InstanceOfPredicate;
@@ -538,5 +537,30 @@ public class GuiUtilities {
         parent.removeView(currentView);
         GuiUtilities.removeView(newView);
         parent.addView(newView, indexOfChild);
+    }
+
+    public static void setProgressBarTintColor(ProgressBar progressBar, int color) {
+        Drawable progressDrawable = progressBar.getProgressDrawable();
+        progressDrawable.mutate().setColorFilter(color, PorterDuff.Mode.SRC_IN);
+        progressBar.setProgressDrawable(progressDrawable);
+
+        Drawable indeterminateDrawable = progressBar.getIndeterminateDrawable();
+        indeterminateDrawable.mutate().setColorFilter(color, PorterDuff.Mode.SRC_IN);
+        progressBar.setIndeterminateDrawable(indeterminateDrawable);
+    }
+
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
+    public static void setSeekBarTintColor(SeekBar seekBar, int color) {
+        setProgressBarTintColor(seekBar, color);
+        Drawable thumb = seekBar.getThumb();
+        thumb.mutate().setColorFilter(color, PorterDuff.Mode.SRC_IN);
+        seekBar.setThumb(thumb);
+    }
+
+    public static void setSeekBarTintColor(ExtendedSeekBar seekBar, int color) {
+        setProgressBarTintColor(seekBar, color);
+        Drawable thumb = seekBar.getSeekBarThumb();
+        thumb.mutate().setColorFilter(color, PorterDuff.Mode.SRC_IN);
+        seekBar.setThumb(thumb);
     }
 }
