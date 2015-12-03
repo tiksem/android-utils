@@ -572,4 +572,24 @@ public class GuiUtilities {
                 getColorStateList(colorResourceId));
         button.setBackgroundDrawable(background);
     }
+
+    public static boolean isPointInView(float x, float y, View view) {
+        float viewX = view.getX();
+        float viewY = view.getY();
+
+        float width = view.getMeasuredWidth();
+        float height = view.getMeasuredHeight();
+
+        float xDiff = x - viewX;
+        if (xDiff < 0 || xDiff >= width) {
+            return false;
+        }
+
+        float yDiff = y - viewY;
+        if (yDiff < 0 || yDiff >= height) {
+            return false;
+        }
+
+        return true;
+    }
 }
