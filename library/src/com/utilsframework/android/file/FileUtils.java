@@ -3,6 +3,7 @@ package com.utilsframework.android.file;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Environment;
 import com.utilsframework.android.threading.BackgroundLoopEvent;
@@ -179,5 +180,42 @@ public final class FileUtils {
     public static void updateSDCard(Context context) {
         context.sendBroadcast(new Intent(Intent.ACTION_MEDIA_MOUNTED,
                 Uri.parse("file://" + Environment.getExternalStorageDirectory())));
+    }
+
+    private static class SingleMediaScanner implements MediaScannerConnection.MediaScannerConnectionClient {
+
+        private MediaScannerConnection connection;
+        private String filePath;
+
+        public SingleMediaScanner(Context context, String filePath) {
+            this.filePath = filePath;
+            connection = new MediaScannerConnection(context, this);
+            connection.connect();
+        }
+
+        @Override
+        public void onMediaScannerConnected() {
+            connection.scanFile(filePath, null);
+        }
+
+        @Override
+        public void onScanCompleted(String path, Uri uri) {
+            connection.disconnect();
+        }
+
+    }
+
+    public interface OnFileScanned {
+        void onFileScanned(String filePath);
+    }
+
+    public static void scanFile(Context context, final String filePath, final OnFileScanned onFileScanned) {
+        new SingleMediaScanner(context, filePath) {
+            @Override
+            public void onScanCompleted(String path, Uri uri) {
+                super.onScanCompleted(path, uri);
+                onFileScanned.onFileScanned(filePath);
+            }
+        };
     }
 }

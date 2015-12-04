@@ -8,6 +8,7 @@ import android.os.Handler;
 import android.os.IBinder;
 import com.utils.framework.io.Network;
 import com.utils.framework.io.ProgressListener;
+import com.utilsframework.android.file.FileUtils;
 import com.utilsframework.android.threading.Threading;
 
 import java.io.File;
@@ -143,7 +144,15 @@ public abstract class DownloadFileService extends Service {
                     deleteFileAsync(saveFileName);
                     onHandleError(error);
                 } else {
-                    onFileDownloaded(saveFileName);
+                    onFileDownloaded(saveFileName, intent);
+                    if (shouldScanFileWithMediaScanner()) {
+                        FileUtils.scanFile(DownloadFileService.this, saveFileName, new FileUtils.OnFileScanned() {
+                            @Override
+                            public void onFileScanned(String filePath) {
+                                DownloadFileService.this.onFileScanned(saveFileName, intent);
+                            }
+                        });
+                    }
                 }
             }
 
@@ -158,7 +167,18 @@ public abstract class DownloadFileService extends Service {
         });
     }
 
-    protected abstract void onFileDownloaded(String saveFileName);
+    protected void onFileDownloaded(String saveFileName, Intent intent) {
+
+    }
+
+    protected void onFileScanned(String saveFileName, Intent intent) {
+
+    }
+
+    protected boolean shouldScanFileWithMediaScanner() {
+        return true;
+    }
+
     protected abstract void onHandleError(IOException error);
     protected abstract void onProgressChanged(int fileIndex, int max, int progress);
 
