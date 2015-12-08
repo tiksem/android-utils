@@ -371,7 +371,8 @@ public final class Alerts {
         // https://code.google.com/p/android/issues/detail?id=42750
         // Set then reset the date on the calendar so that it properly
         // shows today's date. The choice of 24 months is arbitrary.
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB &&
+                Build.VERSION.SDK_INT <= Build.VERSION_CODES.LOLLIPOP) {
             final CalendarView cal = datePicker.getCalendarView();
             if (cal != null) {
                 date.add(Calendar.MONTH, 24);
@@ -403,6 +404,7 @@ public final class Alerts {
         minimumDateCalendar.set(Calendar.SECOND, 0);
         minimumDateCalendar.set(Calendar.MILLISECOND, 0);
         datePicker.setMinDate(minimumDateCalendar.getTimeInMillis());
+        datePicker.setCalendarViewShown(true);
         fixUpDatePickerCalendarView(datePicker, minimumDateCalendar);
 
         if (settings.clearTime) {
