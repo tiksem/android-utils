@@ -6,8 +6,7 @@
 
     <string name="crop__done">DONE</string>
     <string name="crop__cancel" tools:ignore="ButtonCase">CANCEL</string>
-
-    <string name="app_name">Crop Demo</string>
+    
     <string name="action_select">Select</string>
 
     <string name="drawer_open">Open navigation drawer</string>
