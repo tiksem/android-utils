@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent">
+    <CalendarView android:id="@+id/start"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+    <CalendarView android:id="@+id/end"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+</LinearLayout><!-- From: file:/Users/mac/Projects/Events/dependencies/android-utils/library/src/main/res/layout/date_range_picker.xml -->
