@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<GridView xmlns:android="http://schemas.android.com/apk/res/android"
-              android:id="@+id/list"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent">
-
-</GridView><!-- From: file:/Users/mac/Projects/Events/dependencies/android-utils/library/src/main/res/layout/grid.xml -->
