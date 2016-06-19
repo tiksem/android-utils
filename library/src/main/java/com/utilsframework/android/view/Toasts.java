@@ -50,7 +50,7 @@ public class Toasts {
 
     public static void message(Context context, int stringResourceId) {
         String message = context.getResources().getString(stringResourceId);
-        error(context, message);
+        message(context, message);
     }
 
     public static void messageAtCenter(Context context, CharSequence message) {
