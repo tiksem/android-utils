@@ -1,7 +1,7 @@
 # Gradle
 .gradle/
 build/
-library/build
+library/build/
 # built application files
 *.apk
 *.ap_
