@@ -31,7 +31,7 @@ public class PermissionUtils {
                                           int description) {
         if (ActivityCompat.shouldShowRequestPermissionRationale(activity,
                 Manifest.permission.READ_EXTERNAL_STORAGE)) {
-            Toasts.message(activity, description);
+            Toasts.toast(activity, description);
         }
 
         ActivityCompat.requestPermissions(activity,

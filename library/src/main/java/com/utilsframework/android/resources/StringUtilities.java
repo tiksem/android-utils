@@ -1,13 +1,9 @@
 package com.utilsframework.android.resources;
 
 import android.content.Context;
-import android.content.res.AssetManager;
-import android.content.res.Configuration;
-import android.content.res.Resources;
-import android.util.DisplayMetrics;
+import android.text.Html;
+import android.text.Spanned;
 import android.widget.TextView;
-
-import java.util.Locale;
 
 /**
  * Created by CM on 1/21/2015.
@@ -22,5 +18,10 @@ public class StringUtilities {
         String string = context.getString(stringId);
         string = String.format(string, args);
         return string;
+    }
+
+    public static Spanned fromHtml(Context context, int html, Object... args) {
+        final String htmlString = context.getString(html, args);
+        return Html.fromHtml(htmlString);
     }
 }

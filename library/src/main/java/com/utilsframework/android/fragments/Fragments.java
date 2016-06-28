@@ -70,6 +70,16 @@ public class Fragments {
         return arguments.getParcelable(key);
     }
 
+    public static <T extends Parcelable> T getParcelable(android.support.v4.app.Fragment fragment,
+                                                         String key) {
+        Bundle arguments = fragment.getArguments();
+        if(arguments == null){
+            return null;
+        }
+
+        return arguments.getParcelable(key);
+    }
+
     // use replaceFragment instead
     @Deprecated
     public static void addFragment(Activity activity, int containerId, Fragment fragment) {

@@ -9,7 +9,6 @@ import android.os.Build;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.*;
 import com.utilsframework.android.R;
 import com.utilsframework.android.threading.AsyncOperationCallback;
@@ -17,7 +16,6 @@ import com.utilsframework.android.threading.Cancelable;
 import com.utilsframework.android.time.TimeUtils;
 
 import java.util.Calendar;
-import java.util.Date;
 import java.util.GregorianCalendar;
 
 /**
@@ -26,51 +24,6 @@ import java.util.GregorianCalendar;
  * Time: 17:21
  */
 public final class Alerts {
-    public static class YesNoAlertSettings {
-        public CharSequence title = "";
-        public CharSequence message = null;
-        public int yesButtonText = R.string.yes;
-        public int noButtonText = R.string.no;
-        public OnYes onYes;
-        public OnNo onNo;
-    }
-
-    public static void showYesNoAlert(Context context, OnYes onYes, int messageId) {
-        YesNoAlertSettings settings = new YesNoAlertSettings();
-        settings.message = context.getString(messageId);
-        settings.onYes = onYes;
-        showYesNoAlert(context, settings);
-    }
-
-    public static void showYesNoAlert(Context context, final YesNoAlertSettings settings) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
-
-        builder.setPositiveButton(settings.yesButtonText, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                if(settings.onYes != null){
-                    settings.onYes.onYes();
-                }
-            }
-        });
-
-        builder.setNegativeButton(settings.noButtonText, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                if (settings.onNo != null) {
-                    settings.onNo.onNo();
-                }
-            }
-        });
-
-        builder.setTitle(settings.title);
-        if (settings.message != null) {
-            builder.setMessage(settings.message);
-        }
-
-        builder.create().show();
-    }
-
     public static class OkAlertSettings {
         public CharSequence title = "";
         public CharSequence message = "";
@@ -102,6 +55,29 @@ public final class Alerts {
     }
     public static void showOkButtonAlert(Context context, int message) {
         showOkButtonAlert(context, context.getString(message));
+    }
+
+    public static void showYesNoAlert(final YesNoAlertSettings settings) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(settings.context);
+
+        builder.setPositiveButton(settings.yesButtonText, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                settings.onYes();
+            }
+        });
+
+        builder.setNegativeButton(settings.noButtonText, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                settings.onNo();
+            }
+        });
+
+        builder.setTitle(settings.title);
+        builder.setMessage(settings.message);
+
+        builder.create().show();
     }
 
     public static AlertDialog showAlertWithCustomView(Context context, View view, CharSequence message){
@@ -462,7 +438,7 @@ public final class Alerts {
             @Override
             public void onClick(View v) {
                 if (start.getDate() >= end.getDate()) {
-                    Toasts.error(context, context.getString(settings.invalidRangeErrorId));
+                    Toasts.toast(context, context.getString(settings.invalidRangeErrorId));
                 } else {
                     if (settings.onDateRangeSelected != null) {
                         GregorianCalendar first = new GregorianCalendar();

@@ -318,7 +318,7 @@ public abstract class NavigationListFragment<T, RequestManagerImpl extends Reque
         if (elements.getElementsCount() == 0) {
             showView(noConnectionView);
         } else if(errorCount <= SHOW_TOAST_MAX_ERROR_COUNT) {
-            Toasts.error(listView.getContext(), R.string.no_internet_connection);
+            Toasts.toast(listView.getContext(), R.string.no_internet_connection);
         }
     }
 

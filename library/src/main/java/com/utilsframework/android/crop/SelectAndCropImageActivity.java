@@ -4,29 +4,23 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Point;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 import com.utilsframework.android.ImagePicker;
 import com.utilsframework.android.R;
-import com.utilsframework.android.bitmap.BitmapUtilities;
 import com.utilsframework.android.view.Alerts;
 import com.utilsframework.android.view.GuiUtilities;
 import com.utilsframework.android.view.OnNo;
 import com.utilsframework.android.view.OnYes;
+import com.utilsframework.android.view.YesNoAlertSettings;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.InputStream;
 
 public class SelectAndCropImageActivity extends Activity {
     public static final String ASPECT_RATIO_KEY = "ASPECT_RATIO_KEY";
@@ -49,36 +43,32 @@ public class SelectAndCropImageActivity extends Activity {
     }
 
     private static void start(final Activity activity, final Fragment fragment,
-                              Params params, final int requestCode) {
+                              final Params params, final int requestCode) {
         Context context = activity != null ? activity : fragment.getActivity();
 
         final Intent intent = new Intent(context, SelectAndCropImageActivity.class);
         intent.putExtra(ASPECT_RATIO_KEY, params.aspectRatio);
 
         if(params.importPhotoMode == ImportPhotoMode.SHOW_ALERT){
-            String galleryCameraAlertText = params.galleryCameraAlertText;
-            if(galleryCameraAlertText == null){
-                galleryCameraAlertText = "";
-            }
+            YesNoAlertSettings settings = new YesNoAlertSettings(context) {
+                {
+                    yesButtonText = R.string.gallery;
+                    noButtonText = R.string.camera;
+                    title = params.galleryCameraAlertText;
+                }
 
-            Alerts.YesNoAlertSettings settings = new Alerts.YesNoAlertSettings();
-            settings.yesButtonText = R.string.gallery;
-            settings.noButtonText = R.string.camera;
-            settings.onYes = new OnYes() {
                 @Override
                 public void onYes() {
                     GuiUtilities.startActivityForResult(activity, fragment, intent, requestCode);
                 }
-            };
-            settings.onNo = new OnNo() {
+
                 @Override
                 public void onNo() {
                     intent.putExtra(SHOULD_PICK_IMAGE_FROM_CAMERA, true);
                     GuiUtilities.startActivityForResult(activity, fragment, intent, requestCode);
                 }
             };
-            settings.title = galleryCameraAlertText;
-            Alerts.showYesNoAlert(context, settings);
+            Alerts.showYesNoAlert(settings);
         } else {
             if(params.importPhotoMode == ImportPhotoMode.FROM_CAMERA){
                 intent.putExtra(SHOULD_PICK_IMAGE_FROM_CAMERA, true);

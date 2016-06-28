@@ -367,4 +367,14 @@ public abstract class ViewArrayAdapter<Element, ViewHolder> extends BaseAdapter 
     public boolean areAllItemsEnabled() {
         return false;
     }
+
+    public void removeItemAt(int index) {
+        elements.remove(index);
+        notifyDataSetChanged();
+    }
+
+    public void removeItem(Element item) {
+        elements.remove(item);
+        notifyDataSetChanged();
+    }
 }
