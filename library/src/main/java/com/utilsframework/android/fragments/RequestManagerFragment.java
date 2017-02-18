@@ -1,31 +1,29 @@
 package com.utilsframework.android.fragments;
 
-import android.app.Activity;
+import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.view.View;
 
-import com.utilsframework.android.network.LegacyRequestManager;
+import com.utilsframework.android.network.retrofit.RetrofitRequestManager;
 
-/**
- * Created by stykhonenko on 12.10.15.
- */
-public abstract class RequestManagerFragment<RequestManagerImpl extends LegacyRequestManager> extends Fragment {
-    private RequestManagerImpl requestManager;
+public abstract class RequestManagerFragment extends Fragment {
+    private RetrofitRequestManager requestManager;
 
-    public RequestManagerImpl getRequestManager() {
+    public RetrofitRequestManager getRequestManager() {
         return requestManager;
     }
 
     @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
         requestManager = obtainRequestManager();
     }
 
     @Override
-    public void onDetach() {
-        super.onDetach();
+    public void onDestroyView() {
+        super.onDestroyView();
         requestManager.cancelAll();
     }
 
-    protected abstract RequestManagerImpl obtainRequestManager();
+    protected abstract RetrofitRequestManager obtainRequestManager();
 }

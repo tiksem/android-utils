@@ -16,7 +16,7 @@ import java.io.IOException;
  * Created by CM on 7/2/2015.
  */
 public abstract class PageLoadingFragment<RequestManagerImpl extends LegacyRequestManager, Data>
-        extends RequestManagerFragment<RequestManagerImpl> {
+        extends LegacyRequestManagerFragment<RequestManagerImpl> {
     private View content;
     private View loading;
     private View noConnection;

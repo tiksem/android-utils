@@ -17,6 +17,10 @@ public class OneVisibleViewInGroupToggle {
 
     public OneVisibleViewInGroupToggle(View visible, View... views) {
         this.views = CollectionUtils.asLinkedHashSetRemoveNulls(views);
+        if (visible == null) {
+            throw new NullPointerException("visible view should not be null");
+        }
+
         this.views.add(visible);
         makeVisible(visible);
     }

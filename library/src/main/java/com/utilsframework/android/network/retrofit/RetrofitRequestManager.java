@@ -1,21 +1,27 @@
 package com.utilsframework.android.network.retrofit;
 
+import android.util.Log;
+
 import com.utilsframework.android.network.BaseRequestManager;
 import com.utilsframework.android.network.CancelStrategy;
+import com.utilsframework.android.network.HttpResponseException;
 import com.utilsframework.android.network.RequestListener;
 import com.utilsframework.android.threading.AbstractCancelable;
 import com.utilsframework.android.threading.Cancelable;
+
+import java.io.IOException;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public abstract class RetrofitRequestManager<ErrorData> extends BaseRequestManager
-        implements RetrofitRequestExecutor<ErrorData> {
+public abstract class RetrofitRequestManager extends BaseRequestManager
+        implements RetrofitRequestExecutor {
+    private static final String TAG = RetrofitRequestManager.class.getSimpleName();
+
     @Override
     public <Result> void executeCall(final Call<Result> call,
-                                     final RequestListener<Result,
-                                             RetrofitError<ErrorData>> requestListener,
+                                     final RequestListener<Result, Throwable> requestListener,
                                      final CancelStrategy cancelStrategy) {
         if (requestListener != null) {
             requestListener.onPreExecute();
@@ -38,11 +44,20 @@ public abstract class RetrofitRequestManager<ErrorData> extends BaseRequestManag
                         requestListener.onCanceled();
                     } else if(response.isSuccessful()) {
                         requestListener.onSuccess(response.body());
+                        requestListener.onSuccessOrError();
                     } else {
-                        ErrorData errorData = createErrorData(response);
-                        RetrofitError<ErrorData> retrofitError = new RetrofitError<ErrorData>(null,
-                                errorData);
-                        requestListener.onError(retrofitError);
+                        try {
+                            Object data = getHttpResponseExceptionData(response);
+                            int code = response.code();
+                            String message = getErrorMessage(data, response);
+                            HttpResponseException e = new HttpResponseException(code, message);
+                            e.setData(data);
+                            requestListener.onError(e);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                            requestListener.onError(e);
+                        }
+                        requestListener.onSuccessOrError();
                     }
 
                     requestListener.onAfterCompleteOrCanceled();
@@ -53,12 +68,16 @@ public abstract class RetrofitRequestManager<ErrorData> extends BaseRequestManag
 
             @Override
             public void onFailure(Call<Result> call, Throwable t) {
+                if (t != null) {
+                    Log.i(TAG, "request failed", t);
+                }
+
                 if (requestListener != null) {
                     if (call.isCanceled()) {
                         requestListener.onCanceled();
                         requestListener.onAfterCompleteOrCanceled();
                     } else {
-                        requestListener.onError(new RetrofitError<ErrorData>(t, null));
+                        requestListener.onError(t);
                         requestListener.onSuccessOrError();
                     }
 
@@ -72,5 +91,16 @@ public abstract class RetrofitRequestManager<ErrorData> extends BaseRequestManag
         notifyTaskExecuting(cancelable, cancelStrategy);
     }
 
-    protected abstract <Data> ErrorData createErrorData(Response<Data> response);
+    protected <T> Object getHttpResponseExceptionData(Response<T> response)
+            throws IOException {
+        return null;
+    }
+
+    protected String getErrorMessage(Object errorData, Response response) {
+        if (errorData != null) {
+            return errorData.toString();
+        } else {
+            return "Http response error " + response.code();
+        }
+    }
 }

@@ -17,7 +17,7 @@ import com.utilsframework.android.menu.SearchListener;
 import com.utilsframework.android.menu.SearchMenuAction;
 import com.utilsframework.android.menu.SortListener;
 import com.utilsframework.android.menu.SortMenuAction;
-import com.utilsframework.android.network.LegacyRequestManager;
+import com.utilsframework.android.network.retrofit.RetrofitRequestManager;
 import com.utilsframework.android.view.OneVisibleViewInGroupToggle;
 import com.utilsframework.android.view.Toasts;
 import com.utilsframework.android.view.listview.SwipeLayoutListViewTouchListener;
@@ -28,8 +28,8 @@ import java.util.List;
 /**
  * Created by CM on 6/21/2015.
  */
-public abstract class LazyLoadingListFragment<T, RequestManagerImpl extends LegacyRequestManager>
-        extends RequestManagerFragment<RequestManagerImpl> implements SortListener {
+public abstract class LazyLoadingListFragment<T>
+        extends RequestManagerFragment implements SortListener {
     private static final String LIST_VIEW_STATE = "LIST_VIEW_STATE";
     private static final String SORT_ORDER = "SORT_ORDER";
     private static final int SHOW_TOAST_MAX_ERROR_COUNT = 1;
@@ -85,7 +85,7 @@ public abstract class LazyLoadingListFragment<T, RequestManagerImpl extends Lega
     }
 
     private void setupListViewListenersAndAdapter() {
-        adapter = createAdapter(getRequestManager());
+        adapter = createAdapter();
         listView.setAdapter(adapter);
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -101,7 +101,16 @@ public abstract class LazyLoadingListFragment<T, RequestManagerImpl extends Lega
 
     private void setupViews(View view) {
         listView = (AbsListView) view.findViewById(getListResourceId());
+        if (listView == null) {
+            throw new NullPointerException("getListResourceId returns invalid id, " +
+                    "listView == null");
+        }
         loadingView = view.findViewById(getLoadingResourceId());
+        if (loadingView == null) {
+            throw new NullPointerException("getLoadingResourceId returns invalid id, " +
+                    "loadingView == null");
+        }
+
         noConnectionView = view.findViewById(getNoInternetConnectionViewId());
 
         int emptyListResourceId = getEmptyListResourceId();
@@ -144,7 +153,7 @@ public abstract class LazyLoadingListFragment<T, RequestManagerImpl extends Lega
     }
 
     private void requestGetNavigationList(String filter) {
-        elements = getNavigationList(getRequestManager(), filter);
+        elements = getLazyLoadingList(getRequestManager(), filter);
         sort(elements.getElements());
         onNavigationListChanged(elements);
     }
@@ -206,8 +215,9 @@ public abstract class LazyLoadingListFragment<T, RequestManagerImpl extends Lega
 
     protected abstract int getLoadingResourceId();
 
-    protected abstract ViewArrayAdapter<T, ? extends Object> createAdapter(RequestManagerImpl requestManager);
-    protected abstract LazyLoadingList<T> getNavigationList(RequestManagerImpl requestManager, String filter);
+    protected abstract ViewArrayAdapter<T, ? extends Object> createAdapter();
+    protected abstract LazyLoadingList<T> getLazyLoadingList(RetrofitRequestManager requestManager,
+                                                             String filter);
 
     protected abstract void onListItemClicked(T item, int position);
 

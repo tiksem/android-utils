@@ -5,7 +5,7 @@ import com.utilsframework.android.network.RequestListener;
 
 import retrofit2.Call;
 
-public interface RetrofitRequestExecutor<ErrorData> {
-    <Result> void executeCall(Call<Result> call, RequestListener<Result,
-            RetrofitError<ErrorData>> requestListener, CancelStrategy cancelStrategy);
+public interface RetrofitRequestExecutor {
+    <Result> void executeCall(Call<Result> call, RequestListener<Result, Throwable> requestListener,
+                              CancelStrategy cancelStrategy);
 }
