@@ -8,12 +8,12 @@ import com.utilsframework.android.adapters.ViewArrayAdapter;
 /**
  * Created by CM on 6/22/2015.
  */
-public abstract class NavigationListAdapter<Element, ViewHolder> extends ViewArrayAdapter<Element, ViewHolder> {
-    public NavigationListAdapter(Context context) {
+public abstract class LazyLoadingListAdapter<Element, ViewHolder> extends ViewArrayAdapter<Element, ViewHolder> {
+    public LazyLoadingListAdapter(Context context) {
         super(context);
     }
 
-    public NavigationListAdapter(Context context, View header) {
+    public LazyLoadingListAdapter(Context context, View header) {
         super(context, header);
     }
 

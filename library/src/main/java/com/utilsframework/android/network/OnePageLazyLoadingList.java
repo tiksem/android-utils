@@ -1,7 +1,7 @@
 package com.utilsframework.android.network;
 
 import com.utils.framework.OnError;
-import com.utils.framework.collections.NavigationList;
+import com.utils.framework.collections.LazyLoadingList;
 import com.utils.framework.collections.OnLoadingFinished;
 import com.utilsframework.android.threading.Threading;
 
@@ -11,10 +11,10 @@ import java.util.List;
 /**
  * Created by stykhonenko on 23.10.15.
  */
-public abstract class OnePageNavigationList<T> extends NavigationList<T> {
+public abstract class OnePageLazyLoadingList<T> extends LazyLoadingList<T> {
     private LegacyRequestManager requestManager;
 
-    public OnePageNavigationList(LegacyRequestManager requestManager) {
+    public OnePageLazyLoadingList(LegacyRequestManager requestManager) {
         this.requestManager = requestManager;
     }
 

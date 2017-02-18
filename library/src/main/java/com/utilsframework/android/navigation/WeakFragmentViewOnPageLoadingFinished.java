@@ -1,7 +1,7 @@
 package com.utilsframework.android.navigation;
 
 import android.support.v4.app.Fragment;
-import com.utils.framework.collections.NavigationList;
+import com.utils.framework.collections.LazyLoadingList;
 import com.utilsframework.android.fragments.WeakFragmentReferenceHolder;
 
 import java.util.List;
@@ -10,7 +10,7 @@ import java.util.List;
  * Created by CM on 9/18/2015.
  */
 public abstract class WeakFragmentViewOnPageLoadingFinished<FragmentType extends Fragment, Element>
-        extends WeakFragmentReferenceHolder<FragmentType> implements NavigationList.OnPageLoadingFinished<Element> {
+        extends WeakFragmentReferenceHolder<FragmentType> implements LazyLoadingList.OnPageLoadingFinished<Element> {
     public WeakFragmentViewOnPageLoadingFinished(FragmentType fragment) {
         super(fragment);
     }

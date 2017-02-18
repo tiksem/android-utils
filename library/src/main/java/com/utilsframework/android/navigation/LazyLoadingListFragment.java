@@ -9,7 +9,7 @@ import android.view.*;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 
-import com.utils.framework.collections.NavigationList;
+import com.utils.framework.collections.LazyLoadingList;
 import com.utilsframework.android.R;
 import com.utilsframework.android.adapters.ViewArrayAdapter;
 import com.utilsframework.android.fragments.RequestManagerFragment;
@@ -28,7 +28,7 @@ import java.util.List;
 /**
  * Created by CM on 6/21/2015.
  */
-public abstract class NavigationListFragment<T, RequestManagerImpl extends LegacyRequestManager>
+public abstract class LazyLoadingListFragment<T, RequestManagerImpl extends LegacyRequestManager>
         extends RequestManagerFragment<RequestManagerImpl> implements SortListener {
     private static final String LIST_VIEW_STATE = "LIST_VIEW_STATE";
     private static final String SORT_ORDER = "SORT_ORDER";
@@ -37,7 +37,7 @@ public abstract class NavigationListFragment<T, RequestManagerImpl extends Legac
     private ViewArrayAdapter<T, ?> adapter;
     private AbsListView listView;
     private View emptyView;
-    private NavigationList<T> elements;
+    private LazyLoadingList<T> elements;
     private Parcelable listViewState;
     private String lastFilter;
     private View loadingView;
@@ -151,7 +151,7 @@ public abstract class NavigationListFragment<T, RequestManagerImpl extends Legac
 
     private void onSwipeRefresh() {
         requestGetNavigationList(lastFilter);
-        elements.setOnPageLoadingFinished(new NavigationList.OnPageLoadingFinished<T>() {
+        elements.setOnPageLoadingFinished(new LazyLoadingList.OnPageLoadingFinished<T>() {
             @Override
             public void onLoadingFinished(List<T> elements) {
                 updateAdapterAndViewsState();
@@ -159,7 +159,7 @@ public abstract class NavigationListFragment<T, RequestManagerImpl extends Legac
             }
         });
 
-        elements.setOnError(new NavigationList.PageLoadingError() {
+        elements.setOnError(new LazyLoadingList.PageLoadingError() {
             @Override
             public void onError(int errorCount, Throwable error) {
                 handleNavigationListError(errorCount, error);
@@ -207,7 +207,7 @@ public abstract class NavigationListFragment<T, RequestManagerImpl extends Legac
     protected abstract int getLoadingResourceId();
 
     protected abstract ViewArrayAdapter<T, ? extends Object> createAdapter(RequestManagerImpl requestManager);
-    protected abstract NavigationList<T> getNavigationList(RequestManagerImpl requestManager, String filter);
+    protected abstract LazyLoadingList<T> getNavigationList(RequestManagerImpl requestManager, String filter);
 
     protected abstract void onListItemClicked(T item, int position);
 
@@ -230,7 +230,7 @@ public abstract class NavigationListFragment<T, RequestManagerImpl extends Legac
         updateAdapterAndViewsState();
     }
 
-    public NavigationList<T> getElements() {
+    public LazyLoadingList<T> getElements() {
         return elements;
     }
 
@@ -266,7 +266,7 @@ public abstract class NavigationListFragment<T, RequestManagerImpl extends Legac
     private void updateAdapterAndViewsState() {
         adapter.setElements(elements);
 
-        elements.setOnPageLoadingFinished(new NavigationList.OnPageLoadingFinished<T>() {
+        elements.setOnPageLoadingFinished(new LazyLoadingList.OnPageLoadingFinished<T>() {
             @Override
             public void onLoadingFinished(List<T> page) {
                 if (elements.getElementsCount() > 0 || elements.isAllDataLoaded()) {
@@ -279,7 +279,7 @@ public abstract class NavigationListFragment<T, RequestManagerImpl extends Legac
             }
         });
 
-        elements.setOnError(new NavigationList.PageLoadingError() {
+        elements.setOnError(new LazyLoadingList.PageLoadingError() {
             @Override
             public void onError(int errorCount, Throwable error) {
                 handleNavigationListError(errorCount, error);
@@ -335,7 +335,7 @@ public abstract class NavigationListFragment<T, RequestManagerImpl extends Legac
 
                 @Override
                 protected int getSearchMenuId() {
-                    return NavigationListFragment.this.getSearchMenuId();
+                    return LazyLoadingListFragment.this.getSearchMenuId();
                 }
             };
             search.setSearchListener(new SearchListener() {
@@ -434,7 +434,7 @@ public abstract class NavigationListFragment<T, RequestManagerImpl extends Legac
         return result;
     }
 
-    protected void onNavigationListChanged(NavigationList<T> navigationList) {
+    protected void onNavigationListChanged(LazyLoadingList<T> lazyLoadingList) {
 
     }
 
