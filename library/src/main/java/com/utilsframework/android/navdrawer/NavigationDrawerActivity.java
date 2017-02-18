@@ -11,16 +11,27 @@ import com.utilsframework.android.R;
  */
 public abstract class NavigationDrawerActivity extends AppCompatActivity implements NavigationActivityInterface {
     private NavigationFragmentDrawer navigationDrawer;
+    private boolean preventAutomaticInit = false;
 
-    protected void onPreCreate() {
+    public boolean preventAutomaticInit() {
+        return preventAutomaticInit;
+    }
+
+    public void setPreventAutomaticInit(boolean preventAutomaticInit) {
+        this.preventAutomaticInit = preventAutomaticInit;
+    }
+
+    protected void onBeforeNavigationDrawerInit() {
 
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        onPreCreate();
-        init();
+        onBeforeNavigationDrawerInit();
+        if (!preventAutomaticInit) {
+            init();
+        }
     }
 
     protected void init() {
