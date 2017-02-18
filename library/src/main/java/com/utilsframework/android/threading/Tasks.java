@@ -218,7 +218,7 @@ public class Tasks {
 
     public static void cancelAndClearQueue(Collection<Cancelable> cancelables){
         for (Cancelable cancelable : cancelables) {
-            cancelable.cancel();
+            cancelable.cancel(true);
         }
 
         cancelables.clear();

@@ -11,6 +11,7 @@ import android.text.TextWatcher;
 import android.view.View;
 import android.widget.*;
 import com.utilsframework.android.R;
+import com.utilsframework.android.threading.AbstractCancelable;
 import com.utilsframework.android.threading.AsyncOperationCallback;
 import com.utilsframework.android.threading.Cancelable;
 import com.utilsframework.android.time.TimeUtils;
@@ -203,9 +204,9 @@ public final class Alerts {
         }.execute();
 
         // TODO improve cancelable
-        return new Cancelable() {
+        return new AbstractCancelable() {
             @Override
-            public void cancel() {
+            protected void doCancel(boolean mayInterruptIfRunning) {
                 progressDialog.dismiss();
             }
         };

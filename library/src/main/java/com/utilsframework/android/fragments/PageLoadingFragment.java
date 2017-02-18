@@ -7,7 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import com.utilsframework.android.R;
-import com.utilsframework.android.network.RequestManager;
+import com.utilsframework.android.network.LegacyRequestManager;
 import com.utilsframework.android.threading.Threading;
 
 import java.io.IOException;
@@ -15,7 +15,7 @@ import java.io.IOException;
 /**
  * Created by CM on 7/2/2015.
  */
-public abstract class PageLoadingFragment<RequestManagerImpl extends RequestManager, Data>
+public abstract class PageLoadingFragment<RequestManagerImpl extends LegacyRequestManager, Data>
         extends RequestManagerFragment<RequestManagerImpl> {
     private View content;
     private View loading;

@@ -10,7 +10,7 @@ import java.io.IOException;
 /**
  * Created by stykhonenko on 19.10.15.
  */
-public class EmptyRequestManager implements RequestManager {
+public class EmptyRequestManager implements LegacyRequestManager {
     @Override
     public <Result> AsyncTask execute(Threading.Task<IOException, Result> task) {
         throw new UnsupportedOperationException();

@@ -12,9 +12,9 @@ import java.util.List;
  * Created by stykhonenko on 23.10.15.
  */
 public abstract class OnePageNavigationList<T> extends NavigationList<T> {
-    private RequestManager requestManager;
+    private LegacyRequestManager requestManager;
 
-    public OnePageNavigationList(RequestManager requestManager) {
+    public OnePageNavigationList(LegacyRequestManager requestManager) {
         this.requestManager = requestManager;
     }
 

@@ -11,7 +11,7 @@ import java.util.concurrent.Executor;
 /**
  * Created by stykhonenko on 12.10.15.
  */
-public class AsyncRequestExecutorManager implements RequestManager {
+public class AsyncRequestExecutorManager implements LegacyRequestManager {
     private Queue<AsyncTask> runningRequests = new ArrayDeque<>();
     private Executor executor;
 

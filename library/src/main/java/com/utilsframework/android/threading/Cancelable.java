@@ -6,5 +6,6 @@ package com.utilsframework.android.threading;
  * Time: 18:26
  */
 public interface Cancelable {
-    void cancel();
+    void cancel(boolean interrupt);
+    boolean isCancelled();
 }

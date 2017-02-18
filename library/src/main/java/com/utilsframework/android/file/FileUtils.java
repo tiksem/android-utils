@@ -6,6 +6,8 @@ import android.content.pm.PackageManager;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Environment;
+
+import com.utilsframework.android.threading.AbstractCancelable;
 import com.utilsframework.android.threading.BackgroundLoopEvent;
 import com.utilsframework.android.threading.Cancelable;
 import com.utilsframework.android.threading.ResultLoop;
@@ -65,9 +67,9 @@ public final class FileUtils {
 
         backgroundLoopEvent.setMaxRunningTime(maxWaitTime);
 
-        return new Cancelable() {
+        return new AbstractCancelable() {
             @Override
-            public void cancel() {
+            protected void doCancel(boolean mayInterruptIfRunning) {
                 backgroundLoopEvent.stop();
             }
         };

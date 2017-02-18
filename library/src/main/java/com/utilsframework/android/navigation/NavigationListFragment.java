@@ -8,18 +8,16 @@ import android.util.SparseBooleanArray;
 import android.view.*;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
-import com.utils.framework.OnError;
+
 import com.utils.framework.collections.NavigationList;
 import com.utilsframework.android.R;
 import com.utilsframework.android.adapters.ViewArrayAdapter;
-import com.utilsframework.android.fragments.Fragments;
 import com.utilsframework.android.fragments.RequestManagerFragment;
 import com.utilsframework.android.menu.SearchListener;
 import com.utilsframework.android.menu.SearchMenuAction;
 import com.utilsframework.android.menu.SortListener;
 import com.utilsframework.android.menu.SortMenuAction;
-import com.utilsframework.android.network.RequestManager;
-import com.utilsframework.android.view.GuiUtilities;
+import com.utilsframework.android.network.LegacyRequestManager;
 import com.utilsframework.android.view.OneVisibleViewInGroupToggle;
 import com.utilsframework.android.view.Toasts;
 import com.utilsframework.android.view.listview.SwipeLayoutListViewTouchListener;
@@ -30,7 +28,7 @@ import java.util.List;
 /**
  * Created by CM on 6/21/2015.
  */
-public abstract class NavigationListFragment<T, RequestManagerImpl extends RequestManager>
+public abstract class NavigationListFragment<T, RequestManagerImpl extends LegacyRequestManager>
         extends RequestManagerFragment<RequestManagerImpl> implements SortListener {
     private static final String LIST_VIEW_STATE = "LIST_VIEW_STATE";
     private static final String SORT_ORDER = "SORT_ORDER";

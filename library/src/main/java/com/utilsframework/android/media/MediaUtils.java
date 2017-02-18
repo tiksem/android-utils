@@ -60,9 +60,9 @@ public class MediaUtils {
 
         backgroundLoopEvent.setMaxRunningTime(maxWaitTime);
 
-        return new Cancelable() {
+        return new AbstractCancelable() {
             @Override
-            public void cancel() {
+            protected void doCancel(boolean mayInterruptIfRunning) {
                 backgroundLoopEvent.setOnStop(null);
                 backgroundLoopEvent.stop();
             }
