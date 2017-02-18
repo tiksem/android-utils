@@ -3,7 +3,10 @@ package com.utilsframework.android.navdrawer;
 import android.app.Activity;
 import android.support.design.widget.NavigationView;
 import android.view.MenuItem;
-import android.view.View;
+
+import com.utilsframework.android.menu.MenuUtils;
+
+import java.util.List;
 
 /**
  * Created by stykhonenko on 15.10.15.
@@ -19,13 +22,22 @@ public class NavigationViewMenuAdapter implements NavigationDrawerMenuAdapter {
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(MenuItem menuItem) {
-                menuItem.setChecked(true);
-                if (onItemSelectedListener != null) {
-                    onItemSelectedListener.onItemSelected(menuItem.getItemId());
-                }
+                onItemSelected(menuItem);
                 return true;
             }
         });
+    }
+
+    protected void onItemSelected(MenuItem menuItem) {
+        int itemId = menuItem.getItemId();
+        if (onItemSelectedListener != null) {
+            onItemSelectedListener.onItemSelected(itemId);
+        }
+        applySelectItemVisualStyle(itemId);
+    }
+
+    public OnItemSelectedListener getOnItemSelectedListener() {
+        return onItemSelectedListener;
     }
 
     @Override
@@ -34,8 +46,12 @@ public class NavigationViewMenuAdapter implements NavigationDrawerMenuAdapter {
     }
 
     @Override
-    public void selectItem(int id) {
-        navigationView.getMenu().findItem(id).setChecked(true);
+    public void applySelectItemVisualStyle(int id) {
+        List<MenuItem> menuItems = MenuUtils.getAllItemsRecursive(
+                getNavigationMenuView().getMenu());
+        for (MenuItem menuItem : menuItems) {
+            menuItem.setChecked(menuItem.getItemId() == id);
+        }
     }
 
     @Override

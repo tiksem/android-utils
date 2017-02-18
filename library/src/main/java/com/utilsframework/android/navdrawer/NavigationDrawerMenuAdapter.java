@@ -11,6 +11,6 @@ public interface NavigationDrawerMenuAdapter {
     }
 
     void setOnItemSelectedListener(OnItemSelectedListener listener);
-    void selectItem(int id);
+    void applySelectItemVisualStyle(int id);
     View getNavigationMenuView();
 }

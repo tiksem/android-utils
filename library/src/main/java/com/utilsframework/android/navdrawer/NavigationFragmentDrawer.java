@@ -1,10 +1,7 @@
 package com.utilsframework.android.navdrawer;
 
-import android.os.Handler;
-import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -152,13 +149,14 @@ public abstract class NavigationFragmentDrawer {
         });
 
         navigationView = navigationDrawerMenuAdapter.getNavigationMenuView();
-        navigationDrawerMenuAdapter.selectItem(currentSelectedItem);
+        navigationDrawerMenuAdapter.applySelectItemVisualStyle(currentSelectedItem);
 
         updateActionBarTitle();
         initDrawableToggle();
     }
 
     public void performMenuItemSelection(int id) {
+        navigationDrawerMenuAdapter.applySelectItemVisualStyle(currentSelectedItem);
         selectFragment(id, 0, 0, true);
     }
 

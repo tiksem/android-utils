@@ -12,7 +12,7 @@ public class NoMenuAdapter implements NavigationDrawerMenuAdapter {
     }
 
     @Override
-    public void selectItem(int id) {
+    public void applySelectItemVisualStyle(int id) {
 
     }
 
