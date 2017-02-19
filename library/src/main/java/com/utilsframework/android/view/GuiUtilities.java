@@ -115,6 +115,10 @@ public class GuiUtilities {
         setVisibility(Arrays.asList(views), visibility);
     }
 
+    public static void setVisibility(int visibility, View... views){
+        setVisibility(Arrays.asList(views), visibility);
+    }
+
     public static View getContentView(Activity activity){
         return activity.getWindow().getDecorView().getRootView();
     }
