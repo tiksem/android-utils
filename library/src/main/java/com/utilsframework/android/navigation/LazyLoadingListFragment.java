@@ -1,6 +1,5 @@
 package com.utilsframework.android.navigation;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -46,11 +45,7 @@ public abstract class LazyLoadingListFragment<T>
     private OneVisibleViewInGroupToggle viewsVisibilityToggle;
     private SortMenuAction sortAction;
     private int restoredSortOrder = 0;
-
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-    }
+    private boolean firstViewCreate = true;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -66,9 +61,18 @@ public abstract class LazyLoadingListFragment<T>
         }
     }
 
+    protected String getInitialFilter() {
+        return null;
+    }
+
     @Override
     public void onViewCreated(final View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        if (firstViewCreate) {
+            lastFilter = getInitialFilter();
+            firstViewCreate = false;
+        }
 
         setupViews(view);
         setupListViewListenersAndAdapter();
@@ -78,7 +82,7 @@ public abstract class LazyLoadingListFragment<T>
         setupRetryLoadingButton();
 
         if (elements == null) {
-            requestGetNavigationList(null);
+            requestGetLazyLoadingList(lastFilter);
         }
 
         updateAdapterAndViewsState();
@@ -152,14 +156,14 @@ public abstract class LazyLoadingListFragment<T>
         updateNavigationListWithLastFilter();
     }
 
-    private void requestGetNavigationList(String filter) {
+    private void requestGetLazyLoadingList(String filter) {
         elements = getLazyLoadingList(getRequestManager(), filter);
         sort(elements.getElements());
         onNavigationListChanged(elements);
     }
 
     private void onSwipeRefresh() {
-        requestGetNavigationList(lastFilter);
+        requestGetLazyLoadingList(lastFilter);
         elements.setOnPageLoadingFinished(new LazyLoadingList.OnPageLoadingFinished<T>() {
             @Override
             public void onLoadingFinished(List<T> elements) {
@@ -235,7 +239,7 @@ public abstract class LazyLoadingListFragment<T>
 
     public void updateNavigationList(String filter) {
         lastFilter = filter;
-        requestGetNavigationList(filter);
+        requestGetLazyLoadingList(filter);
         listViewState = null;
         updateAdapterAndViewsState();
     }
