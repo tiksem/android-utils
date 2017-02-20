@@ -12,6 +12,7 @@ import com.utilsframework.android.R;
 public abstract class NavigationDrawerActivity extends AppCompatActivity implements NavigationActivityInterface {
     private NavigationFragmentDrawer navigationDrawer;
     private boolean preventAutomaticInit = false;
+    private FragmentFactory fragmentFactory;
 
     public boolean preventAutomaticInit() {
         return preventAutomaticInit;
@@ -36,7 +37,10 @@ public abstract class NavigationDrawerActivity extends AppCompatActivity impleme
 
     protected void init() {
         setContentView(getRootLayoutId());
-        FragmentFactory fragmentFactory = createFragmentFactory();
+        fragmentFactory = createFragmentFactory();
+        if (fragmentFactory == null) {
+            throw new NullPointerException("createFragmentFactory returns null");
+        }
 
         navigationDrawer = new NavigationFragmentDrawer(this, fragmentFactory,
                 getCurrentSelectedNavigationItemId()) {
@@ -187,6 +191,10 @@ public abstract class NavigationDrawerActivity extends AppCompatActivity impleme
     protected abstract NavigationDrawerMenuAdapter createNavigationDrawerMenuAdapter(int navigationViewId);
 
     protected TabsAdapter createTabsAdapter() {
+        if (fragmentFactory instanceof NoTabsFragmentFactory) {
+            return new NoTabsAdapter();
+        }
+
         return TabLayoutAdapter.fromViewStub(this, getTabsStub(), getTabLayoutId());
     }
 
