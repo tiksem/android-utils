@@ -2,12 +2,8 @@ package com.utilsframework.android.navdrawer;
 
 import android.app.Activity;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.ViewStub;
-import android.widget.FrameLayout;
-import com.utilsframework.android.R;
+
 import com.utilsframework.android.view.GuiUtilities;
-import com.utilsframework.android.view.LayoutUtils;
 
 /**
  * Created by stykhonenko on 04.11.15.

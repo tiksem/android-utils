@@ -6,7 +6,7 @@ import android.view.View;
 /**
  * Created by stykhonenko on 15.10.15.
  */
-public abstract class NavigationDrawerMenuActivity extends NavigationDrawerActivity {
+public abstract class NavigationDrawerMenuActivity extends NavigationActivity {
     private NavigationViewMenuAdapter menuAdapter;
 
     protected abstract int getMenuId();

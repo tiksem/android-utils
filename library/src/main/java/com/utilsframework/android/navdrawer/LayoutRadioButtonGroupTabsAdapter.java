@@ -2,7 +2,6 @@ package com.utilsframework.android.navdrawer;
 
 import android.app.Activity;
 import android.content.Context;
-import android.support.design.widget.TabLayout;
 import android.view.View;
 import android.view.ViewStub;
 import com.utilsframework.android.view.LayoutRadioButtonGroup;

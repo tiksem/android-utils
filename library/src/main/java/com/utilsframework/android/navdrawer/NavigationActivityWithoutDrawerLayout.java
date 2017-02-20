@@ -5,7 +5,7 @@ import com.utilsframework.android.R;
 /**
  * Created by stykhonenko on 19.10.15.
  */
-public abstract class NavigationActivityWithoutDrawerLayout extends NavigationDrawerActivity {
+public abstract class NavigationActivityWithoutDrawerLayout extends NavigationActivity {
     @Override
     protected int getCurrentSelectedNavigationItemId() {
         return 0;

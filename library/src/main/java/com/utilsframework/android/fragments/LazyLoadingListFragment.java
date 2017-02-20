@@ -1,4 +1,4 @@
-package com.utilsframework.android.navigation;
+package com.utilsframework.android.fragments;
 
 import android.os.Bundle;
 import android.os.Parcelable;
@@ -11,7 +11,6 @@ import android.widget.AdapterView;
 import com.utils.framework.collections.LazyLoadingList;
 import com.utilsframework.android.R;
 import com.utilsframework.android.adapters.ViewArrayAdapter;
-import com.utilsframework.android.fragments.RequestManagerFragment;
 import com.utilsframework.android.menu.SearchListener;
 import com.utilsframework.android.menu.SearchMenuAction;
 import com.utilsframework.android.menu.SortListener;

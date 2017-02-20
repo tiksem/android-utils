@@ -6,8 +6,8 @@ import android.support.v4.app.Fragment;
  * Created by CM on 2/20/2015.
  */
 public class NavigationDrawerFragment extends Fragment {
-    public NavigationDrawerActivity getNavigationActivity() {
-        return (NavigationDrawerActivity) getActivity();
+    public NavigationActivity getNavigationActivity() {
+        return (NavigationActivity) getActivity();
     }
 
     public void replaceFragment(Fragment newFragment, int navigationLevel) {

@@ -9,8 +9,8 @@ import com.utilsframework.android.R;
 /**
  * Created by CM on 12/26/2014.
  */
-public abstract class NavigationDrawerActivity extends AppCompatActivity implements NavigationActivityInterface {
-    private NavigationFragmentDrawer navigationDrawer;
+public abstract class NavigationActivity extends AppCompatActivity implements NavigationActivityInterface {
+    private NavigationHandler navigationHandler;
     private boolean preventAutomaticInit = false;
     private FragmentFactory fragmentFactory;
 
@@ -42,16 +42,16 @@ public abstract class NavigationDrawerActivity extends AppCompatActivity impleme
             throw new NullPointerException("createFragmentFactory returns null");
         }
 
-        navigationDrawer = new NavigationFragmentDrawer(this, fragmentFactory,
+        navigationHandler = new NavigationHandler(this, fragmentFactory,
                 getCurrentSelectedNavigationItemId()) {
             @Override
             protected DrawerLayoutAdapter createDrawerLayoutAdapter() {
-                return NavigationDrawerActivity.this.createDrawerLayoutAdapter();
+                return NavigationActivity.this.createDrawerLayoutAdapter();
             }
 
             @Override
             protected int getContentId() {
-                return NavigationDrawerActivity.this.getContentId();
+                return NavigationActivity.this.getContentId();
             }
 
             @Override
@@ -61,7 +61,7 @@ public abstract class NavigationDrawerActivity extends AppCompatActivity impleme
 
             @Override
             protected String getActionBarTitle(int currentSelectedItem, int tabIndex, int navigationLevel) {
-                String title = NavigationDrawerActivity.this.getActionBarTitle(currentSelectedItem,
+                String title = NavigationActivity.this.getActionBarTitle(currentSelectedItem,
                         tabIndex, navigationLevel);
                 if(title == null){
                     title = super.getActionBarTitle(currentSelectedItem, tabIndex, navigationLevel);
@@ -72,7 +72,7 @@ public abstract class NavigationDrawerActivity extends AppCompatActivity impleme
 
             @Override
             protected String getActionBarTitleWhenNavigationIsShown(int currentSelectedItem) {
-                String title = NavigationDrawerActivity.this.
+                String title = NavigationActivity.this.
                         getActionBarTitleWhenNavigationIsShown(currentSelectedItem);
                 if(title == null){
                     title = super.getActionBarTitleWhenNavigationIsShown(currentSelectedItem);
@@ -83,30 +83,30 @@ public abstract class NavigationDrawerActivity extends AppCompatActivity impleme
 
             @Override
             protected int getToolBarStubId() {
-                return NavigationDrawerActivity.this.getToolBarStubId();
+                return NavigationActivity.this.getToolBarStubId();
             }
 
             @Override
             protected int getToolbarLayoutId() {
-                return NavigationDrawerActivity.this.getToolbarLayoutId();
+                return NavigationActivity.this.getToolbarLayoutId();
             }
 
             @Override
             protected NavigationDrawerMenuAdapter createNavigationDrawerMenuAdapter(int navigationViewId) {
-                return NavigationDrawerActivity.this.createNavigationDrawerMenuAdapter(navigationViewId);
+                return NavigationActivity.this.createNavigationDrawerMenuAdapter(navigationViewId);
             }
 
             @Override
             protected TabsAdapter createTabsAdapter() {
-                return NavigationDrawerActivity.this.createTabsAdapter();
+                return NavigationActivity.this.createTabsAdapter();
             }
 
             @Override
             protected void onTabsInit(int tabsCount, int navigationLevel) {
-                NavigationDrawerActivity.this.onTabsInit(tabsCount, navigationLevel);
+                NavigationActivity.this.onTabsInit(tabsCount, navigationLevel);
             }
         };
-        navigationDrawer.init(getNavigationMode());
+        navigationHandler.init(getNavigationMode());
     }
 
     protected int getContentId() {
@@ -135,37 +135,37 @@ public abstract class NavigationDrawerActivity extends AppCompatActivity impleme
 
     @Override
     public void replaceFragment(Fragment newFragment, int navigationLevel) {
-        navigationDrawer.replaceFragment(newFragment, navigationLevel);
+        navigationHandler.replaceFragment(newFragment, navigationLevel);
     }
 
     @Override
     public void replaceFragment(int navigationLevel) {
-        navigationDrawer.replaceFragment(navigationLevel);
+        navigationHandler.replaceFragment(navigationLevel);
     }
 
     @Override
     public Fragment getCurrentFragment() {
-        return navigationDrawer.getCurrentFragment();
+        return navigationHandler.getCurrentFragment();
     }
 
     public Fragment getLatestBackStackFragment() {
-        return navigationDrawer.getLatestBackStackFragment();
+        return navigationHandler.getLatestBackStackFragment();
     }
 
     @Override
     public void onBackPressed() {
-        navigationDrawer.onBackPressed();
+        navigationHandler.onBackPressed();
         super.onBackPressed();
     }
 
     public void updateActionBarTitle() {
-        navigationDrawer.updateActionBarTitle();
+        navigationHandler.updateActionBarTitle();
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
-            navigationDrawer.handleHomeButtonClick();
+            navigationHandler.handleHomeButtonClick();
             return true;
         }
 
@@ -181,11 +181,11 @@ public abstract class NavigationDrawerActivity extends AppCompatActivity impleme
     }
 
     private void performMenuItemSelection(int id) {
-        navigationDrawer.performMenuItemSelection(id);
+        navigationHandler.performMenuItemSelection(id);
     }
 
     public void selectTab(int index) {
-        navigationDrawer.selectTab(index);
+        navigationHandler.selectTab(index);
     }
 
     protected abstract NavigationDrawerMenuAdapter createNavigationDrawerMenuAdapter(int navigationViewId);

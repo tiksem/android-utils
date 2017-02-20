@@ -18,7 +18,7 @@ import java.util.*;
 /**
  * Created by CM on 12/26/2014.
  */
-public abstract class NavigationFragmentDrawer {
+public abstract class NavigationHandler {
     private final AppCompatActivity activity;
     private FragmentFactory fragmentFactory;
     private int currentSelectedItem;
@@ -164,9 +164,9 @@ public abstract class NavigationFragmentDrawer {
         tabsAdapter.selectTab(index);
     }
 
-    public NavigationFragmentDrawer(final AppCompatActivity activity,
-                                    FragmentFactory fragmentFactory,
-                                    int currentSelectedItem) {
+    public NavigationHandler(final AppCompatActivity activity,
+                             FragmentFactory fragmentFactory,
+                             int currentSelectedItem) {
         this.fragmentFactory = fragmentFactory;
         this.currentSelectedItem = currentSelectedItem;
         this.activity = activity;
@@ -280,7 +280,7 @@ public abstract class NavigationFragmentDrawer {
                 new FragmentManager.OnBackStackChangedListener() {
             @Override
             public void onBackStackChanged() {
-                if (NavigationFragmentDrawer.this.navigationLevel == navigationLevel) {
+                if (NavigationHandler.this.navigationLevel == navigationLevel) {
                     if (backStackEntryCount != activity.getSupportFragmentManager().getBackStackEntryCount()) {
                         return;
                     }
