@@ -313,11 +313,13 @@ public abstract class LazyLoadingListFragment<T>
     }
 
     protected void onEmptyResults() {
-        showView(emptyView);
+        if (emptyView != null) {
+            showView(emptyView);
+        }
     }
 
     private void showListViewOrEmptyView() {
-        if (emptyView != null && elements.isAllDataLoaded() && elements.isEmpty()) {
+        if (elements.isAllDataLoaded() && elements.isEmpty()) {
             onEmptyResults();
             return;
         }

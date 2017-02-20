@@ -96,6 +96,13 @@ public class OneFragmentActivity extends AppCompatActivity implements Navigation
     }
 
     @Override
+    public void replaceCurrentFragmentWithoutAddingToBackStack(Fragment newFragment) {
+        latestBackStackFragment = getSupportFragmentManager().findFragmentById(R.id.one);
+        Fragments.replaceFragment(this, R.id.one, newFragment);
+        updateActionBarTitle(newFragment);
+    }
+
+    @Override
     public Fragment getLatestBackStackFragment() {
         return latestBackStackFragment;
     }

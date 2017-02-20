@@ -1,9 +1,9 @@
 package com.utilsframework.android.view;
 
-import android.app.Activity;
-import android.app.Fragment;
-import android.app.FragmentManager;
 import android.content.Context;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.view.PagerAdapter;
 import android.util.AttributeSet;
 import android.view.View;
@@ -42,8 +42,8 @@ public class NextPrevCyclingViewPager extends ExtendedViewPager {
     }
 
     public FragmentManager getFragmentManager() {
-        Activity activity = (Activity) getContext();
-        return activity.getFragmentManager();
+        FragmentActivity activity = (FragmentActivity) getContext();
+        return activity.getSupportFragmentManager();
     }
 
     public Fragment getCurrentFragment() {

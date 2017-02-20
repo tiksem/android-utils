@@ -1,15 +1,16 @@
 package com.utilsframework.android.fragments;
 
 import android.app.Activity;
-import android.app.Fragment;
-import android.app.FragmentManager;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import com.utilsframework.android.UiLoopEvent;
 import com.utilsframework.android.WeakUiLoopEvent;
+import com.utilsframework.android.navdrawer.FragmentFactory;
 import com.utilsframework.android.view.GuiUtilities;
 
 /**
@@ -70,23 +71,6 @@ public class Fragments {
         return arguments.getParcelable(key);
     }
 
-    public static <T extends Parcelable> T getParcelable(android.support.v4.app.Fragment fragment,
-                                                         String key) {
-        Bundle arguments = fragment.getArguments();
-        if(arguments == null){
-            return null;
-        }
-
-        return arguments.getParcelable(key);
-    }
-
-    // use replaceFragment instead
-    @Deprecated
-    public static void addFragment(Activity activity, int containerId, Fragment fragment) {
-        FragmentManager fragmentManager = activity.getFragmentManager();
-        fragmentManager.beginTransaction().add(containerId, fragment).commit();
-    }
-
     public static void executeWhenViewCreated(Fragment fragment, final GuiUtilities.OnViewCreated onViewCreated) {
         if(fragment.getView() != null){
             onViewCreated.onViewCreated(fragment.getView());
@@ -106,38 +90,12 @@ public class Fragments {
         });
     }
 
-    public static void executeWhenViewCreated(final android.support.v4.app.Fragment fragment,
-                                              final GuiUtilities.OnViewCreated onViewCreated) {
-        if(fragment.getView() != null){
-            onViewCreated.onViewCreated(fragment.getView());
-            return;
-        }
-
-        final WeakUiLoopEvent<android.support.v4.app.Fragment> uiLoopEvent = new WeakUiLoopEvent<>(fragment);
-        uiLoopEvent.run(new Runnable() {
-            @Override
-            public void run() {
-                android.support.v4.app.Fragment fragment = uiLoopEvent.get();
-                if (fragment.getView() != null) {
-                    onViewCreated.onViewCreated(fragment.getView());
-                    uiLoopEvent.stop();
-                }
-            }
-        });
-    }
-
     public static int getFragmentContainerId(Fragment fragment) {
         return ((View) fragment.getView().getParent()).getId();
     }
 
-    public static void replaceFragment(Activity activity, int id, Fragment newFragment) {
-        FragmentManager fragmentManager = activity.getFragmentManager();
-        removeFragmentWithId(fragmentManager, id);
-        fragmentManager.beginTransaction().replace(id, newFragment).commit();
-    }
-
-    public static void replaceFragment(FragmentActivity activity, int id, android.support.v4.app.Fragment newFragment) {
-        android.support.v4.app.FragmentManager fragmentManager = activity.getSupportFragmentManager();
+    public static void replaceFragment(FragmentActivity activity, int id, Fragment newFragment) {
+        FragmentManager fragmentManager = activity.getSupportFragmentManager();
         removeFragmentWithId(fragmentManager, id);
         fragmentManager.beginTransaction().replace(id, newFragment).commit();
     }
@@ -146,9 +104,9 @@ public class Fragments {
         void onBack();
     }
 
-    public static void replaceFragmentAndAddToBackStack(Activity activity, final int id,
+    public static void replaceFragmentAndAddToBackStack(FragmentActivity activity, final int id,
                                                         Fragment newFragment) {
-        final FragmentManager fragmentManager = activity.getFragmentManager();
+        final FragmentManager fragmentManager = activity.getSupportFragmentManager();
         final Fragment currentFragment = fragmentManager.findFragmentById(id);
         if(currentFragment == null){
             throw new IllegalStateException("Unable to replace fragment, fragment doesn't exist");
@@ -157,25 +115,7 @@ public class Fragments {
         fragmentManager.beginTransaction().replace(id, newFragment).addToBackStack(null).commit();
     }
 
-    public static void replaceFragmentAndAddToBackStack(AppCompatActivity activity, final int id,
-                                     android.support.v4.app.Fragment newFragment) {
-        final android.support.v4.app.FragmentManager fragmentManager = activity.getSupportFragmentManager();
-        final android.support.v4.app.Fragment currentFragment = fragmentManager.findFragmentById(id);
-        if(currentFragment == null){
-            throw new IllegalStateException("Unable to replace fragment, fragment doesn't exist");
-        }
-
-        fragmentManager.beginTransaction().remove(currentFragment).add(id, newFragment).addToBackStack(null).commit();
-    }
-
-
     public static void clearBackStack(FragmentManager fragmentManager) {
-        while (fragmentManager.getBackStackEntryCount() > 0) {
-            fragmentManager.popBackStackImmediate();
-        }
-    }
-
-    public static void clearBackStack(android.support.v4.app.FragmentManager fragmentManager) {
         while (fragmentManager.getBackStackEntryCount() > 0) {
             fragmentManager.popBackStackImmediate();
         }
@@ -186,17 +126,6 @@ public class Fragments {
         if (fragment != null) {
             fragmentManager.beginTransaction().remove(fragment).commit();
         }
-    }
-
-    public static void removeFragmentWithId(android.support.v4.app.FragmentManager fragmentManager, int id) {
-        android.support.v4.app.Fragment fragment = fragmentManager.findFragmentById(id);
-        if (fragment != null) {
-            fragmentManager.beginTransaction().remove(fragment).commit();
-        }
-    }
-
-    public static void clearBackStack(Activity activity) {
-        clearBackStack(activity.getFragmentManager());
     }
 
     public static void clearBackStack(FragmentActivity activity) {

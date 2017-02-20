@@ -144,6 +144,11 @@ public abstract class NavigationActivity extends AppCompatActivity implements Na
     }
 
     @Override
+    public void replaceCurrentFragmentWithoutAddingToBackStack(Fragment newFragment) {
+        navigationHandler.replaceCurrentFragmentWithoutAddingToBackStack(newFragment);
+    }
+
+    @Override
     public Fragment getCurrentFragment() {
         return navigationHandler.getCurrentFragment();
     }

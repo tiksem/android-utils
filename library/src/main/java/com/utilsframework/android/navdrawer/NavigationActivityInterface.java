@@ -10,4 +10,5 @@ public interface NavigationActivityInterface {
     void replaceFragment(int navigationLevel);
     Fragment getLatestBackStackFragment();
     Fragment getCurrentFragment();
+    void replaceCurrentFragmentWithoutAddingToBackStack(Fragment newFragment);
 }
