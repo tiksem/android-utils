@@ -320,11 +320,13 @@ public class GuiUtilities {
     }
 
     public static void createBitmapFromViewAsync(final View view, final OnFinish<Bitmap> onFinish) {
+        final int measuredWidth = view.getMeasuredWidth();
+        final int measuredHeight = view.getMeasuredHeight();
         final AsyncTask<Void, Void, Bitmap> asyncTask = new AsyncTask<Void, Void, Bitmap>(){
             @Override
             protected Bitmap doInBackground(Void... params) {
-                return Bitmap.createBitmap(view.getMeasuredWidth(),
-                        view.getMeasuredHeight(), Bitmap.Config.ARGB_8888);
+                return Bitmap.createBitmap(measuredWidth,
+                        measuredHeight, Bitmap.Config.ARGB_8888);
             }
 
             @Override
