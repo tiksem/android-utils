@@ -54,6 +54,7 @@ public abstract class NavigationHandler {
         tabsAdapter.removeAllTabs();
         int tabsCount = fragmentFactory.getTabsCount(menuItemId, navigationLevel);
         onTabsInit(tabsCount, navigationLevel);
+        View tabsAdapterView = tabsAdapter.getView();
         if (tabsCount <= 1) {
             if (createFragment) {
                 clearBackStack();
@@ -61,9 +62,13 @@ public abstract class NavigationHandler {
                 Fragment fragment = fragmentFactory.createFragmentBySelectedItem(menuItemId, 0, navigationLevel);
                 Fragments.replaceFragment(activity, getContentId(), fragment);
             }
-            tabsAdapter.getView().setVisibility(View.GONE);
+            if (tabsAdapterView != null) {
+                tabsAdapterView.setVisibility(View.GONE);
+            }
         } else {
-            tabsAdapter.getView().setVisibility(View.VISIBLE);
+            if (tabsAdapterView != null) {
+                tabsAdapterView.setVisibility(View.VISIBLE);
+            }
             initTabs(tabsCount, menuItemId, navigationLevel, createFragment, tabIndex);
         }
 
@@ -130,11 +135,16 @@ public abstract class NavigationHandler {
 
         int tabsCount = fragmentFactory.getTabsCount(currentSelectedItem, navigationLevel);
         onTabsInit(tabsCount, navigationLevel);
+        final View tabsAdapterView = tabsAdapter.getView();
         if (tabsCount > 1) {
-            tabsAdapter.getView().setVisibility(View.VISIBLE);
+            if (tabsAdapterView != null) {
+                tabsAdapterView.setVisibility(View.VISIBLE);
+            }
             initTabs(tabsCount, currentSelectedItem, navigationLevel, true, 0);
         } else {
-            tabsAdapter.getView().setVisibility(View.GONE);
+            if (tabsAdapterView != null) {
+                tabsAdapterView.setVisibility(View.GONE);
+            }
             Fragments.replaceFragment(activity, getContentId(),
                     fragmentFactory.createFragmentBySelectedItem(currentSelectedItem, 0, navigationLevel));
         }

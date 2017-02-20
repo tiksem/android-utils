@@ -10,9 +10,6 @@ import java.util.List;
 
 import retrofit2.Call;
 
-/**
- * Created by stikhonenko on 2/18/17.
- */
 public abstract class RetrofitLazyLoadingList<T> extends UniqueLazyLoadingList<T> {
     private RetrofitRequestManager requestManager;
     private int itemsPerPage;
@@ -34,7 +31,7 @@ public abstract class RetrofitLazyLoadingList<T> extends UniqueLazyLoadingList<T
 
             @Override
             public void onSuccess(List<T> list) {
-                onPageLoadingFinished.onLoadingFinished(list, list.size() < itemsPerPage);
+                onPageLoadingFinished.onLoadingFinished(list, isLastPage(list, itemsPerPage));
             }
 
             @Override
@@ -42,6 +39,10 @@ public abstract class RetrofitLazyLoadingList<T> extends UniqueLazyLoadingList<T
                 onError.onError(e);
             }
         }, CancelStrategy.INTERRUPT);
+    }
+
+    protected boolean isLastPage(List<T> list, int itemsPerPage) {
+        return list.size() < itemsPerPage;
     }
 
     protected abstract Call<List<T>> createLoadPageCall(int itemsPerPage);

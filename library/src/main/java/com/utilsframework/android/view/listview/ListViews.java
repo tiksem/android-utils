@@ -2,6 +2,8 @@ package com.utilsframework.android.view.listview;
 
 import android.view.View;
 import android.widget.AbsListView;
+import android.widget.ListView;
+
 import com.utilsframework.android.UiLoopEvent;
 import com.utilsframework.android.adapters.ViewArrayAdapter;
 
@@ -22,5 +24,11 @@ public class ListViews {
         }
 
         listView.setSelection(position - 1);
+    }
+
+    public static View addHeader(ListView listView, int headerLayoutId) {
+        View header = View.inflate(listView.getContext(), headerLayoutId, null);
+        listView.addHeaderView(header);
+        return header;
     }
 }
