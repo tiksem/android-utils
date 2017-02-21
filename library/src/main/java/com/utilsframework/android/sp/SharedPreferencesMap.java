@@ -35,6 +35,14 @@ public class SharedPreferencesMap {
         preferences.edit().putInt(key, value).apply();
     }
 
+    public void putString(String key, String value) {
+        preferences.edit().putString(key, value).apply();
+    }
+
+    public String getString(String key) {
+        return preferences.getString(key, null);
+    }
+
     public void remove(String key) {
         preferences.edit().remove(key).apply();
     }

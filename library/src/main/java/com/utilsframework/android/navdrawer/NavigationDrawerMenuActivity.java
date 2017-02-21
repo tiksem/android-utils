@@ -33,4 +33,9 @@ public abstract class NavigationDrawerMenuActivity extends NavigationActivity {
     public void registerItemAsSelectable(View item) {
         menuAdapter.registerItemAsSelectable(item);
     }
+
+    public void registerItemAsSelectable(int itemId) {
+        View view = findViewById(itemId);
+        menuAdapter.registerItemAsSelectable(view);
+    }
 }
