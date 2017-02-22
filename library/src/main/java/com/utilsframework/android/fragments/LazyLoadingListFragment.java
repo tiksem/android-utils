@@ -193,7 +193,10 @@ public abstract class LazyLoadingListFragment<T>
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        Parcelable listViewState = listView.onSaveInstanceState();
+        Parcelable listViewState = null;
+        if (listView != null) {
+            listViewState = listView.onSaveInstanceState();
+        }
         if (listViewState != null) {
             outState.putParcelable(LIST_VIEW_STATE, listViewState);
         }
