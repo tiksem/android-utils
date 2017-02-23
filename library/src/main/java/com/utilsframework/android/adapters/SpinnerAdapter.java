@@ -22,16 +22,33 @@ public abstract class SpinnerAdapter<Element> extends ViewArrayAdapter<Element, 
     @Override
     protected void reuseView(Element element, TextView textView, int position, View view) {
         textView.setText(getTextOfElement(element));
+        int textColor = getTextColor();
+        if (textColor != 0) {
+            textView.setTextColor(textView.getResources().getColor(textColor));
+        }
     }
 
     @Override
     protected void reuseNullView(int position, View convertView) {
-        ((TextView)convertView).setText(getHint());
+        TextView textView = (TextView) convertView;
+        textView.setText(getHint());
+        int hintTextColor = getHintTextColor();
+        if (hintTextColor != 0) {
+            textView.setTextColor(textView.getResources().getColor(hintTextColor));
+        }
     }
 
     @Override
     public int getViewTypeCount() {
         return 1;
+    }
+
+    public int getHintTextColor() {
+        return 0;
+    }
+
+    public int getTextColor() {
+        return 0;
     }
 
     @Override
