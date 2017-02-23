@@ -598,4 +598,14 @@ public class GuiUtilities {
 
         return true;
     }
+
+    public static void setTopPadding(View view, int topPadding) {
+        view.setPadding(view.getPaddingLeft(), topPadding, view.getPaddingRight(),
+                view.getPaddingBottom());
+    }
+
+    public static void setLeftPadding(View view, int leftPadding) {
+        view.setPadding(leftPadding, view.getPaddingTop(), view.getPaddingRight(),
+                view.getPaddingBottom());
+    }
 }

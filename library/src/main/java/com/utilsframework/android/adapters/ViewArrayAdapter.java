@@ -246,7 +246,7 @@ public abstract class ViewArrayAdapter<Element, ViewHolder> extends BaseAdapter 
         }
     }
 
-    public final void setElements(List<Element> elements){
+    public void setElements(List<Element> elements){
         this.elements = elements;
         notifyDataSetChanged();
     }
