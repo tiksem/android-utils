@@ -608,4 +608,12 @@ public class GuiUtilities {
         view.setPadding(leftPadding, view.getPaddingTop(), view.getPaddingRight(),
                 view.getPaddingBottom());
     }
+
+    public static void toggleVisibilityGoneAndVisible(View view) {
+        if (view.getVisibility() == View.GONE) {
+            view.setVisibility(View.VISIBLE);
+        } else {
+            view.setVisibility(View.GONE);
+        }
+    }
 }

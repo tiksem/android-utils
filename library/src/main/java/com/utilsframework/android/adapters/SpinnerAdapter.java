@@ -31,7 +31,7 @@ public abstract class SpinnerAdapter<Element> extends ViewArrayAdapter<Element, 
     @Override
     protected void reuseNullView(int position, View convertView) {
         TextView textView = (TextView) convertView;
-        textView.setText(getHint());
+        textView.setText(getHintAsString(textView.getContext()));
         int hintTextColor = getHintTextColor();
         if (hintTextColor != 0) {
             textView.setTextColor(textView.getResources().getColor(hintTextColor));
@@ -56,7 +56,18 @@ public abstract class SpinnerAdapter<Element> extends ViewArrayAdapter<Element, 
         return getRootLayoutId(0);
     }
 
-    public abstract int getHint();
+    public int getHint() {
+        return 0;
+    }
+
+    public String getHintAsString(Context context) {
+        int hint = getHint();
+        if (hint != 0) {
+            return context.getString(hint);
+        }
+
+        return "No hint";
+    }
 
     public String getTextOfElement(Element element) {
         return element.toString();

@@ -54,4 +54,16 @@ public abstract class LoadingContentVisibilityManager<T, ErrorType> extends Requ
     public void onRetry() {
 
     }
+
+    public View getContentView() {
+        return contentView;
+    }
+
+    public View getLoadingView() {
+        return loadingView;
+    }
+
+    public OneVisibleViewInGroupToggle getVisibilityToggle() {
+        return visibilityToggle;
+    }
 }
