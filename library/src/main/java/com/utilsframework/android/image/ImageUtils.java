@@ -11,10 +11,16 @@ import java.io.File;
  * Created by semyon.tikhonenko on 22.05.2015.
  */
 public class ImageUtils {
+    public static final int PICK_IMAGE_FROM_GALLERY_REQUEST_CODE = 33455;
+
     public static void pickImageFromGallery(Activity activity, int requestCode) {
         Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
         photoPickerIntent.setType("image/*");
         activity.startActivityForResult(photoPickerIntent, requestCode);
+    }
+
+    public static void pickImageFromGallery(Activity activity) {
+        pickImageFromGallery(activity, PICK_IMAGE_FROM_GALLERY_REQUEST_CODE);
     }
 
     public static void takeImageFromCamera(Activity activity, int requestCode) {
@@ -33,5 +39,17 @@ public class ImageUtils {
         }
 
         return selectedImage.getAbsolutePath();
+    }
+
+    public static String handleImagePick(Activity activity,
+                                         int requestCode,
+                                         int resultCode,
+                                         Intent data) {
+        if (requestCode == PICK_IMAGE_FROM_GALLERY_REQUEST_CODE &&
+                resultCode == Activity.RESULT_OK) {
+            return getSelectedImagePath(activity, data);
+        }
+
+        return null;
     }
 }
