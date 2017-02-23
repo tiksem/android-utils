@@ -1,15 +1,22 @@
 package com.utilsframework.android.network.retrofit;
 
+import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.utilsframework.android.network.BaseRequestManager;
 import com.utilsframework.android.network.CancelStrategy;
 import com.utilsframework.android.network.HttpResponseException;
 import com.utilsframework.android.network.RequestListener;
+import com.utilsframework.android.network.RequestListenerWrapper;
 import com.utilsframework.android.threading.AbstractCancelable;
 import com.utilsframework.android.threading.Cancelable;
+import com.utilsframework.android.threading.MainThreadExecutor;
+import com.utilsframework.android.threading.OnSuccess;
+import com.utilsframework.android.threading.ResultTask;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -47,11 +54,7 @@ public abstract class RetrofitRequestManager extends BaseRequestManager
                         requestListener.onSuccessOrError();
                     } else {
                         try {
-                            Object data = getHttpResponseExceptionData(response);
-                            int code = response.code();
-                            String message = getErrorMessage(data, response);
-                            HttpResponseException e = new HttpResponseException(code, message);
-                            e.setData(data);
+                            HttpResponseException e = getHttpResponseException(response);
                             requestListener.onError(e);
                         } catch (IOException e) {
                             e.printStackTrace();
@@ -89,6 +92,45 @@ public abstract class RetrofitRequestManager extends BaseRequestManager
         });
 
         notifyTaskExecuting(cancelable, cancelStrategy);
+    }
+
+    @NonNull
+    private <Result> HttpResponseException getHttpResponseException(Response<Result> response) throws IOException {
+        Object data = getHttpResponseExceptionData(response);
+        int code = response.code();
+        String message = getErrorMessage(data, response);
+        HttpResponseException e = new HttpResponseException(code, message);
+        e.setData(data);
+        return e;
+    }
+
+    @Override
+    public void executeMultipleCalls(final List<CallProvider> callProviders,
+                                     RequestListener<List, Throwable> requestListener,
+                                     CancelStrategy cancelStrategy) {
+        new ResultTask<List, Throwable>(this, requestListener) {
+            @Override
+            protected List getResultInBackground() throws Throwable {
+                List result = new ArrayList();
+                for (final CallProvider callProvider : callProviders) {
+                    Response response = callProvider.getCall().execute();
+                    if (response.isSuccessful()) {
+                        final Object body = response.body();
+                        result.add(body);
+                        MainThreadExecutor.handler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                callProvider.onSuccess(body);
+                            }
+                        });
+                    } else {
+                        throw getHttpResponseException(response);
+                    }
+                }
+
+                return result;
+            }
+        }.execute();
     }
 
     protected <T> Object getHttpResponseExceptionData(Response<T> response)

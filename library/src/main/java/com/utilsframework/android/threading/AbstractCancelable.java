@@ -4,11 +4,12 @@ public abstract class AbstractCancelable implements Cancelable {
     private boolean isCancelled;
 
     @Override
-    public final void cancel(boolean mayInterruptIfRunning) {
+    public final boolean cancel(boolean mayInterruptIfRunning) {
         if (!isCancelled) {
             doCancel(mayInterruptIfRunning);
         }
         isCancelled = true;
+        return true;
     }
 
     protected abstract void doCancel(boolean mayInterruptIfRunning);

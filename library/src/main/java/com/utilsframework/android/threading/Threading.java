@@ -2,6 +2,7 @@ package com.utilsframework.android.threading;
 
 import android.os.AsyncTask;
 import android.os.Handler;
+import android.os.Looper;
 
 import java.io.IOException;
 import java.util.Comparator;
@@ -184,5 +185,9 @@ public final class Threading {
                 task.onComplete(result, errorType);
             }
         }.execute();
+    }
+
+    public static boolean isMainThread() {
+        return Thread.currentThread() == Looper.getMainLooper().getThread();
     }
 }
