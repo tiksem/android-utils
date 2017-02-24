@@ -5,6 +5,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+
+import com.utils.framework.Lists;
 import com.utilsframework.android.WeakUiLoopEvent;
 import com.utilsframework.android.view.GuiUtilities;
 
@@ -273,6 +275,11 @@ public abstract class ViewArrayAdapter<Element, ViewHolder> extends BaseAdapter 
     }
 
     public void addElements(Iterable<Element> elements){
+        if (this.elements == null) {
+            setElements(Lists.fromIterable(elements));
+            return;
+        }
+
         for(Element i : elements){
             internalAddElement(i);
         }
