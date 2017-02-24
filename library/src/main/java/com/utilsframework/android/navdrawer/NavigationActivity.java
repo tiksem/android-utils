@@ -222,4 +222,12 @@ public abstract class NavigationActivity extends AppCompatActivity implements Na
     protected int getToolBarStubId() {
         return R.id.toolbarStub;
     }
+
+    public void openDrawer() {
+        navigationHandler.show();
+    }
+
+    public void closeDrawer() {
+        navigationHandler.hide();
+    }
 }
