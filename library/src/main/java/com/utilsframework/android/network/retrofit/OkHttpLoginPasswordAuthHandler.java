@@ -12,7 +12,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Response;
 import retrofit2.Retrofit;
 
-public class OkHttpBaseAuthHandler {
+public class OkHttpLoginPasswordAuthHandler {
 
     public static final String USERNAME = "username";
     public static final String PASSWORD = "password";
@@ -20,7 +20,7 @@ public class OkHttpBaseAuthHandler {
     private final SharedPreferencesMap preferencesMap;
     private final AuthenticationInterceptor authenticationInterceptor;
 
-    public OkHttpBaseAuthHandler(OkHttpClient.Builder builder, Context context) {
+    public OkHttpLoginPasswordAuthHandler(OkHttpClient.Builder builder, Context context) {
         preferencesMap = new SharedPreferencesMap(context);
         authenticationInterceptor = new AuthenticationInterceptor(getAuthToken());
         builder.addInterceptor(authenticationInterceptor);

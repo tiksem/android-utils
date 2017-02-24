@@ -8,6 +8,7 @@ public class HttpResponseException extends IOException {
     private String message;
 
     public HttpResponseException(int responseCode, String message) {
+        super(message);
         this.responseCode = responseCode;
         this.message = message;
     }
