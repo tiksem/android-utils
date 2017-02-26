@@ -24,7 +24,7 @@ public class AuthenticationInterceptor implements Interceptor {
 
         Request.Builder builder = original.newBuilder();
         if (authToken != null) {
-            builder.header("Authorization", authToken);
+            builder.addHeader("Authorization", "Bearer " + authToken);
         }
 
         Request request = builder.build();

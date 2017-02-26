@@ -51,6 +51,7 @@ public abstract class RetrofitRequestManager extends BaseRequestManager
                         requestListener.onCanceled();
                     } else if(response.isSuccessful()) {
                         requestListener.onSuccess(response.body());
+                        requestListener.onSuccess(response);
                         requestListener.onSuccessOrError();
                     } else {
                         try {

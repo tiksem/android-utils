@@ -283,7 +283,7 @@ public abstract class NavigationHandler {
         }
 
         final int backStackEntryCount = activity.getSupportFragmentManager().getBackStackEntryCount();
-        Fragments.replaceFragmentAndAddToBackStack(activity, getContentId(), newFragment);
+        Fragments.replaceOrAddFragmentAndAddToBackStack(activity, getContentId(), newFragment);
         selectFragment(currentSelectedItem, navigationLevel, 0, false);
 
         FragmentManager.OnBackStackChangedListener onBackStackChangedListener =

@@ -31,8 +31,16 @@ public class SharedPreferencesMap {
         return preferences.getInt(key, 0);
     }
 
+    public Set<String> getStringSet(String key) {
+        return preferences.getStringSet(key, new HashSet<String>());
+    }
+
     public void putInt(String key, int value) {
         preferences.edit().putInt(key, value).apply();
+    }
+
+    public void putStringSet(String key, Set<String> strings) {
+        preferences.edit().putStringSet(key, strings).apply();
     }
 
     public void putString(String key, String value) {

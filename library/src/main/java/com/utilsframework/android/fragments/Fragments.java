@@ -104,15 +104,15 @@ public class Fragments {
         void onBack();
     }
 
-    public static void replaceFragmentAndAddToBackStack(FragmentActivity activity, final int id,
-                                                        Fragment newFragment) {
+    public static void replaceOrAddFragmentAndAddToBackStack(FragmentActivity activity, final int id,
+                                                             Fragment newFragment) {
         final FragmentManager fragmentManager = activity.getSupportFragmentManager();
         final Fragment currentFragment = fragmentManager.findFragmentById(id);
         if(currentFragment == null){
-            throw new IllegalStateException("Unable to replace fragment, fragment doesn't exist");
+            fragmentManager.beginTransaction().add(id, newFragment).addToBackStack(null).commit();
+        } else {
+            fragmentManager.beginTransaction().replace(id, newFragment).addToBackStack(null).commit();
         }
-
-        fragmentManager.beginTransaction().replace(id, newFragment).addToBackStack(null).commit();
     }
 
     public static void clearBackStack(FragmentManager fragmentManager) {
