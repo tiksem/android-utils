@@ -114,13 +114,14 @@ public abstract class RetrofitRequestManager extends BaseRequestManager
             protected List getResultInBackground() throws Throwable {
                 List result = new ArrayList();
                 for (final CallProvider callProvider : callProviders) {
-                    Response response = callProvider.getCall().execute();
+                    final Response response = callProvider.getCall().execute();
                     if (response.isSuccessful()) {
                         final Object body = response.body();
                         result.add(body);
                         MainThreadExecutor.handler.post(new Runnable() {
                             @Override
                             public void run() {
+                                callProvider.onSuccess(response);
                                 callProvider.onSuccess(body);
                             }
                         });

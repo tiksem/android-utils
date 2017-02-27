@@ -11,12 +11,19 @@ import android.webkit.WebView;
  */
 public class WebViewActivity extends Activity {
     private static final String URL = "url";
+    private static final String HTML = "html";
 
     private WebView webView;
 
-    public static void start(Context context, String url) {
+    public static void loadUrl(Context context, String url) {
         Intent intent = new Intent(context, WebViewActivity.class);
         intent.putExtra(URL, url);
+        context.startActivity(intent);
+    }
+
+    public static void loadHtml(Context context, String html) {
+        Intent intent = new Intent(context, WebViewActivity.class);
+        intent.putExtra(HTML, html);
         context.startActivity(intent);
     }
 
@@ -25,7 +32,12 @@ public class WebViewActivity extends Activity {
         super.onCreate(savedInstanceState);
         webView = new WebView(this);
         webView.getSettings().setJavaScriptEnabled(true);
-        webView.loadUrl(getIntent().getStringExtra(URL));
+        Intent intent = getIntent();
+        if (intent.hasExtra(URL)) {
+            webView.loadUrl(intent.getStringExtra(URL));
+        } else {
+            webView.loadData(intent.getStringExtra(HTML), "text/html", "UTF-8");
+        }
         setContentView(webView);
     }
 

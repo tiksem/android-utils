@@ -33,6 +33,10 @@ public class OkHttpTokenAuthHandler {
         authenticationInterceptor.setAuthToken(null);
     }
 
+    public AuthenticationInterceptor getAuthenticationInterceptor() {
+        return authenticationInterceptor;
+    }
+
     public boolean isLoggedIn() {
         return getAuthToken() != null;
     }

@@ -45,7 +45,7 @@ public class SocialUtils {
         if (isVkInstalled(context)) {
             startVkUserProfileActivity(context, userId);
         } else {
-            WebViewActivity.start(context, "http://vk.com/id" + userId);
+            WebViewActivity.loadUrl(context, "http://vk.com/id" + userId);
         }
     }
 }

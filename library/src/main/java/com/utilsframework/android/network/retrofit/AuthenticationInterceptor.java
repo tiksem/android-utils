@@ -9,6 +9,7 @@ import okhttp3.Response;
 public class AuthenticationInterceptor implements Interceptor {
 
     private String authToken;
+    private String headerKey = "Authorization";
 
     public AuthenticationInterceptor(String token) {
         this.authToken = token;
@@ -18,13 +19,21 @@ public class AuthenticationInterceptor implements Interceptor {
         this.authToken = authToken;
     }
 
+    public String getHeaderKey() {
+        return headerKey;
+    }
+
+    public void setHeaderKey(String headerKey) {
+        this.headerKey = headerKey;
+    }
+
     @Override
     public Response intercept(Chain chain) throws IOException {
         Request original = chain.request();
 
         Request.Builder builder = original.newBuilder();
         if (authToken != null) {
-            builder.addHeader("Authorization", "Bearer " + authToken);
+            builder.header(headerKey, authToken);
         }
 
         Request request = builder.build();
