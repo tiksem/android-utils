@@ -92,17 +92,20 @@ public abstract class RetrofitRequestManager extends BaseRequestManager
     private <Result> void onResponseError(Response<Result> response,
                                           RequestListener<Result, Throwable> requestListener) {
         if (errorInterceptors != null) {
-            boolean errorHandled = false;
+            Throwable throwable = null;
             for (RetrofitRequestManagerResponseErrorInterceptor interceptor
                     : errorInterceptors) {
-                if (interceptor.onResponseError(response)) {
-                    errorHandled = true;
+                Throwable error = interceptor.onResponseError(response);
+                if (error != null) {
+                    throwable = error;
                     break;
                 }
             }
 
-            if (!errorHandled) {
+            if (throwable == null) {
                 executeResponseUserErrorListener(response, requestListener);
+            } else {
+                requestListener.onError(throwable);
             }
         } else {
             executeResponseUserErrorListener(response, requestListener);

@@ -5,13 +5,13 @@ import retrofit2.Response;
 public abstract class LoginResponseErrorInterceptor implements
         RetrofitRequestManagerResponseErrorInterceptor {
     @Override
-    public boolean onResponseError(Response response) {
+    public Throwable onResponseError(Response response) {
         if (response.code() == 401) {
             onLoginRequired();
-            return true;
+            return new LoginRequiredException();
         }
 
-        return false;
+        return null;
     }
 
     protected abstract void onLoginRequired();

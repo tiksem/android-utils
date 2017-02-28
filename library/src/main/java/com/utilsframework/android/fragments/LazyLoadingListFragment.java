@@ -334,8 +334,12 @@ public abstract class LazyLoadingListFragment<T>
         if (elements.getElementsCount() == 0) {
             showView(noConnectionView);
         } else if(errorCount <= SHOW_TOAST_MAX_ERROR_COUNT) {
-            Toasts.toast(listView.getContext(), R.string.no_internet_connection);
+            Toasts.toast(listView.getContext(), getErrorToastMessage(e));
         }
+    }
+
+    protected int getErrorToastMessage(Throwable e) {
+        return R.string.no_internet_connection;
     }
 
     protected boolean hasSearchMenu() {
