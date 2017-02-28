@@ -7,16 +7,15 @@ import com.utilsframework.android.network.BaseRequestManager;
 import com.utilsframework.android.network.CancelStrategy;
 import com.utilsframework.android.network.HttpResponseException;
 import com.utilsframework.android.network.RequestListener;
-import com.utilsframework.android.network.RequestListenerWrapper;
 import com.utilsframework.android.threading.AbstractCancelable;
 import com.utilsframework.android.threading.Cancelable;
 import com.utilsframework.android.threading.MainThreadExecutor;
-import com.utilsframework.android.threading.OnSuccess;
 import com.utilsframework.android.threading.ResultTask;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -26,6 +25,7 @@ public abstract class RetrofitRequestManager extends BaseRequestManager
         implements RetrofitRequestExecutor {
     private static final String TAG = RetrofitRequestManager.class.getSimpleName();
 
+    private Set<RetrofitRequestManagerResponseErrorInterceptor> errorInterceptors;
     @Override
     public <Result> void executeCall(final Call<Result> call,
                                      final RequestListener<Result, Throwable> requestListener,
@@ -54,13 +54,7 @@ public abstract class RetrofitRequestManager extends BaseRequestManager
                         requestListener.onSuccess(response);
                         requestListener.onSuccessOrError();
                     } else {
-                        try {
-                            HttpResponseException e = getHttpResponseException(response);
-                            requestListener.onError(e);
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                            requestListener.onError(e);
-                        }
+                        onResponseError(response, requestListener);
                         requestListener.onSuccessOrError();
                     }
 
@@ -95,19 +89,49 @@ public abstract class RetrofitRequestManager extends BaseRequestManager
         notifyTaskExecuting(cancelable, cancelStrategy);
     }
 
+    private <Result> void onResponseError(Response<Result> response,
+                                          RequestListener<Result, Throwable> requestListener) {
+        if (errorInterceptors != null) {
+            boolean errorHandled = false;
+            for (RetrofitRequestManagerResponseErrorInterceptor interceptor
+                    : errorInterceptors) {
+                if (interceptor.onResponseError(response)) {
+                    errorHandled = true;
+                    break;
+                }
+            }
+
+            if (!errorHandled) {
+                executeResponseUserErrorListener(response, requestListener);
+            }
+        } else {
+            executeResponseUserErrorListener(response, requestListener);
+        }
+    }
+
+    private <Result> void executeResponseUserErrorListener(Response<Result> response,
+                                                           RequestListener<Result, Throwable> requestListener) {
+        try {
+            HttpResponseException e = getHttpResponseException(response);
+            requestListener.onError(e);
+        } catch (IOException e) {
+            e.printStackTrace();
+            requestListener.onError(e);
+        }
+    }
+
     @NonNull
     private <Result> HttpResponseException getHttpResponseException(Response<Result> response) throws IOException {
         Object data = getHttpResponseExceptionData(response);
-        int code = response.code();
         String message = getErrorMessage(data, response);
-        HttpResponseException e = new HttpResponseException(code, message);
+        HttpResponseException e = new HttpResponseException(response, message);
         e.setData(data);
         return e;
     }
 
     @Override
     public void executeMultipleCalls(final List<CallProvider> callProviders,
-                                     RequestListener<List, Throwable> requestListener,
+                                     final RequestListener<List, Throwable> requestListener,
                                      CancelStrategy cancelStrategy) {
         new ResultTask<List, Throwable>(this, requestListener) {
             @Override
@@ -132,7 +156,22 @@ public abstract class RetrofitRequestManager extends BaseRequestManager
 
                 return result;
             }
+
+            @Override
+            protected void onError(Throwable e) {
+                if (e instanceof HttpResponseException) {
+                    HttpResponseException httpResponseException = (HttpResponseException)e;
+                    onResponseError(httpResponseException.getResponse(), requestListener);
+                } else {
+                    super.onError(e);
+                }
+            }
         }.execute();
+    }
+
+    public void setErrorInterceptors(Set<RetrofitRequestManagerResponseErrorInterceptor>
+                                             errorInterceptors) {
+        this.errorInterceptors = errorInterceptors;
     }
 
     protected <T> Object getHttpResponseExceptionData(Response<T> response)

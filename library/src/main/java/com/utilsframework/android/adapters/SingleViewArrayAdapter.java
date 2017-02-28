@@ -12,7 +12,7 @@ public abstract class SingleViewArrayAdapter<Element> extends ViewArrayAdapter<E
     }
 
     @Override
-    protected Void createViewHolder(View view) {
+    protected Void createViewHolder(View view, int itemViewType) {
         return null;
     }
 }

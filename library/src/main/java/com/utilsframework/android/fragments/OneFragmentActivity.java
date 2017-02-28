@@ -31,14 +31,28 @@ public class OneFragmentActivity extends AppCompatActivity implements Navigation
         context.startActivity(intent);
     }
 
+    public static void start(Context context, Class<? extends Fragment> fragmentClass, Bundle args) {
+        Intent intent = getStartIntent(context, fragmentClass, args, 0);
+        context.startActivity(intent);
+    }
+
+    public static void start(Context context, Class<? extends Fragment> fragmentClass) {
+        Intent intent = getStartIntent(context, fragmentClass, null, 0);
+        context.startActivity(intent);
+    }
+
     public static Intent getStartIntent(Context context,
                                         Class<? extends Fragment> fragmentClass,
                                         Bundle args,
                                         int toolbarLayoutId) {
         Intent intent = new Intent(context, OneFragmentActivity.class);
         intent.putExtra(FRAGMENT, fragmentClass.getCanonicalName());
-        intent.putExtra(ARGS, args);
-        intent.putExtra(TOOL_BAR_LAYOUT_ID, toolbarLayoutId);
+        if (args != null) {
+            intent.putExtra(ARGS, args);
+        }
+        if (toolbarLayoutId != 0) {
+            intent.putExtra(TOOL_BAR_LAYOUT_ID, toolbarLayoutId);
+        }
         return intent;
     }
 
@@ -46,8 +60,7 @@ public class OneFragmentActivity extends AppCompatActivity implements Navigation
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Intent intent = getIntent();
-        String fragmentClassName = intent.getStringExtra(FRAGMENT);
-        Fragment fragment = Fragment.instantiate(this, fragmentClassName, intent.getBundleExtra(ARGS));
+        Fragment fragment = createInitialFragment(intent);
         setContentView(R.layout.one);
         Fragments.replaceFragment(this, R.id.one, fragment);
 
@@ -57,11 +70,18 @@ public class OneFragmentActivity extends AppCompatActivity implements Navigation
             Toolbar toolbar = (Toolbar) View.inflate(this, toolBarLayoutId, null);
             ((ViewGroup)findViewById(R.id.one).getParent()).addView(toolbar, 0);
             setSupportActionBar(toolbar);
-            ActionBar actionBar = getSupportActionBar();
-            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
 
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
             updateActionBarTitle(fragment);
         }
+    }
+
+    protected Fragment createInitialFragment(Intent intent) {
+        String fragmentClassName = intent.getStringExtra(FRAGMENT);
+        return Fragment.instantiate(this, fragmentClassName, intent.getBundleExtra(ARGS));
     }
 
     private void updateActionBarTitle(Fragment fragment) {

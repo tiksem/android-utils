@@ -46,6 +46,7 @@ public class RetrofitTemplates {
                     }
                 });
         interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
-        return new OkHttpClient.Builder().addInterceptor(interceptor);
+        return new OkHttpClient.Builder().addInterceptor(interceptor).
+                addNetworkInterceptor(interceptor);
     }
 }

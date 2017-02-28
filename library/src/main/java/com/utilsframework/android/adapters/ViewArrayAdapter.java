@@ -163,8 +163,9 @@ public abstract class ViewArrayAdapter<Element, ViewHolder> extends BaseAdapter 
         }
 
         if(viewHolder == null){
-            convertView = inflater.inflate(getRootLayoutId(getItemViewType(position)),null);
-            viewHolder = createViewHolder(convertView);
+            int itemViewType = getItemViewType(position);
+            convertView = inflater.inflate(getRootLayoutId(itemViewType),null);
+            viewHolder = createViewHolder(convertView, itemViewType);
             convertView.setTag(viewHolder);
             onViewCreated(position, convertView, element, viewHolder);
         }
@@ -229,7 +230,7 @@ public abstract class ViewArrayAdapter<Element, ViewHolder> extends BaseAdapter 
     protected int getNullLayoutId(){
         throw new NullPointerException("null elements are not allowed");
     }
-    protected abstract ViewHolder createViewHolder(View view);
+    protected abstract ViewHolder createViewHolder(View view, int itemViewType);
     protected abstract void reuseView(Element element, ViewHolder viewHolder, int position, View view);
 
     public final Element getElement(int index){

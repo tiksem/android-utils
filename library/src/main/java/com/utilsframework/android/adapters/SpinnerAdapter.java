@@ -15,7 +15,7 @@ public abstract class SpinnerAdapter<Element> extends ViewArrayAdapter<Element, 
     }
 
     @Override
-    protected TextView createViewHolder(View view) {
+    protected TextView createViewHolder(View view, int itemViewType) {
         return (TextView) view;
     }
 

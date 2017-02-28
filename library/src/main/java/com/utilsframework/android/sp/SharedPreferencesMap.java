@@ -54,4 +54,8 @@ public class SharedPreferencesMap {
     public void remove(String key) {
         preferences.edit().remove(key).apply();
     }
+
+    public boolean hasKey(String key) {
+        return preferences.contains(key);
+    }
 }

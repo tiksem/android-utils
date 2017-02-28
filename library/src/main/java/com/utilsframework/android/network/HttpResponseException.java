@@ -2,14 +2,16 @@ package com.utilsframework.android.network;
 
 import java.io.IOException;
 
+import retrofit2.Response;
+
 public class HttpResponseException extends IOException {
-    private int responseCode;
+    private Response response;
     private Object data;
     private String message;
 
-    public HttpResponseException(int responseCode, String message) {
+    public HttpResponseException(Response response, String message) {
         super(message);
-        this.responseCode = responseCode;
+        this.response = response;
         this.message = message;
     }
 
@@ -17,8 +19,8 @@ public class HttpResponseException extends IOException {
         this.data = data;
     }
 
-    public int getResponseCode() {
-        return responseCode;
+    public Response getResponse() {
+        return response;
     }
 
     public Object getData() {
