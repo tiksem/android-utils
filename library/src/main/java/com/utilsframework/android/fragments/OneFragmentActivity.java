@@ -12,18 +12,18 @@ import android.view.View;
 import android.view.ViewGroup;
 import com.utilsframework.android.R;
 import com.utilsframework.android.navdrawer.ActionBarTitleProvider;
-import com.utilsframework.android.navdrawer.NavigationActivityInterface;
+import com.utilsframework.android.navdrawer.FragmentsNavigationInterface;
 import com.utilsframework.android.view.GuiUtilities;
 
 /**
  * Created by CM on 7/20/2015.
  */
-public class OneFragmentActivity extends AppCompatActivity implements NavigationActivityInterface {
+public class OneFragmentActivity extends AppCompatActivity implements FragmentsNavigationInterface {
     public static final String FRAGMENT = "fragment";
     public static final String ARGS = "args";
     public static final String TOOL_BAR_LAYOUT_ID = "toolbarLayoutId";
 
-    private Fragment latestBackStackFragment;
+    private FragmentsStackManager fragmentsStackManager;
 
     public static void start(Context context, Class<? extends Fragment> fragmentClass, Bundle args,
                              int toolbarLayoutId) {
@@ -62,7 +62,9 @@ public class OneFragmentActivity extends AppCompatActivity implements Navigation
         Intent intent = getIntent();
         Fragment fragment = createInitialFragment(intent);
         setContentView(R.layout.one);
-        Fragments.replaceFragment(this, R.id.one, fragment);
+
+        fragmentsStackManager = new FragmentsStackManager(this, R.id.one);
+        fragmentsStackManager.replaceCurrentFragmentWithoutAddingToBackStack(fragment);
 
         int toolBarLayoutId = intent.getIntExtra(TOOL_BAR_LAYOUT_ID, 0);
 
@@ -91,7 +93,10 @@ public class OneFragmentActivity extends AppCompatActivity implements Navigation
             Fragments.executeWhenViewCreated(fragment, new GuiUtilities.OnViewCreated() {
                 @Override
                 public void onViewCreated(View view) {
-                    actionBar.setTitle(actionBarTitleProvider.getActionBarTitle());
+                    String title = actionBarTitleProvider.getActionBarTitle();
+                    if (title != null) {
+                        actionBar.setTitle(title);
+                    }
                 }
             });
         }
@@ -110,26 +115,24 @@ public class OneFragmentActivity extends AppCompatActivity implements Navigation
 
     @Override
     public void replaceFragment(Fragment newFragment, int navigationLevel) {
-        latestBackStackFragment = getSupportFragmentManager().findFragmentById(R.id.one);
-        Fragments.replaceOrAddFragmentAndAddToBackStack(this, R.id.one, newFragment);
+        fragmentsStackManager.replaceFragment(newFragment, navigationLevel);
         updateActionBarTitle(newFragment);
     }
 
     @Override
     public void replaceCurrentFragmentWithoutAddingToBackStack(Fragment newFragment) {
-        latestBackStackFragment = getSupportFragmentManager().findFragmentById(R.id.one);
-        Fragments.replaceFragment(this, R.id.one, newFragment);
+        fragmentsStackManager.replaceCurrentFragmentWithoutAddingToBackStack(newFragment);
         updateActionBarTitle(newFragment);
     }
 
     @Override
     public Fragment getLatestBackStackFragment() {
-        return latestBackStackFragment;
+        return fragmentsStackManager.getLatestBackStackFragment();
     }
 
     @Override
     public void replaceFragment(int navigationLevel) {
-
+        throw new UnsupportedOperationException();
     }
 
     @Override

@@ -1,6 +1,7 @@
 package com.utilsframework.android.fragments;
 
 import android.app.Activity;
+import android.app.FragmentTransaction;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.v4.app.Fragment;
@@ -17,6 +18,8 @@ import com.utilsframework.android.view.GuiUtilities;
  * Created by CM on 1/21/2015.
  */
 public class Fragments {
+    private static final int DEFAULT_TRANSITION = FragmentTransaction.TRANSIT_FRAGMENT_OPEN;
+
     public static long getLong(Fragment fragment, String key, long defaultValue) {
         Bundle arguments = fragment.getArguments();
         if(arguments == null){
@@ -97,7 +100,9 @@ public class Fragments {
     public static void replaceFragment(FragmentActivity activity, int id, Fragment newFragment) {
         FragmentManager fragmentManager = activity.getSupportFragmentManager();
         removeFragmentWithId(fragmentManager, id);
-        fragmentManager.beginTransaction().replace(id, newFragment).commit();
+        fragmentManager.beginTransaction().
+                setTransition(DEFAULT_TRANSITION).
+                replace(id, newFragment).commit();
     }
 
     public interface OnBack {
@@ -109,9 +114,12 @@ public class Fragments {
         final FragmentManager fragmentManager = activity.getSupportFragmentManager();
         final Fragment currentFragment = fragmentManager.findFragmentById(id);
         if(currentFragment == null){
-            fragmentManager.beginTransaction().add(id, newFragment).addToBackStack(null).commit();
+            fragmentManager.beginTransaction().add(id, newFragment).
+                    addToBackStack(null).commit();
         } else {
-            fragmentManager.beginTransaction().replace(id, newFragment).addToBackStack(null).commit();
+            fragmentManager.beginTransaction().replace(id, newFragment).
+                    setTransition(DEFAULT_TRANSITION).
+                    addToBackStack(null).commit();
         }
     }
 

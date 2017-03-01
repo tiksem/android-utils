@@ -309,7 +309,9 @@ public abstract class NavigationHandler {
     }
 
     public void replaceCurrentFragmentWithoutAddingToBackStack(Fragment newFragment) {
-        backStack.replaceTop(newFragment);
+        if (!backStack.isEmpty()) {
+            backStack.replaceTop(newFragment);
+        }
         Fragments.replaceFragment(activity, getContentId(), newFragment);
     }
 
