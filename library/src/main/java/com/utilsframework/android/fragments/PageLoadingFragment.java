@@ -19,7 +19,7 @@ public abstract class PageLoadingFragment extends RequestManagerFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        return inflater.inflate(getRetryButtonId(), null);
+        return inflater.inflate(getRootLayoutId(), null);
     }
 
     @Override

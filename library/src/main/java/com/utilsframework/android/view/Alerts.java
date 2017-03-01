@@ -26,33 +26,77 @@ import java.util.GregorianCalendar;
  */
 public final class Alerts {
     public static class OkAlertSettings {
-        public CharSequence title = "";
-        public CharSequence message = "";
-        public CharSequence okButtonText = "OK";
-        public OnOk onOk;
+        private Context context;
+        private CharSequence title = "";
+        private CharSequence message = "";
+        private CharSequence okButtonText = "OK";
+
+        public OkAlertSettings(Context context) {
+            this.context = context;
+        }
+
+        public Context getContext() {
+            return context;
+        }
+
+        public CharSequence getTitle() {
+            return title;
+        }
+
+        public CharSequence getMessage() {
+            return message;
+        }
+
+        public CharSequence getOkButtonText() {
+            return okButtonText;
+        }
+
+        public void setTitle(CharSequence title) {
+            this.title = title;
+        }
+
+        public void setMessage(CharSequence message) {
+            this.message = message;
+        }
+
+        public void setOkButtonText(CharSequence okButtonText) {
+            this.okButtonText = okButtonText;
+        }
+
+        public void setMessage(int message) {
+            this.message = context.getString(message);
+        }
+
+        public void onOk() {}
+        public void onDismiss() {}
     }
 
-    public static void showOkButtonAlert(Context context, final OkAlertSettings settings) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+    public static void showOkButtonAlert(final OkAlertSettings settings) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(settings.context);
 
         builder.setPositiveButton(settings.okButtonText, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                if(settings.onOk != null){
-                    settings.onOk.onOk();
-                }
+                settings.onOk();
             }
         });
 
         builder.setTitle(settings.title);
         builder.setMessage(settings.message);
 
-        builder.create().show();
+        AlertDialog alertDialog = builder.create();
+        alertDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialog) {
+                settings.onDismiss();
+            }
+        });
+        alertDialog.show();
     }
     public static void showOkButtonAlert(Context context, String message) {
-        OkAlertSettings okAlertSettings = new OkAlertSettings();
+        OkAlertSettings okAlertSettings = new OkAlertSettings(context);
         okAlertSettings.message = message;
-        showOkButtonAlert(context, okAlertSettings);
+        showOkButtonAlert(okAlertSettings);
     }
     public static void showOkButtonAlert(Context context, int message) {
         showOkButtonAlert(context, context.getString(message));
