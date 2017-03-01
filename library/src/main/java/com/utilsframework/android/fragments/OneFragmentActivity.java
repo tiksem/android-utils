@@ -94,7 +94,7 @@ public class OneFragmentActivity extends AppCompatActivity implements FragmentsN
                 @Override
                 public void onViewCreated(View view) {
                     String title = actionBarTitleProvider.getActionBarTitle();
-                    if (title != null) {
+                    if (title != null && actionBar != null) {
                         actionBar.setTitle(title);
                     }
                 }
