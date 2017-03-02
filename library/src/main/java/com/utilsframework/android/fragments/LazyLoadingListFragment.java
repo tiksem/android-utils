@@ -353,6 +353,10 @@ public abstract class LazyLoadingListFragment<T>
             }
         }
 
+        if (swipeRefreshLayout != null) {
+            swipeRefreshLayout.setEnabled(!elements.isAllDataLoaded());
+        }
+
         if (listViewState != null) {
             listView.onRestoreInstanceState(listViewState);
         }
