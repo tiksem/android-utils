@@ -62,6 +62,17 @@ public class GuiUtilities {
         return result;
     }
 
+    public static <T extends View> List<T> getAllChildrenRecursiveInSubView(View view,
+                                                                            int subViewId,
+                                                                            Class<T> aClass){
+        View subView = view.findViewById(subViewId);
+        if (subView == null) {
+            throw new NullPointerException("subView not found");
+        }
+
+        return getAllChildrenRecursive(subView, aClass);
+    }
+
     public static List<View> getAllChildrenRecursive(View view, Predicate<View> predicate){
         List<View> views = getAllChildrenRecursive(view);
         return CollectionUtils.findAll(views, predicate);
