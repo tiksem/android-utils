@@ -15,6 +15,9 @@ import com.utilsframework.android.menu.SearchListener;
 import com.utilsframework.android.menu.SearchMenuAction;
 import com.utilsframework.android.menu.SortListener;
 import com.utilsframework.android.menu.SortMenuAction;
+import com.utilsframework.android.network.CancelStrategy;
+import com.utilsframework.android.network.RequestListener;
+import com.utilsframework.android.network.retrofit.CallProvider;
 import com.utilsframework.android.network.retrofit.RetrofitRequestManager;
 import com.utilsframework.android.view.OneVisibleViewInGroupToggle;
 import com.utilsframework.android.view.Toasts;
@@ -22,6 +25,8 @@ import com.utilsframework.android.view.listview.SwipeLayoutListViewTouchListener
 
 import java.util.ArrayList;
 import java.util.List;
+
+import retrofit2.Call;
 
 /**
  * Created by CM on 6/21/2015.
@@ -108,10 +113,13 @@ public abstract class LazyLoadingListFragment<T>
             throw new NullPointerException("getListResourceId returns invalid id, " +
                     "listView == null");
         }
-        loadingView = view.findViewById(getLoadingResourceId());
-        if (loadingView == null) {
-            throw new NullPointerException("getLoadingResourceId returns invalid id, " +
-                    "loadingView == null");
+        int loadingViewId = getLoadingViewId();
+        if (loadingViewId != 0) {
+            loadingView = view.findViewById(loadingViewId);
+            if (loadingView == null) {
+                throw new NullPointerException("getLoadingViewId returns invalid id, " +
+                        "loadingView == null");
+            }
         }
 
         noConnectionView = view.findViewById(getNoInternetConnectionViewId());
@@ -124,13 +132,19 @@ public abstract class LazyLoadingListFragment<T>
             }
         }
 
-        viewsVisibilityToggle = new OneVisibleViewInGroupToggle(loadingView, listView, noConnectionView, emptyView);
+        viewsVisibilityToggle = new OneVisibleViewInGroupToggle(loadingView, listView,
+                noConnectionView, emptyView);
     }
 
     private void setupRetryLoadingButton() {
         int buttonId = getRetryLoadingButtonId();
         if (buttonId != 0) {
             View retryButton = noConnectionView.findViewById(buttonId);
+            if (retryButton == null) {
+                throw new NullPointerException("getRetryLoadingButtonId " +
+                        "returns invalid resource. Return 0 if you don't want retry button");
+            }
+
             retryButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -152,7 +166,7 @@ public abstract class LazyLoadingListFragment<T>
     }
 
     private void onRetryLoading() {
-        updateNavigationListWithLastFilter();
+        update();
     }
 
     private void requestGetLazyLoadingList(String filter) {
@@ -174,7 +188,7 @@ public abstract class LazyLoadingListFragment<T>
         elements.setOnError(new LazyLoadingList.PageLoadingError() {
             @Override
             public void onError(int errorCount, Throwable error) {
-                handleNavigationListError(errorCount, error);
+                handleLoadingError(errorCount, error);
             }
         });
 
@@ -219,7 +233,7 @@ public abstract class LazyLoadingListFragment<T>
 
     protected abstract int getListResourceId();
 
-    protected abstract int getLoadingResourceId();
+    protected abstract int getLoadingViewId();
 
     protected abstract ViewArrayAdapter<T, ? extends Object> createAdapter();
     protected abstract LazyLoadingList<T> getLazyLoadingList(RetrofitRequestManager requestManager,
@@ -239,7 +253,7 @@ public abstract class LazyLoadingListFragment<T>
         return 0;
     }
 
-    public void updateNavigationList(String filter) {
+    public void update(String filter) {
         lastFilter = filter;
         requestGetLazyLoadingList(filter);
         listViewState = null;
@@ -250,8 +264,8 @@ public abstract class LazyLoadingListFragment<T>
         return elements;
     }
 
-    public void updateNavigationListWithLastFilter() {
-        updateNavigationList(lastFilter);
+    public void update() {
+        update(lastFilter);
     }
 
     private void showView(View view) {
@@ -298,16 +312,45 @@ public abstract class LazyLoadingListFragment<T>
         elements.setOnError(new LazyLoadingList.PageLoadingError() {
             @Override
             public void onError(int errorCount, Throwable error) {
-                handleNavigationListError(errorCount, error);
+                handleLoadingError(errorCount, error);
             }
         });
 
-        if (!elements.isAllDataLoaded() && elements.getElementsCount() <= 0) {
-            // load first page
-            elements.get(0);
-            showView(loadingView);
+        Call callForPreloadedData = createCallForPreloadedData();
+        List<CallProvider> callsForPreloadedData = createCallsForPreloadedData();
+
+        if (callForPreloadedData == null && callsForPreloadedData == null) {
+            if (!elements.isAllDataLoaded() && elements.getElementsCount() <= 0) {
+                // load first page
+                elements.get(0);
+                showLoadingOrListView();
+            } else {
+                showListViewOrEmptyView();
+            }
+        } else if(callForPreloadedData != null && callsForPreloadedData != null) {
+            throw new IllegalStateException("createCallForPreloadedData and createCallsForPreloadedData " +
+                    "returns non null. One of them should return null");
         } else {
-            showListViewOrEmptyView();
+            showLoadingOrListView();
+            RequestListener listener = new RequestListener<Object, Throwable>() {
+                @Override
+                public void onSuccess(Object o) {
+                    onAllPreloadedDataLoaded(o);
+                }
+
+                @Override
+                public void onError(Throwable e) {
+                    onFirstPageOrPreloadedDataLoadingError(e);
+                }
+            };
+
+            if (callForPreloadedData != null) {
+                getRequestManager().executeCall(callForPreloadedData,
+                        listener, CancelStrategy.INTERRUPT);
+            } else {
+                getRequestManager().executeMultipleCalls(callsForPreloadedData, listener,
+                        CancelStrategy.INTERRUPT);
+            }
         }
 
         if (listViewState != null) {
@@ -315,9 +358,23 @@ public abstract class LazyLoadingListFragment<T>
         }
     }
 
+    private void showLoadingOrListView() {
+        if (loadingView != null) {
+            showView(loadingView);
+        } else {
+            showView(listView);
+        }
+    }
+
+    protected void onAllPreloadedDataLoaded(Object data) {
+        showView(listView);
+    }
+
     protected void onEmptyResults() {
         if (emptyView != null) {
             showView(emptyView);
+        } else {
+            showView(listView);
         }
     }
 
@@ -330,12 +387,16 @@ public abstract class LazyLoadingListFragment<T>
         showView(listView);
     }
 
-    protected void handleNavigationListError(int errorCount, Throwable e) {
+    protected void handleLoadingError(int errorCount, Throwable e) {
         if (elements.getElementsCount() == 0) {
-            showView(noConnectionView);
+            onFirstPageOrPreloadedDataLoadingError(e);
         } else if(errorCount <= SHOW_TOAST_MAX_ERROR_COUNT) {
             Toasts.toast(listView.getContext(), getErrorToastMessage(e));
         }
+    }
+
+    protected void onFirstPageOrPreloadedDataLoadingError(Throwable e) {
+        showLoadingOrListView();
     }
 
     protected int getErrorToastMessage(Throwable e) {
@@ -363,7 +424,7 @@ public abstract class LazyLoadingListFragment<T>
             search.setSearchListener(new SearchListener() {
                 @Override
                 public void onSearch(String filter) {
-                    updateNavigationList(filter);
+                    update(filter);
                 }
             });
         }
@@ -409,7 +470,7 @@ public abstract class LazyLoadingListFragment<T>
 
     @Override
     public void onSortOrderChanged(int newSortOrder) {
-        updateNavigationListWithLastFilter();
+        update();
     }
 
     protected int getInitialSortOrder() {
@@ -469,5 +530,13 @@ public abstract class LazyLoadingListFragment<T>
 
     protected void sort(List<T> items, int sortingOrder) {
         throw new UnsupportedOperationException();
+    }
+
+    // override one of these methods to load some data before loading navigation list
+    protected Call createCallForPreloadedData() {
+        return null;
+    }
+    protected List<CallProvider> createCallsForPreloadedData() {
+        return null;
     }
 }

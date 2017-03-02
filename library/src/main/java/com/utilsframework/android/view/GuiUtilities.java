@@ -616,4 +616,10 @@ public class GuiUtilities {
             view.setVisibility(View.GONE);
         }
     }
+
+    public static void setLeftDrawable(TextView textView, Drawable drawable) {
+        Drawable[] compoundDrawables = textView.getCompoundDrawables();
+        textView.setCompoundDrawables(drawable, compoundDrawables[1],
+                compoundDrawables[2], compoundDrawables[3]);
+    }
 }
