@@ -41,6 +41,10 @@
         </attr>
     </declare-styleable>
 
+    <declare-styleable name="LayoutWithAspectRatio">
+        <attr name="aspectRatio" format="float" />
+    </declare-styleable>
+
     <declare-styleable name="FlowLayout">
         <attr name="android:orientation" />
         <attr name="layoutDirection" format="enum">
