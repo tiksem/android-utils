@@ -48,4 +48,13 @@ public class SocialUtils {
             WebViewActivity.loadUrl(context, "http://vk.com/id" + userId);
         }
     }
+
+    public static void shareImage(Context context, Uri uri) {
+        Intent intent = new Intent(Intent.ACTION_SEND);
+        intent.setType("image/*");
+        intent.putExtra(Intent.EXTRA_STREAM, uri);
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+        context.startActivity(intent);
+    }
 }
