@@ -36,6 +36,7 @@ import com.utilsframework.android.BuildConfig;
 import com.utilsframework.android.ListenerRemover;
 import com.utilsframework.android.UiLoopEvent;
 import com.utilsframework.android.WeakUiLoopEvent;
+import com.utilsframework.android.system.Intents;
 import com.utilsframework.android.threading.OnFinish;
 import com.utilsframework.android.threading.ResultLoop;
 
@@ -509,6 +510,14 @@ public class GuiUtilities {
         }
     }
 
+    public static void setClickListenersToChildren(View.OnClickListener clickListener,
+                                                   ViewGroup viewGroup) {
+        int childCount = viewGroup.getChildCount();
+        for (int i = 0; i < childCount; i++) {
+            viewGroup.getChildAt(i).setOnClickListener(clickListener);
+        }
+    }
+
     public interface EditTextFocusListener {
         void onFocusEnter();
         void onFocusLeave(boolean textChanged, String textBefore);
@@ -632,5 +641,21 @@ public class GuiUtilities {
         Drawable[] compoundDrawables = textView.getCompoundDrawables();
         textView.setCompoundDrawables(drawable, compoundDrawables[1],
                 compoundDrawables[2], compoundDrawables[3]);
+    }
+
+    public static void setupLinkButton(final Context context, View root,
+                                       int buttonId, final String link) {
+        View linkButton = root.findViewById(buttonId);
+        if (link != null) {
+            linkButton.setVisibility(View.VISIBLE);
+            linkButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intents.openUrl(context, link);
+                }
+            });
+        } else {
+            linkButton.setVisibility(View.GONE);
+        }
     }
 }
