@@ -59,17 +59,12 @@ public class SocialUtils {
     }
 
     public static void sendEmail(Context context, String toEmail, String chooserHeader) {
-        Intent intent = new Intent(Intent.ACTION_SEND);
-        intent.setType("text/html");
-        intent.putExtra(Intent.EXTRA_EMAIL, toEmail);
+        Intent intent = new Intent(Intent.ACTION_SENDTO);
+        intent.setData(Uri.parse("mailto:" + toEmail));
         context.startActivity(Intent.createChooser(intent, chooserHeader));
     }
 
     public static void sendEmail(Context context, String toEmail, int chooserHeader) {
-        Intent intent = new Intent(Intent.ACTION_SEND);
-        intent.setType("text/html");
-        intent.putExtra(Intent.EXTRA_EMAIL, toEmail);
-        String chooserHeaderString = context.getString(chooserHeader);
-        context.startActivity(Intent.createChooser(intent, chooserHeaderString));
+        sendEmail(context, toEmail, context.getString(chooserHeader));
     }
 }

@@ -643,7 +643,7 @@ public class GuiUtilities {
                 compoundDrawables[2], compoundDrawables[3]);
     }
 
-    public static void setupLinkButton(final Context context, View root,
+    public static void setupLinkButton(View root,
                                        int buttonId, final String link) {
         View linkButton = root.findViewById(buttonId);
         if (link != null) {
@@ -651,7 +651,23 @@ public class GuiUtilities {
             linkButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Intents.openUrl(context, link);
+                    Intents.openUrl(v.getContext(), link);
+                }
+            });
+        } else {
+            linkButton.setVisibility(View.GONE);
+        }
+    }
+
+    public static void setupLinkButton(final Activity activity,
+                                       int buttonId, final String link) {
+        View linkButton = activity.findViewById(buttonId);
+        if (link != null) {
+            linkButton.setVisibility(View.VISIBLE);
+            linkButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intents.openUrl(activity, link);
                 }
             });
         } else {
