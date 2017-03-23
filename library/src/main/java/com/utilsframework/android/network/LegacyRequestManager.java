@@ -1,22 +1,94 @@
 package com.utilsframework.android.network;
 
 import android.os.AsyncTask;
-import com.utilsframework.android.threading.OnFinish;
-import com.utilsframework.android.threading.Threading;
-import com.utilsframework.android.threading.ThrowingRunnable;
+import com.utilsframework.android.threading.*;
 
 import java.io.IOException;
+import java.util.ArrayDeque;
+import java.util.Queue;
+import java.util.concurrent.Executor;
 
 /**
  * Created by stykhonenko on 12.10.15.
- * Use implementation of RequestManager (for example: AsyncRequestExecutorManager) in your activity/fragment/view
- * lifecycle. Create requestManager on onCreate/onAttach/onAttachedToWindow. Call cancelAll on onDestroy/onDetach/
- * onDetachedFromWindow etc. This is used to avoid fragment/activity memory leaks
- * and cancel unused network requests executions.
  */
-public interface LegacyRequestManager {
-    <Result> AsyncTask execute(Threading.Task<IOException, Result> task);
-    void execute(ThrowingRunnable<IOException> runnable, OnFinish<IOException> onFinish);
-    void execute(Runnable runnable);
-    void cancelAll();
+public class LegacyRequestManager extends BaseRequestManager {
+    private Executor executor;
+
+    public <Result> Cancelable execute(final Threading.Task<IOException, Result> task) {
+        RequestListener<Result, IOException> listener = new RequestListener<Result, IOException>() {
+            @Override
+            public void onSuccess(Result result) {
+                task.onComplete(result, null);
+            }
+
+            @Override
+            public void onError(IOException e) {
+                task.onComplete(null, e);
+            }
+
+            @Override
+            public void onCanceled() {
+                task.onCancelled(null, null);
+            }
+
+            @Override
+            public void onAfterCompleteOrCanceled() {
+                task.onAfterCompleteOrCancelled();
+            }
+        };
+
+        ResultTask<Result, IOException> resultTask = new ResultTask<Result, IOException>(this, listener) {
+            @Override
+            protected Result getResultInBackground() throws IOException {
+                return task.runOnBackground();
+            }
+        };
+
+        if (executor != null) {
+            resultTask.executeOnExecutor(executor);
+        } else {
+            resultTask.execute();
+        }
+
+        return resultTask;
+    }
+
+    public LegacyRequestManager(Executor executor) {
+        this.executor = executor;
+    }
+
+    public LegacyRequestManager() {
+    }
+
+    public void execute(final ThrowingRunnable<IOException> runnable, final OnFinish<IOException> onFinish) {
+        execute(new Threading.Task<IOException, Object>() {
+            @Override
+            public Object runOnBackground() throws IOException {
+                runnable.run();
+                return null;
+            }
+
+            @Override
+            public void onComplete(Object o, IOException error) {
+                if (onFinish != null) {
+                    onFinish.onFinish(error);
+                }
+            }
+        });
+    }
+
+    public void execute(final Runnable runnable) {
+        execute(new Threading.Task<IOException, Object>() {
+            @Override
+            public Object runOnBackground() throws IOException {
+                runnable.run();
+                return null;
+            }
+
+            @Override
+            public void onComplete(Object o, IOException error) {
+
+            }
+        });
+    }
 }

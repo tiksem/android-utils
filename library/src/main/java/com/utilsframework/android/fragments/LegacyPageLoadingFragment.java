@@ -7,7 +7,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import com.utilsframework.android.R;
-import com.utilsframework.android.network.LegacyRequestManager;
+import com.utilsframework.android.network.RequestListener;
+import com.utilsframework.android.threading.ResultTask;
 import com.utilsframework.android.threading.Threading;
 
 import java.io.IOException;
@@ -15,8 +16,7 @@ import java.io.IOException;
 /**
  * Created by CM on 7/2/2015.
  */
-public abstract class LegacyPageLoadingFragment<RequestManagerImpl extends LegacyRequestManager, Data>
-        extends LegacyRequestManagerFragment<RequestManagerImpl> {
+public abstract class LegacyPageLoadingFragment<Data> extends RequestManagerFragment {
     private View content;
     private View loading;
     private View noConnection;
@@ -50,7 +50,7 @@ public abstract class LegacyPageLoadingFragment<RequestManagerImpl extends Legac
         return result;
     }
 
-    protected abstract Data loadOnBackground(RequestManagerImpl requestManager) throws IOException;
+    protected abstract Data loadOnBackground() throws IOException;
 
     private void showLoading() {
         content.setVisibility(View.INVISIBLE);
@@ -75,17 +75,24 @@ public abstract class LegacyPageLoadingFragment<RequestManagerImpl extends Legac
 
     public void reloadPage() {
         showLoading();
-        getRequestManager().execute(new Threading.Task<IOException, Data>() {
+        new ResultTask<Data, IOException>(getRequestManager(), null) {
             @Override
-            public Data runOnBackground() throws IOException {
-                return loadOnBackground(getRequestManager());
+            protected Data getResultInBackground() throws IOException {
+                return loadOnBackground();
             }
 
             @Override
-            public void onComplete(Data data, IOException error) {
-                onDataLoadingFinished(data, error);
+            protected void onSuccess(Data data) {
+                super.onSuccess(data);
+                onDataLoadingFinished(data, null);
             }
-        });
+
+            @Override
+            protected void onError(IOException e) {
+                super.onError(e);
+                onDataLoadingFinished(null, e);
+            }
+        }.execute();
     }
 
     private void onDataLoadingFinished(Data data, IOException error) {

@@ -15,18 +15,15 @@ import com.utilsframework.android.menu.SearchListener;
 import com.utilsframework.android.menu.SearchMenuAction;
 import com.utilsframework.android.menu.SortListener;
 import com.utilsframework.android.menu.SortMenuAction;
+import com.utilsframework.android.network.AsyncRequestExecutionManager;
 import com.utilsframework.android.network.CancelStrategy;
 import com.utilsframework.android.network.RequestListener;
-import com.utilsframework.android.network.retrofit.CallProvider;
-import com.utilsframework.android.network.retrofit.RetrofitRequestManager;
 import com.utilsframework.android.view.OneVisibleViewInGroupToggle;
 import com.utilsframework.android.view.Toasts;
 import com.utilsframework.android.view.listview.SwipeLayoutListViewTouchListener;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import retrofit2.Call;
 
 /**
  * Created by CM on 6/21/2015.
@@ -50,6 +47,7 @@ public abstract class LazyLoadingListFragment<T>
     private SortMenuAction sortAction;
     private int restoredSortOrder = 0;
     private boolean firstViewCreate = true;
+    private AsyncRequestExecutionManager asyncRequestExecutionManager;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -72,6 +70,8 @@ public abstract class LazyLoadingListFragment<T>
     @Override
     public void onViewCreated(final View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        asyncRequestExecutionManager = createAsyncRequestExecutionManager();
 
         if (firstViewCreate) {
             lastFilter = getInitialFilter();
@@ -170,9 +170,9 @@ public abstract class LazyLoadingListFragment<T>
     }
 
     private void requestGetLazyLoadingList(String filter) {
-        elements = getLazyLoadingList(getRequestManager(), filter);
+        elements = getLazyLoadingList(filter);
         sort(elements.getElements());
-        onNavigationListChanged(elements);
+        onLazyLoadingListChanged(elements);
     }
 
     private void onSwipeRefresh() {
@@ -236,8 +236,7 @@ public abstract class LazyLoadingListFragment<T>
     protected abstract int getLoadingViewId();
 
     protected abstract ViewArrayAdapter<T, ? extends Object> createAdapter();
-    protected abstract LazyLoadingList<T> getLazyLoadingList(RetrofitRequestManager requestManager,
-                                                             String filter);
+    protected abstract LazyLoadingList<T> getLazyLoadingList(String filter);
 
     protected abstract void onListItemClicked(T item, int position);
 
@@ -316,10 +315,10 @@ public abstract class LazyLoadingListFragment<T>
             }
         });
 
-        Call callForPreloadedData = createCallForPreloadedData();
-        List<CallProvider> callsForPreloadedData = createCallsForPreloadedData();
+        Object requestForPreloadedData = createRequestForPreloadedData();
+        Object requestsForPreloadedData = createRequestsForPreloadedData();
 
-        if (callForPreloadedData == null && callsForPreloadedData == null) {
+        if (requestForPreloadedData == null && requestsForPreloadedData == null) {
             if (!elements.isAllDataLoaded() && elements.getElementsCount() <= 0) {
                 // load first page
                 elements.get(0);
@@ -327,8 +326,8 @@ public abstract class LazyLoadingListFragment<T>
             } else {
                 showListViewOrEmptyView();
             }
-        } else if(callForPreloadedData != null && callsForPreloadedData != null) {
-            throw new IllegalStateException("createCallForPreloadedData and createCallsForPreloadedData " +
+        } else if(requestForPreloadedData != null && requestsForPreloadedData != null) {
+            throw new IllegalStateException("createRequestForPreloadedData and createRequestsForPreloadedData " +
                     "returns non null. One of them should return null");
         } else {
             showLoadingOrListView();
@@ -344,12 +343,18 @@ public abstract class LazyLoadingListFragment<T>
                 }
             };
 
-            if (callForPreloadedData != null) {
-                getRequestManager().executeCall(callForPreloadedData,
+            if (asyncRequestExecutionManager == null) {
+                throw new IllegalStateException("implement " +
+                        "createAsyncRequestExecutionManager to support " +
+                        "createRequestForPreloadedData and createRequestsForPreloadedData");
+            }
+
+            if (requestForPreloadedData != null) {
+                asyncRequestExecutionManager.execute(requestForPreloadedData,
                         listener, CancelStrategy.INTERRUPT);
             } else {
-                getRequestManager().executeMultipleCalls(callsForPreloadedData, listener,
-                        CancelStrategy.INTERRUPT);
+                asyncRequestExecutionManager.executeMultipleRequests(requestsForPreloadedData,
+                        listener, CancelStrategy.INTERRUPT);
             }
         }
 
@@ -521,7 +526,7 @@ public abstract class LazyLoadingListFragment<T>
         return result;
     }
 
-    protected void onNavigationListChanged(LazyLoadingList<T> lazyLoadingList) {
+    protected void onLazyLoadingListChanged(LazyLoadingList<T> lazyLoadingList) {
 
     }
 
@@ -537,10 +542,15 @@ public abstract class LazyLoadingListFragment<T>
     }
 
     // override one of these methods to load some data before loading navigation list
-    protected Call createCallForPreloadedData() {
+    protected Object createRequestForPreloadedData() {
         return null;
     }
-    protected List<CallProvider> createCallsForPreloadedData() {
+    protected Object createRequestsForPreloadedData() {
+        return null;
+    }
+
+    // used only to support createRequestForPreloadedData and createRequestsForPreloadedData functionality
+    protected AsyncRequestExecutionManager createAsyncRequestExecutionManager() {
         return null;
     }
 }

@@ -4,12 +4,12 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.View;
 
-import com.utilsframework.android.network.retrofit.RetrofitRequestManager;
+import com.utilsframework.android.network.RequestManager;
 
 public abstract class RequestManagerFragment extends Fragment {
-    private RetrofitRequestManager requestManager;
+    private RequestManager requestManager;
 
-    public RetrofitRequestManager getRequestManager() {
+    public RequestManager getRequestManager() {
         return requestManager;
     }
 
@@ -25,5 +25,5 @@ public abstract class RequestManagerFragment extends Fragment {
         requestManager.cancelAll();
     }
 
-    protected abstract RetrofitRequestManager obtainRequestManager();
+    protected abstract RequestManager obtainRequestManager();
 }

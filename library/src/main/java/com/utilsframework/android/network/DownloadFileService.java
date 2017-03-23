@@ -28,7 +28,7 @@ public abstract class DownloadFileService extends Service {
     private static final int DOWNLOAD_FILE = 1;
     private static final int PROGRESS_UPDATE_DELAY = 400;
 
-    private AsyncRequestExecutorManager requestManager;
+    private LegacyRequestManager requestManager;
     private ExecutorService executor;
     private List<String> downloadingFiles = new ArrayList<>();
     private Handler handler;
@@ -86,7 +86,7 @@ public abstract class DownloadFileService extends Service {
     public void onCreate() {
         super.onCreate();
         executor = Executors.newSingleThreadExecutor();
-        requestManager = new AsyncRequestExecutorManager(executor);
+        requestManager = new LegacyRequestManager(executor);
         handler = new Handler();
         notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
     }

@@ -8,7 +8,9 @@ import android.view.ViewGroup;
 
 import com.utilsframework.android.network.CancelStrategy;
 import com.utilsframework.android.network.LoadingContentVisibilityManager;
+import com.utilsframework.android.network.RequestManager;
 import com.utilsframework.android.network.retrofit.CallProvider;
+import com.utilsframework.android.network.retrofit.RetrofitRequestManager;
 
 import java.util.List;
 
@@ -71,4 +73,9 @@ public abstract class PageLoadingFragment extends RequestManagerFragment {
     }
 
     public abstract int getRootLayoutId();
+
+    @Override
+    public RetrofitRequestManager getRequestManager() {
+        return (RetrofitRequestManager) super.getRequestManager();
+    }
 }

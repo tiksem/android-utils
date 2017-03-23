@@ -22,6 +22,7 @@ gen/
 .idea/
 out/
 *.iml
+library/*.iml
 
 # Eclipse files
 .userSettings/
