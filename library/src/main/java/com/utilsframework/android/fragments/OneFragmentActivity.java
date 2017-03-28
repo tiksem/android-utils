@@ -1,5 +1,6 @@
 package com.utilsframework.android.fragments;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -39,6 +40,12 @@ public class OneFragmentActivity extends AppCompatActivity implements FragmentsN
     public static void start(Context context, Class<? extends Fragment> fragmentClass) {
         Intent intent = getStartIntent(context, fragmentClass, null, 0);
         context.startActivity(intent);
+    }
+
+    public static void startForResult(Activity activity, int requestCode,
+                                      Class<? extends Fragment> fragmentClass) {
+        Intent intent = getStartIntent(activity, fragmentClass, null, 0);
+        activity.startActivityForResult(intent, requestCode);
     }
 
     public static Intent getStartIntent(Context context,
