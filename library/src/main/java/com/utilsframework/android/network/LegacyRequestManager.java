@@ -1,11 +1,8 @@
 package com.utilsframework.android.network;
 
-import android.os.AsyncTask;
 import com.utilsframework.android.threading.*;
 
 import java.io.IOException;
-import java.util.ArrayDeque;
-import java.util.Queue;
 import java.util.concurrent.Executor;
 
 /**
@@ -28,7 +25,7 @@ public class LegacyRequestManager extends BaseRequestManager {
 
             @Override
             public void onCanceled() {
-                task.onCancelled(null, null);
+                task.onCancelled();
             }
 
             @Override

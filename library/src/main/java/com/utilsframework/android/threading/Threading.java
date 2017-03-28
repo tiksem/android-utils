@@ -122,7 +122,7 @@ public final class Threading {
     public static abstract class Task<ErrorType extends Throwable, Result> {
         public abstract Result runOnBackground() throws ErrorType;
         public void onComplete(Result result, ErrorType error) {}
-        public void onCancelled(Result result, ErrorType error) {}
+        public void onCancelled() {}
         public void onAfterCompleteOrCancelled() {}
     }
 
@@ -142,7 +142,7 @@ public final class Threading {
 
             @Override
             protected void onCancelled(Result result) {
-                task.onCancelled(result, error);
+                task.onCancelled();
                 task.onAfterCompleteOrCancelled();
             }
 

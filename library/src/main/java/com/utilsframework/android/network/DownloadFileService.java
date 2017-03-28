@@ -134,7 +134,7 @@ public abstract class DownloadFileService extends Service {
             }
 
             @Override
-            public void onCancelled(Object o, IOException error) {
+            public void onCancelled() {
                 deleteFileAsync(saveFileName);
             }
 

@@ -1,4 +1,4 @@
-package com.utilsframework.android.network;
+package com.utilsframework.android.network.retrofit;
 
 import java.io.IOException;
 
