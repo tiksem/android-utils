@@ -1,25 +1,20 @@
 package com.utilsframework.android.fragments;
 
-import android.app.Activity;
-import android.app.FragmentTransaction;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
-import android.support.v7.app.AppCompatActivity;
+import android.support.v4.app.FragmentTransaction;
 import android.view.View;
-import com.utilsframework.android.UiLoopEvent;
+
 import com.utilsframework.android.WeakUiLoopEvent;
-import com.utilsframework.android.navdrawer.FragmentFactory;
 import com.utilsframework.android.view.GuiUtilities;
 
 /**
  * Created by CM on 1/21/2015.
  */
 public class Fragments {
-    private static final int DEFAULT_TRANSITION = FragmentTransaction.TRANSIT_FRAGMENT_OPEN;
-
     public static long getLong(Fragment fragment, String key, long defaultValue) {
         Bundle arguments = fragment.getArguments();
         if(arguments == null){
@@ -101,7 +96,7 @@ public class Fragments {
         FragmentManager fragmentManager = activity.getSupportFragmentManager();
         removeFragmentWithId(fragmentManager, id);
         fragmentManager.beginTransaction().
-                setTransition(DEFAULT_TRANSITION).
+                setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out).
                 replace(id, newFragment).commit();
     }
 
@@ -115,11 +110,11 @@ public class Fragments {
         final Fragment currentFragment = fragmentManager.findFragmentById(id);
         if(currentFragment == null){
             fragmentManager.beginTransaction().add(id, newFragment).
-                    setTransition(DEFAULT_TRANSITION).
+                    setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out).
                     addToBackStack(null).commit();
         } else {
             fragmentManager.beginTransaction().replace(id, newFragment).
-                    setTransition(DEFAULT_TRANSITION).
+                    setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out).
                     addToBackStack(null).commit();
         }
     }
@@ -133,7 +128,9 @@ public class Fragments {
     public static void removeFragmentWithId(FragmentManager fragmentManager, int id) {
         Fragment fragment = fragmentManager.findFragmentById(id);
         if (fragment != null) {
-            fragmentManager.beginTransaction().remove(fragment).commit();
+            fragmentManager.beginTransaction().
+                    setTransition(FragmentTransaction.TRANSIT_FRAGMENT_CLOSE).
+                    remove(fragment).commit();
         }
     }
 
