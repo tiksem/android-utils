@@ -115,6 +115,7 @@ public class Fragments {
         final Fragment currentFragment = fragmentManager.findFragmentById(id);
         if(currentFragment == null){
             fragmentManager.beginTransaction().add(id, newFragment).
+                    setTransition(DEFAULT_TRANSITION).
                     addToBackStack(null).commit();
         } else {
             fragmentManager.beginTransaction().replace(id, newFragment).
