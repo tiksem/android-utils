@@ -71,4 +71,9 @@ public class StringSQLiteCache extends AbstractCache<String, String> {
             readWriteLock.writeLock().unlock();
         }
     }
+
+    @Override
+    public void clear() {
+        throw new UnsupportedOperationException();
+    }
 }

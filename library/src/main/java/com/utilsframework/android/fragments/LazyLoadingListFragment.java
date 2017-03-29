@@ -175,7 +175,7 @@ public abstract class LazyLoadingListFragment<T>
         onLazyLoadingListChanged(elements);
     }
 
-    private void onSwipeRefresh() {
+    protected void onSwipeRefresh() {
         requestGetLazyLoadingList(lastFilter);
         elements.setOnPageLoadingFinished(new LazyLoadingList.OnPageLoadingFinished<T>() {
             @Override
