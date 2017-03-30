@@ -25,4 +25,9 @@ public class NoDrawerAdapter implements DrawerLayoutAdapter {
     public void setListener(Listener listener) {
 
     }
+
+    @Override
+    public boolean isDrawerVisible(View drawerView) {
+        return false;
+    }
 }

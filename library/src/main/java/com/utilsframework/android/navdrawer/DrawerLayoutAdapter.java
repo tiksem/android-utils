@@ -14,5 +14,6 @@ public interface DrawerLayoutAdapter {
     void openDrawer(View drawerView);
     void closeDrawer(View drawerView);
     boolean isDrawerOpened(View drawerView);
+    boolean isDrawerVisible(View drawerView);
     void setListener(Listener listener);
 }

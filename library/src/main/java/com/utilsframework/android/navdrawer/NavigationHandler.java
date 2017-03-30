@@ -11,6 +11,7 @@ import com.utils.framework.collections.*;
 import com.utils.framework.collections.Stack;
 import com.utilsframework.android.R;
 import com.utilsframework.android.fragments.Fragments;
+import com.utilsframework.android.threading.Tasks;
 import com.utilsframework.android.view.GuiUtilities;
 
 import java.util.*;
@@ -32,6 +33,7 @@ public abstract class NavigationHandler {
     private View navigationView;
     private TabsAdapter tabsAdapter;
     private DrawerLayoutAdapter drawerLayoutAdapter;
+    private Queue<Runnable> whenDrawableClosedQueue = new ArrayDeque<>();
 
     private void clearBackStack() {
         FragmentManager fragmentManager = activity.getSupportFragmentManager();
@@ -44,51 +46,70 @@ public abstract class NavigationHandler {
         backStack.clear();
     }
 
-    private void selectFragment(int menuItemId, int navigationLevel, int tabIndex, boolean createFragment) {
+    private void executeWhenDrawerClosed(Runnable runnable) {
+        if (!drawerLayoutAdapter.isDrawerVisible(navigationView)) {
+            runnable.run();
+        } else {
+            whenDrawableClosedQueue.add(runnable);
+        }
+    }
+
+    private void selectFragment(final int menuItemId,
+                                final int navigationLevel,
+                                final int tabIndex,
+                                final boolean createFragment) {
         hide();
 
-        if(menuItemId == currentSelectedItem && navigationLevel == this.navigationLevel){
-            return;
-        }
+        executeWhenDrawerClosed(new Runnable() {
+            @Override
+            public void run() {
+                if(menuItemId == currentSelectedItem && navigationLevel ==
+                        NavigationHandler.this.navigationLevel){
+                    return;
+                }
 
-        tabsAdapter.removeAllTabs();
-        int tabsCount = fragmentFactory.getTabsCount(menuItemId, navigationLevel);
-        onTabsInit(tabsCount, navigationLevel);
-        View tabsAdapterView = tabsAdapter.getView();
-        if (tabsCount <= 1) {
-            if (createFragment) {
-                clearBackStack();
-                Fragments.removeFragmentWithId(activity.getSupportFragmentManager(), getContentId());
-                Fragment fragment = fragmentFactory.createFragmentBySelectedItem(menuItemId, 0, navigationLevel);
-                Fragments.replaceFragment(activity, getContentId(), fragment);
-            }
-            if (tabsAdapterView != null) {
-                tabsAdapterView.setVisibility(View.GONE);
-            }
-        } else {
-            if (tabsAdapterView != null) {
-                tabsAdapterView.setVisibility(View.VISIBLE);
-            }
-            initTabs(tabsCount, menuItemId, navigationLevel, createFragment, tabIndex);
-        }
-
-        this.currentSelectedItem = menuItemId;
-        this.navigationLevel = navigationLevel;
-        updateActionBarTitle();
-
-        ActionBar actionBar = activity.getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.setDisplayHomeAsUpEnabled(navigationLevel != 0 ||
-                    navigationMode != NavigationMode.NEVER_SHOW_NAVIGATION_TOGGLE);
-
-            if (navigationMode == NavigationMode.SHOW_BACK_FOR_NESTED_LEVELS) {
-                if (navigationLevel == 0) {
-                    actionBar.setHomeAsUpIndicator(getToggleIconResourceId());
+                tabsAdapter.removeAllTabs();
+                int tabsCount = fragmentFactory.getTabsCount(menuItemId, navigationLevel);
+                onTabsInit(tabsCount, navigationLevel);
+                View tabsAdapterView = tabsAdapter.getView();
+                if (tabsCount <= 1) {
+                    if (createFragment) {
+                        clearBackStack();
+                        Fragments.removeFragmentWithId(activity.getSupportFragmentManager(),
+                                getContentId());
+                        Fragment fragment = fragmentFactory.createFragmentBySelectedItem(
+                                menuItemId, 0, navigationLevel);
+                        Fragments.replaceFragment(activity, getContentId(), fragment);
+                    }
+                    if (tabsAdapterView != null) {
+                        tabsAdapterView.setVisibility(View.GONE);
+                    }
                 } else {
-                    actionBar.setHomeAsUpIndicator(null);
+                    if (tabsAdapterView != null) {
+                        tabsAdapterView.setVisibility(View.VISIBLE);
+                    }
+                    initTabs(tabsCount, menuItemId, navigationLevel, createFragment, tabIndex);
+                }
+
+                NavigationHandler.this.currentSelectedItem = menuItemId;
+                NavigationHandler.this.navigationLevel = navigationLevel;
+                updateActionBarTitle();
+
+                ActionBar actionBar = activity.getSupportActionBar();
+                if (actionBar != null) {
+                    actionBar.setDisplayHomeAsUpEnabled(navigationLevel != 0 ||
+                            navigationMode != NavigationMode.NEVER_SHOW_NAVIGATION_TOGGLE);
+
+                    if (navigationMode == NavigationMode.SHOW_BACK_FOR_NESTED_LEVELS) {
+                        if (navigationLevel == 0) {
+                            actionBar.setHomeAsUpIndicator(getToggleIconResourceId());
+                        } else {
+                            actionBar.setHomeAsUpIndicator(null);
+                        }
+                    }
                 }
             }
-        }
+        });
     }
 
     private void initTabs(int tabsCount,
@@ -218,6 +239,7 @@ public abstract class NavigationHandler {
             @Override
             public void onDrawerClosed(View view) {
                 updateActionBarTitle();
+                Tasks.executeAndClearQueue(whenDrawableClosedQueue);
             }
 
             @Override

@@ -30,6 +30,11 @@ public class AndroidSupportDrawerLayoutAdapter implements DrawerLayoutAdapter {
     }
 
     @Override
+    public boolean isDrawerVisible(View drawerView) {
+        return drawerLayout.isDrawerVisible(drawerView);
+    }
+
+    @Override
     public void setListener(final Listener listener) {
         if (listener == null) {
             drawerLayout.setDrawerListener(null);
