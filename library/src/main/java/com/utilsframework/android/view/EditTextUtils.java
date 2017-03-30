@@ -92,4 +92,8 @@ public class EditTextUtils {
                 Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(editText.getWindowToken(), 0);
     }
+
+    public static void moveCursorToEnd(EditText editText) {
+        editText.setSelection(editText.getText().length());
+    }
 }

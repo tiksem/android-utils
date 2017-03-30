@@ -9,7 +9,8 @@ import com.utilsframework.android.R;
 /**
  * Created by CM on 12/26/2014.
  */
-public abstract class NavigationActivity extends AppCompatActivity implements FragmentsNavigationInterface {
+public abstract class NavigationActivity extends AppCompatActivity
+        implements FragmentsNavigationInterface {
     private NavigationHandler navigationHandler;
     private boolean preventAutomaticInit = false;
     private FragmentFactory fragmentFactory;
@@ -159,8 +160,12 @@ public abstract class NavigationActivity extends AppCompatActivity implements Fr
 
     @Override
     public void onBackPressed() {
-        navigationHandler.onBackPressed();
-        super.onBackPressed();
+        navigationHandler.onBackPressed(new Runnable() {
+            @Override
+            public void run() {
+                NavigationActivity.super.onBackPressed();
+            }
+        });
     }
 
     public void updateActionBarTitle() {

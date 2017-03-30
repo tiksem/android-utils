@@ -288,8 +288,22 @@ public abstract class NavigationHandler {
         return R.drawable.ic_menu_white;
     }
 
-    public void onBackPressed() {
-        Fragments.removeFragmentWithId(activity.getSupportFragmentManager(), getContentId());
+    public void onBackPressed(Runnable superBackPressed) {
+        Fragment currentFragment = getCurrentFragment();
+        if (currentFragment instanceof BackPressedListener) {
+            BackPressedListener listener = (BackPressedListener) currentFragment;
+            if (!listener.shouldOverrideDefaultBackPressedBehavior()) {
+                callDefaultBackPressed(superBackPressed);
+            }
+        } else {
+            callDefaultBackPressed(superBackPressed);
+        }
+    }
+
+    private void callDefaultBackPressed(Runnable superBackPressed) {
+        Fragments.removeFragmentWithId(activity.getSupportFragmentManager(),
+                getContentId());
+        superBackPressed.run();
     }
 
     public Fragment getCurrentFragment() {
