@@ -531,6 +531,10 @@ public abstract class LazyLoadingListFragment<T>
         }
     }
 
+    public boolean isRefreshing() {
+        return swipeRefreshLayout != null && swipeRefreshLayout.isRefreshing();
+    }
+
     protected int getSearchMenuId() {
         return R.menu.search;
     }
