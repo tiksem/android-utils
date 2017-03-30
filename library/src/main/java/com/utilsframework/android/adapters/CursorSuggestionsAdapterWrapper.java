@@ -6,6 +6,7 @@ import android.database.DataSetObserver;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.*;
+import android.widget.ListAdapter;
 
 /**
  * Created by CM on 10/15/2014.

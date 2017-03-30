@@ -13,10 +13,6 @@ public abstract class LazyLoadingListAdapter<Element, ViewHolder> extends ViewAr
         super(context);
     }
 
-    public LazyLoadingListAdapter(Context context, View header) {
-        super(context, header);
-    }
-
     @Override
     protected int getNullLayoutId() {
         return R.layout.navigation_list_null_item;

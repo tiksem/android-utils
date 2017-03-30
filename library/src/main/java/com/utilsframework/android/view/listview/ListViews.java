@@ -1,5 +1,6 @@
 package com.utilsframework.android.view.listview;
 
+import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.AbsListView;
 import android.widget.ListView;
@@ -30,5 +31,9 @@ public class ListViews {
         View header = View.inflate(listView.getContext(), headerLayoutId, null);
         listView.addHeaderView(header);
         return header;
+    }
+
+    public static View getViewByAdapterPosition(RecyclerView recyclerView, int position) {
+        return recyclerView.findViewHolderForAdapterPosition(position).itemView;
     }
 }

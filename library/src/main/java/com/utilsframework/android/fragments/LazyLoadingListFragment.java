@@ -2,7 +2,10 @@ package com.utilsframework.android.fragments;
 
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.SparseBooleanArray;
 import android.view.*;
 import android.widget.AbsListView;
@@ -10,7 +13,7 @@ import android.widget.AdapterView;
 
 import com.utils.framework.collections.LazyLoadingList;
 import com.utilsframework.android.R;
-import com.utilsframework.android.adapters.ViewArrayAdapter;
+import com.utilsframework.android.adapters.ListAdapter;
 import com.utilsframework.android.menu.SearchListener;
 import com.utilsframework.android.menu.SearchMenuAction;
 import com.utilsframework.android.menu.SortListener;
@@ -20,6 +23,7 @@ import com.utilsframework.android.network.CancelStrategy;
 import com.utilsframework.android.network.RequestListener;
 import com.utilsframework.android.view.OneVisibleViewInGroupToggle;
 import com.utilsframework.android.view.Toasts;
+import com.utilsframework.android.view.listview.RecyclerViewItemClickListener;
 import com.utilsframework.android.view.listview.SwipeLayoutListViewTouchListener;
 
 import java.util.ArrayList;
@@ -34,8 +38,8 @@ public abstract class LazyLoadingListFragment<T>
     private static final String SORT_ORDER = "SORT_ORDER";
     private static final int SHOW_TOAST_MAX_ERROR_COUNT = 1;
 
-    private ViewArrayAdapter<T, ?> adapter;
-    private AbsListView listView;
+    private ListAdapter<T> adapter;
+    private View listView;
     private View emptyView;
     private LazyLoadingList<T> elements;
     private Parcelable listViewState;
@@ -48,6 +52,7 @@ public abstract class LazyLoadingListFragment<T>
     private int restoredSortOrder = 0;
     private boolean firstViewCreate = true;
     private AsyncRequestExecutionManager asyncRequestExecutionManager;
+    private SparseBooleanArray disabledItemPositions = new SparseBooleanArray();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -94,21 +99,72 @@ public abstract class LazyLoadingListFragment<T>
 
     private void setupListViewListenersAndAdapter() {
         adapter = createAdapter();
-        listView.setAdapter(adapter);
-
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                T item = adapter.getElementOfView(view);
-                if (item != null) {
-                    onListItemClicked(item, position);
+        if (listView instanceof AbsListView) {
+            AbsListView absListView = getAbsListView();
+            absListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    onListItemClicked(position);
                 }
+            });
+            if (!(adapter instanceof android.widget.ListAdapter)) {
+                throw new IllegalStateException("getListResourceId() is AbsListView resource," +
+                        "but createAdapter returns " + adapter.getClass().getCanonicalName() + " " +
+                        "which doesn't inherit android.widget.ListAdapter. " +
+                        "Your adapter is incompatible with AbsListView. Use ViewArrayAdapter as " +
+                        "a base class of your adapter for example");
             }
-        });
+
+            absListView.setAdapter((android.widget.ListAdapter) adapter);
+        } else if(listView instanceof RecyclerView) {
+            RecyclerView recyclerView = getRecyclerView();
+            recyclerView.setLayoutManager(createRecyclerViewLayoutManager());
+
+            if (!(adapter instanceof RecyclerView.Adapter)) {
+                throw new IllegalStateException("getListResourceId() is RecyclerView resource," +
+                        "but createAdapter returns " + adapter.getClass().getCanonicalName() + " " +
+                        "which doesn't inherit RecyclerView.Adapter. " +
+                        "Your adapter is incompatible with RecyclerView. " +
+                        "Use RecyclerViewListAdapter as " +
+                        "a base class of your adapter for example");
+            }
+
+            recyclerView.addOnItemTouchListener(new RecyclerViewItemClickListener(recyclerView,
+                    new RecyclerViewItemClickListener.OnItemClickListener() {
+                @Override
+                public void onItemClick(View view, int position) {
+                    onListItemClicked(position);
+                }
+
+                @Override
+                public void onLongItemClick(View view, int position) {
+
+                }
+            }));
+            recyclerView.setAdapter((RecyclerView.Adapter) adapter);
+        } else {
+            throw new IllegalStateException("getListResourceId() returns unsupported " +
+                    "listview type. Should be AbsListView or RecyclerView");
+        }
+    }
+
+    protected RecyclerView.LayoutManager createRecyclerViewLayoutManager() {
+        return new LinearLayoutManager(getContext());
+    }
+
+    private void onListItemClicked(int position) {
+        if (disabledItemPositions.get(position)) {
+            return;
+        }
+
+        T item = adapter.getElement(position);
+        if (item != null) {
+            onListItemClicked(item, position);
+        }
     }
 
     private void setupViews(View view) {
-        listView = (AbsListView) view.findViewById(getListResourceId());
+        listView = view.findViewById(getListResourceId());
         if (listView == null) {
             throw new NullPointerException("getListResourceId returns invalid id, " +
                     "listView == null");
@@ -156,7 +212,25 @@ public abstract class LazyLoadingListFragment<T>
 
     private void setupSwipeLayout(View view) {
         swipeRefreshLayout = (SwipeRefreshLayout) view;
-        listView.setOnTouchListener(new SwipeLayoutListViewTouchListener(swipeRefreshLayout));
+        if (listView instanceof AbsListView) {
+            listView.setOnTouchListener(new SwipeLayoutListViewTouchListener(swipeRefreshLayout));
+        } else if (listView instanceof RecyclerView) {
+            getRecyclerView().addOnScrollListener(new RecyclerView.OnScrollListener() {
+                @Override
+                public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                    int topRowVerticalPosition =
+                            (recyclerView == null || recyclerView.getChildCount() == 0) ? 0 :
+                                    recyclerView.getChildAt(0).getTop();
+                    swipeRefreshLayout.setEnabled(topRowVerticalPosition >= 0);
+
+                }
+
+                @Override
+                public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                    super.onScrollStateChanged(recyclerView, newState);
+                }
+            });
+        }
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -200,7 +274,9 @@ public abstract class LazyLoadingListFragment<T>
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        listViewState = listView.onSaveInstanceState();
+        if (listView instanceof AbsListView) {
+            listViewState = getAbsListView().onSaveInstanceState();
+        }
         restoredSortOrder = getSortOrder();
     }
 
@@ -208,8 +284,8 @@ public abstract class LazyLoadingListFragment<T>
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         Parcelable listViewState = null;
-        if (listView != null) {
-            listViewState = listView.onSaveInstanceState();
+        if (listView != null && listView instanceof AbsListView) {
+            listViewState = getAbsListView().onSaveInstanceState();
         }
         if (listViewState != null) {
             outState.putParcelable(LIST_VIEW_STATE, listViewState);
@@ -227,7 +303,7 @@ public abstract class LazyLoadingListFragment<T>
         }
     }
 
-    public ViewArrayAdapter<T, ?> getAdapter() {
+    public ListAdapter<T> getAdapter() {
         return adapter;
     }
 
@@ -235,7 +311,7 @@ public abstract class LazyLoadingListFragment<T>
 
     protected abstract int getLoadingViewId();
 
-    protected abstract ViewArrayAdapter<T, ? extends Object> createAdapter();
+    protected abstract ListAdapter<T> createAdapter();
     protected abstract LazyLoadingList<T> getLazyLoadingList(String filter);
 
     protected abstract void onListItemClicked(T item, int position);
@@ -363,7 +439,9 @@ public abstract class LazyLoadingListFragment<T>
         }
 
         if (listViewState != null) {
-            listView.onRestoreInstanceState(listViewState);
+            if (listView instanceof AbsListView) {
+                ((AbsListView)listView).onRestoreInstanceState(listViewState);
+            }
         }
     }
 
@@ -461,8 +539,16 @@ public abstract class LazyLoadingListFragment<T>
         return lastFilter;
     }
 
-    public final AbsListView getListView() {
+    public final View getListView() {
         return listView;
+    }
+
+    public final AbsListView getAbsListView() {
+        return (AbsListView) listView;
+    }
+
+    public final RecyclerView getRecyclerView() {
+        return (RecyclerView) listView;
     }
 
     public final View getLoadingView() {
@@ -516,7 +602,11 @@ public abstract class LazyLoadingListFragment<T>
 
     public List<T> getSelectedItems() {
         List<T> result = new ArrayList<>();
-        SparseBooleanArray positions = getListView().getCheckedItemPositions();
+        if (!(listView instanceof AbsListView)) {
+            throw new UnsupportedOperationException("getSelectedItems is supported only for listview");
+        }
+
+        SparseBooleanArray positions = getAbsListView().getCheckedItemPositions();
         for (int i = 0; i < adapter.getCount(); i++) {
             if (positions.get(i)) {
                 result.add(adapter.getElement(i));
@@ -539,6 +629,10 @@ public abstract class LazyLoadingListFragment<T>
 
     protected void sort(List<T> items, int sortingOrder) {
         throw new UnsupportedOperationException();
+    }
+
+    public void setItemClickEnabled(int position, boolean enabled) {
+        disabledItemPositions.put(position, !enabled);
     }
 
     // override one of these methods to load some data before loading navigation list
