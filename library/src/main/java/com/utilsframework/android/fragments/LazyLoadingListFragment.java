@@ -13,6 +13,8 @@ import android.widget.AdapterView;
 
 import com.utils.framework.collections.LazyLoadingList;
 import com.utilsframework.android.R;
+import com.utilsframework.android.adapters.AdapterItemClickListenerHolder;
+import com.utilsframework.android.adapters.ItemClickListener;
 import com.utilsframework.android.adapters.ListAdapter;
 import com.utilsframework.android.menu.SearchListener;
 import com.utilsframework.android.menu.SearchMenuAction;
@@ -27,7 +29,9 @@ import com.utilsframework.android.view.listview.RecyclerViewItemClickListener;
 import com.utilsframework.android.view.listview.SwipeLayoutListViewTouchListener;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by CM on 6/21/2015.
@@ -52,7 +56,7 @@ public abstract class LazyLoadingListFragment<T>
     private int restoredSortOrder = 0;
     private boolean firstViewCreate = true;
     private AsyncRequestExecutionManager asyncRequestExecutionManager;
-    private SparseBooleanArray disabledItemPositions = new SparseBooleanArray();
+    private Set<T> disabledItems = new HashSet<>();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -129,18 +133,28 @@ public abstract class LazyLoadingListFragment<T>
                         "a base class of your adapter for example");
             }
 
-            recyclerView.addOnItemTouchListener(new RecyclerViewItemClickListener(recyclerView,
-                    new RecyclerViewItemClickListener.OnItemClickListener() {
-                @Override
-                public void onItemClick(View view, int position) {
-                    onListItemClicked(position);
-                }
+            if (adapter instanceof AdapterItemClickListenerHolder) {
+                ((AdapterItemClickListenerHolder)adapter).setItemClickListener(
+                        new ItemClickListener() {
+                    @Override
+                    public void onItemCLicked(int position) {
+                        onListItemClicked(position);
+                    }
+                });
+            } else {
+                recyclerView.addOnItemTouchListener(new RecyclerViewItemClickListener(recyclerView,
+                        new RecyclerViewItemClickListener.OnItemClickListener() {
+                            @Override
+                            public void onItemClick(View view, int position) {
+                                onListItemClicked(position);
+                            }
 
-                @Override
-                public void onLongItemClick(View view, int position) {
+                            @Override
+                            public void onLongItemClick(View view, int position) {
 
-                }
-            }));
+                            }
+                        }));
+            }
             recyclerView.setAdapter((RecyclerView.Adapter) adapter);
         } else {
             throw new IllegalStateException("getListResourceId() returns unsupported " +
@@ -153,12 +167,8 @@ public abstract class LazyLoadingListFragment<T>
     }
 
     private void onListItemClicked(int position) {
-        if (disabledItemPositions.get(position)) {
-            return;
-        }
-
         T item = adapter.getElement(position);
-        if (item != null) {
+        if (item != null && !disabledItems.contains(item)) {
             onListItemClicked(item, position);
         }
     }
@@ -635,8 +645,12 @@ public abstract class LazyLoadingListFragment<T>
         throw new UnsupportedOperationException();
     }
 
-    public void setItemClickEnabled(int position, boolean enabled) {
-        disabledItemPositions.put(position, !enabled);
+    public void setItemClickEnabled(T item, boolean enabled) {
+        if (enabled) {
+            disabledItems.remove(item);
+        } else {
+            disabledItems.add(item);
+        }
     }
 
     // override one of these methods to load some data before loading navigation list
@@ -650,5 +664,9 @@ public abstract class LazyLoadingListFragment<T>
     // used only to support createRequestForPreloadedData and createRequestsForPreloadedData functionality
     protected AsyncRequestExecutionManager createAsyncRequestExecutionManager() {
         return null;
+    }
+
+    public Set<T> getDisabledItems() {
+        return disabledItems;
     }
 }

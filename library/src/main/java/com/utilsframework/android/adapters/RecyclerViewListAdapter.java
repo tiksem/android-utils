@@ -10,8 +10,10 @@ import java.util.Collections;
 import java.util.List;
 
 public abstract class RecyclerViewListAdapter<Element, VH extends RecyclerView.ViewHolder>
-        extends RecyclerView.Adapter<VH> implements ListAdapter<Element> {
+        extends RecyclerView.Adapter<VH>
+        implements ListAdapter<Element>, AdapterItemClickListenerHolder {
     private List<Element> items;
+    private ItemClickListener itemClickListener;
 
     public abstract int getItemLayoutId(int viewType);
     protected abstract VH onCreateViewHolder(View view, int viewType);
@@ -28,7 +30,16 @@ public abstract class RecyclerViewListAdapter<Element, VH extends RecyclerView.V
     }
 
     @Override
-    public void onBindViewHolder(VH holder, int position) {
+    public void onBindViewHolder(VH holder, final int position) {
+        if (itemClickListener != null) {
+            holder.itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    itemClickListener.onItemCLicked(position);
+                }
+            });
+        }
+
         onBindViewHolder(holder, position, items.get(position));
     }
 
@@ -142,5 +153,16 @@ public abstract class RecyclerViewListAdapter<Element, VH extends RecyclerView.V
     @Override
     public int getCount() {
         return getItemCount();
+    }
+
+    @Override
+    public void setItemClickListener(ItemClickListener itemClickListener) {
+        this.itemClickListener = itemClickListener;
+    }
+
+    @Override
+    public void notifyItemChanged(Element item) {
+        int index = getElements().indexOf(item);
+        notifyItemChanged(index);
     }
 }

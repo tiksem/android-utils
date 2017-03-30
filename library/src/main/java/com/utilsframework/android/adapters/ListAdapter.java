@@ -11,4 +11,6 @@ public interface ListAdapter<Element> {
     void notifyItemRemoved(int position);
     void removeItemAt(int index);
     void removeItem(Element item);
+    void notifyItemChanged(int position);
+    void notifyItemChanged(Element item);
 }

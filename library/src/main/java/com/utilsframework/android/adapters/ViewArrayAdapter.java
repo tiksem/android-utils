@@ -335,4 +335,14 @@ public abstract class ViewArrayAdapter<Element, ViewHolder> extends BaseAdapter 
     public void notifyItemRemoved(int position) {
         notifyDataSetChanged();
     }
+
+    @Override
+    public void notifyItemChanged(int position) {
+        notifyDataSetChanged();
+    }
+
+    @Override
+    public void notifyItemChanged(Element item) {
+        notifyDataSetChanged();
+    }
 }
