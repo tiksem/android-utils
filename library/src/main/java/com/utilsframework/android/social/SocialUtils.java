@@ -7,6 +7,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.provider.MediaStore;
 import com.utilsframework.android.AndroidUtilities;
+import com.utilsframework.android.system.Intents;
 import com.utilsframework.android.web.WebViewActivity;
 
 import java.io.File;
@@ -45,7 +46,8 @@ public class SocialUtils {
         if (isVkInstalled(context)) {
             startVkUserProfileActivity(context, userId);
         } else {
-            WebViewActivity.loadUrl(context, "http://vk.com/id" + userId);
+            String url = "http://vk.com/id" + userId;
+            Intents.openUrl(context, url);
         }
     }
 
