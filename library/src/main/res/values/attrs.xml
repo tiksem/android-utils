@@ -63,5 +63,6 @@
 
     <declare-styleable name="DateTimePickerButton">
         <attr name="dateTimeTextColor" format="color" />
+        <attr name="delimiter" format="string" />
     </declare-styleable>
 </resources>

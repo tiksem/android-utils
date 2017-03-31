@@ -3,7 +3,6 @@ package com.utilsframework.android.view;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.res.TypedArray;
-import android.graphics.Color;
 import android.os.Build;
 import android.text.SpannableString;
 import android.text.Spanned;
@@ -11,10 +10,10 @@ import android.text.TextPaint;
 import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
 import android.util.AttributeSet;
-import android.view.Gravity;
 import android.view.View;
 import android.widget.TextView;
 
+import com.utils.framework.strings.Strings;
 import com.utilsframework.android.R;
 import com.utilsframework.android.time.TimeUtils;
 
@@ -27,6 +26,7 @@ import java.util.GregorianCalendar;
 public class DateTimePickerButton extends TextView {
     private Alerts.DateTimePickerSettings settings = new Alerts.DateTimePickerSettings();
     private Integer dateTimeTextColor;
+    private String delimiter;
 
     private abstract class DateTimeSpan extends ClickableSpan {
         @Override
@@ -39,7 +39,7 @@ public class DateTimePickerButton extends TextView {
 
     private void updateText(GregorianCalendar calendar) {
         String dateText = createDateText(calendar);
-        String delimiter = createDelimeter();
+        String delimiter = createDelimiter();
         String timeText = createTimeText(calendar);
 
         SpannableString text = new SpannableString(dateText + delimiter + timeText);
@@ -79,8 +79,13 @@ public class DateTimePickerButton extends TextView {
         return hours + ":" + minutes;
     }
 
-    protected String createDelimeter() {
-        return " at ";
+    protected String createDelimiter() {
+        String delimiter = this.delimiter;
+        if (delimiter == null) {
+            delimiter = getContext().getString(R.string.date_time_divider);
+        }
+
+        return Strings.quote(delimiter, " ");
     }
 
     private void init(Context context, AttributeSet attributeSet) {
@@ -94,6 +99,7 @@ public class DateTimePickerButton extends TextView {
                 } else {
                     this.dateTimeTextColor = null;
                 }
+                delimiter = a.getString(R.styleable.DateTimePickerButton_delimiter);
             } finally {
                 a.recycle();
             }
