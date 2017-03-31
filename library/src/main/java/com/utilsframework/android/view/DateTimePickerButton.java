@@ -2,14 +2,20 @@ package com.utilsframework.android.view;
 
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.content.res.TypedArray;
+import android.graphics.Color;
 import android.os.Build;
 import android.text.SpannableString;
 import android.text.Spanned;
+import android.text.TextPaint;
 import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
 import android.util.AttributeSet;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.TextView;
+
+import com.utilsframework.android.R;
 import com.utilsframework.android.time.TimeUtils;
 
 import java.util.Calendar;
@@ -20,6 +26,16 @@ import java.util.GregorianCalendar;
  */
 public class DateTimePickerButton extends TextView {
     private Alerts.DateTimePickerSettings settings = new Alerts.DateTimePickerSettings();
+    private Integer dateTimeTextColor;
+
+    private abstract class DateTimeSpan extends ClickableSpan {
+        @Override
+        public void updateDrawState(TextPaint ds) {
+            if (dateTimeTextColor != null) {
+                ds.setColor(dateTimeTextColor);
+            }
+        }
+    }
 
     private void updateText(GregorianCalendar calendar) {
         String dateText = createDateText(calendar);
@@ -28,14 +44,14 @@ public class DateTimePickerButton extends TextView {
 
         SpannableString text = new SpannableString(dateText + delimiter + timeText);
         int start = dateText.length();
-        text.setSpan(new ClickableSpan() {
+        text.setSpan(new DateTimeSpan() {
             @Override
             public void onClick(View widget) {
                 Alerts.showDatePickerAlert(getContext(), settings);
             }
         }, 0, start, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         start = start + delimiter.length();
-        text.setSpan(new ClickableSpan() {
+        text.setSpan(new DateTimeSpan() {
             @Override
             public void onClick(View widget) {
                 Alerts.showTimePickerAlert(getContext(), settings);
@@ -67,7 +83,22 @@ public class DateTimePickerButton extends TextView {
         return " at ";
     }
 
-    private void init() {
+    private void init(Context context, AttributeSet attributeSet) {
+        if (attributeSet != null) {
+            TypedArray a = context.obtainStyledAttributes(attributeSet,
+                    R.styleable.DateTimePickerButton);
+            try {
+                if (a.hasValue(R.styleable.DateTimePickerButton_dateTimeTextColor)) {
+                    this.dateTimeTextColor = a.getColor(
+                            R.styleable.DateTimePickerButton_dateTimeTextColor, 0);
+                } else {
+                    this.dateTimeTextColor = null;
+                }
+            } finally {
+                a.recycle();
+            }
+        }
+
         settings.onDateTimeSelected = new Alerts.OnDateTimeSelected() {
             @Override
             public void onSelected(GregorianCalendar calendar) {
@@ -85,23 +116,23 @@ public class DateTimePickerButton extends TextView {
 
     public DateTimePickerButton(Context context) {
         super(context);
-        init();
+        init(context, null);
     }
 
     public DateTimePickerButton(Context context, AttributeSet attrs) {
         super(context, attrs);
-        init();
+        init(context, attrs);
     }
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     public DateTimePickerButton(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
-        init();
+        init(context, attrs);
     }
 
     public DateTimePickerButton(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        init();
+        init(context, attrs);
     }
 
     public long getDate() {

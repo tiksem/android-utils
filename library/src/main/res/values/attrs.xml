@@ -60,4 +60,8 @@
         <attr name="layout_weight" format="float"/>
         <attr name="android:layout_gravity"/>
     </declare-styleable>
+
+    <declare-styleable name="DateTimePickerButton">
+        <attr name="dateTimeTextColor" format="color" />
+    </declare-styleable>
 </resources>
