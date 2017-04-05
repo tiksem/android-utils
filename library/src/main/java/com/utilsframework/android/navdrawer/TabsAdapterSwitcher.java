@@ -10,17 +10,13 @@ import com.utilsframework.android.view.GuiUtilities;
  */
 public class TabsAdapterSwitcher implements TabsAdapter {
     private TabsAdapter tabsAdapter;
-    private View currentView;
 
-    public TabsAdapterSwitcher(Activity activity, int viewStubId) {
-        currentView = activity.findViewById(viewStubId);
+    public TabsAdapterSwitcher(TabsAdapter tabsAdapter) {
+        this.tabsAdapter = tabsAdapter;
     }
 
     public void setTabsAdapter(TabsAdapter tabsAdapter) {
         this.tabsAdapter = tabsAdapter;
-        View view = tabsAdapter.getView();
-        GuiUtilities.replaceView(currentView, view);
-        currentView = view;
     }
 
     public TabsAdapter getTabsAdapter() {
@@ -38,17 +34,7 @@ public class TabsAdapterSwitcher implements TabsAdapter {
     }
 
     @Override
-    public void removeAllTabs() {
-        tabsAdapter.removeAllTabs();
-    }
-
-    @Override
     public void selectTab(int index) {
         tabsAdapter.selectTab(index);
-    }
-
-    @Override
-    public View getView() {
-        return tabsAdapter.getView();
     }
 }

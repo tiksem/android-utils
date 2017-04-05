@@ -3,6 +3,8 @@ package com.utilsframework.android.navdrawer;
 import android.support.design.widget.NavigationView;
 import android.view.View;
 
+import com.utilsframework.android.R;
+
 /**
  * Created by stykhonenko on 15.10.15.
  */
@@ -12,18 +14,14 @@ public abstract class NavigationDrawerMenuActivity extends NavigationActivity {
     protected abstract int getMenuId();
 
     @Override
-    protected final NavigationDrawerMenuAdapter createNavigationDrawerMenuAdapter(
-            int navigationViewId) {
-        menuAdapter = createNavigationViewMenuAdapter(navigationViewId);
+    protected MenuLayoutAdapter createMenuLayoutAdapter() {
+        menuAdapter = new NavigationViewMenuAdapter(this, R.id.drawer_layout,
+                R.id.navigation, getMenuId());
         return menuAdapter;
     }
 
-    protected NavigationViewMenuAdapter createNavigationViewMenuAdapter(int navigationViewId) {
-        return new NavigationViewMenuAdapter(this, navigationViewId, getMenuId());
-    }
-
     public NavigationView getNavigationView() {
-        return menuAdapter.getNavigationMenuView();
+        return menuAdapter.getMenuView();
     }
 
     public void registerHeaderItemAsSelectable(int headerItemId) {

@@ -5,7 +5,7 @@ import com.utilsframework.android.R;
 /**
  * Created by stykhonenko on 19.10.15.
  */
-public abstract class NavigationActivityWithoutDrawerLayout extends NavigationActivity {
+public abstract class NavigationActivityWithoutMenu extends NavigationActivity {
     @Override
     protected int getCurrentSelectedNavigationItemId() {
         return 0;
@@ -17,12 +17,7 @@ public abstract class NavigationActivityWithoutDrawerLayout extends NavigationAc
     }
 
     @Override
-    protected DrawerLayoutAdapter createDrawerLayoutAdapter() {
-        return new NoDrawerAdapter();
-    }
-
-    @Override
-    protected NavigationDrawerMenuAdapter createNavigationDrawerMenuAdapter(int navigationViewId) {
+    protected MenuLayoutAdapter createMenuLayoutAdapter() {
         return new NoMenuAdapter();
     }
 

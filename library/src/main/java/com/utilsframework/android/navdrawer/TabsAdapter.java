@@ -20,7 +20,5 @@ public interface TabsAdapter {
 
     void setOnTabSelected(OnTabSelected listener);
     Tab newTab(boolean isSelected);
-    void removeAllTabs();
     void selectTab(int index);
-    View getView();
 }

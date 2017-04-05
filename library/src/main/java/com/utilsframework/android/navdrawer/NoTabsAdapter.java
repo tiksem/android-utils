@@ -14,17 +14,7 @@ public class NoTabsAdapter implements TabsAdapter {
     }
 
     @Override
-    public void removeAllTabs() {
-
-    }
-
-    @Override
     public void selectTab(int index) {
 
-    }
-
-    @Override
-    public View getView() {
-        return null;
     }
 }

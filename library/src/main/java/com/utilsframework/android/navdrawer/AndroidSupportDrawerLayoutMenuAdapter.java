@@ -7,35 +7,38 @@ import android.view.View;
 /**
  * Created by stykhonenko on 19.10.15.
  */
-public class AndroidSupportDrawerLayoutAdapter implements DrawerLayoutAdapter {
+public abstract class AndroidSupportDrawerLayoutMenuAdapter implements MenuLayoutAdapter {
+    private View menuView;
     private DrawerLayout drawerLayout;
+    private Listener listener;
 
-    public AndroidSupportDrawerLayoutAdapter(Activity activity, int drawerLayoutId) {
+    public AndroidSupportDrawerLayoutMenuAdapter(Activity activity, int drawerLayoutId) {
         drawerLayout = (DrawerLayout) activity.findViewById(drawerLayoutId);
     }
 
     @Override
-    public void openDrawer(View drawerView) {
-        drawerLayout.openDrawer(drawerView);
+    public void open() {
+        drawerLayout.openDrawer(menuView);
     }
 
     @Override
-    public void closeDrawer(View drawerView) {
-        drawerLayout.closeDrawer(drawerView);
+    public void close() {
+        drawerLayout.closeDrawer(menuView);
     }
 
     @Override
-    public boolean isDrawerOpened(View drawerView) {
-        return drawerLayout.isDrawerOpen(drawerView);
+    public boolean isOpen() {
+        return drawerLayout.isDrawerOpen(menuView);
     }
 
     @Override
-    public boolean isDrawerVisible(View drawerView) {
-        return drawerLayout.isDrawerVisible(drawerView);
+    public boolean isVisible() {
+        return drawerLayout.isDrawerVisible(menuView);
     }
 
     @Override
     public void setListener(final Listener listener) {
+        this.listener = listener;
         if (listener == null) {
             drawerLayout.setDrawerListener(null);
         } else {
@@ -47,12 +50,12 @@ public class AndroidSupportDrawerLayoutAdapter implements DrawerLayoutAdapter {
 
                 @Override
                 public void onDrawerOpened(View view) {
-                    listener.onDrawerOpened(view);
+                    listener.onOpened();
                 }
 
                 @Override
                 public void onDrawerClosed(View view) {
-                    listener.onDrawerClosed(view);
+                    listener.onClosed();
                 }
 
                 @Override
@@ -60,6 +63,22 @@ public class AndroidSupportDrawerLayoutAdapter implements DrawerLayoutAdapter {
 
                 }
             });
+            setListenerToMenuView(listener, menuView);
         }
     }
+
+    public Listener getListener() {
+        return listener;
+    }
+
+    @Override
+    public View getMenuView() {
+        return menuView;
+    }
+
+    protected final void setMenuView(View menuView) {
+        this.menuView = menuView;
+    }
+
+    protected abstract void setListenerToMenuView(Listener listener, View menuView);
 }

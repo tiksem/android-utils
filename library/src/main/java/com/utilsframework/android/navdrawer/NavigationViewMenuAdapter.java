@@ -12,52 +12,42 @@ import java.util.List;
 /**
  * Created by stykhonenko on 15.10.15.
  */
-public class NavigationViewMenuAdapter implements NavigationDrawerMenuAdapter {
+public class NavigationViewMenuAdapter extends AndroidSupportDrawerLayoutMenuAdapter {
     private NavigationView navigationView;
-    private OnItemSelectedListener onItemSelectedListener;
 
-    public NavigationViewMenuAdapter(Activity activity, int navigationViewId, int menuResourceId) {
+    public NavigationViewMenuAdapter(Activity activity, int drawerLayoutId,
+                                     int navigationViewId,
+                                     int menuResourceId) {
+        super(activity, drawerLayoutId);
         navigationView = (NavigationView) activity.findViewById(navigationViewId);
         navigationView.inflateMenu(menuResourceId);
+        setMenuView(navigationView);
+    }
 
+    @Override
+    protected void setListenerToMenuView(final Listener listener, View menuView) {
         navigationView.setNavigationItemSelectedListener(
                 new NavigationView.OnNavigationItemSelectedListener() {
                     @Override
                     public boolean onNavigationItemSelected(MenuItem menuItem) {
                         int itemId = menuItem.getItemId();
-                        onItemSelected(itemId);
+                        listener.onItemSelected(itemId);
+                        applySelectItemVisualStyle(itemId);
                         return true;
                     }
                 });
     }
 
-    protected void onItemSelected(int itemId) {
-        if (onItemSelectedListener != null) {
-            onItemSelectedListener.onItemSelected(itemId);
-        }
-        applySelectItemVisualStyle(itemId);
-    }
-
-    public OnItemSelectedListener getOnItemSelectedListener() {
-        return onItemSelectedListener;
-    }
-
-    @Override
-    public void setOnItemSelectedListener(OnItemSelectedListener listener) {
-        onItemSelectedListener = listener;
-    }
-
     @Override
     public void applySelectItemVisualStyle(int id) {
-        List<MenuItem> menuItems = MenuUtils.getAllItemsRecursive(
-                getNavigationMenuView().getMenu());
+        List<MenuItem> menuItems = MenuUtils.getAllItemsRecursive(navigationView.getMenu());
         for (MenuItem menuItem : menuItems) {
             menuItem.setChecked(menuItem.getItemId() == id);
         }
     }
 
     @Override
-    public NavigationView getNavigationMenuView() {
+    public NavigationView getMenuView() {
         return navigationView;
     }
 
@@ -70,17 +60,17 @@ public class NavigationViewMenuAdapter implements NavigationDrawerMenuAdapter {
         item.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                onItemSelected(v.getId());
+                getListener().onItemSelected(v.getId());
             }
         });
     }
 
     public void registerHeaderItemAsSelectable(int headerItemId) {
-        View item = getNavigationMenuView().getHeaderView(0).findViewById(headerItemId);
+        View item = navigationView.getHeaderView(0).findViewById(headerItemId);
         item.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                onItemSelected(v.getId());
+                getListener().onItemSelected(v.getId());
             }
         });
     }

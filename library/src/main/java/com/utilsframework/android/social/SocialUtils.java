@@ -1,14 +1,11 @@
 package com.utilsframework.android.social;
 
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
 import android.net.Uri;
-import android.provider.MediaStore;
+
 import com.utilsframework.android.AndroidUtilities;
 import com.utilsframework.android.system.Intents;
-import com.utilsframework.android.web.WebViewActivity;
 
 import java.io.File;
 
@@ -36,7 +33,7 @@ public class SocialUtils {
         return AndroidUtilities.isAppInstalled(context, VK_PACKAGE_NAME);
     }
 
-    public static void startVkUserProfileActivity(Context context, long userId) {
+    private static void startVkUserProfileActivity(Context context, long userId) {
         Uri uri = Uri.parse("vkontakte://profile/" + userId);
         Intent intent = new Intent(Intent.ACTION_VIEW, uri);
         context.startActivity(intent);

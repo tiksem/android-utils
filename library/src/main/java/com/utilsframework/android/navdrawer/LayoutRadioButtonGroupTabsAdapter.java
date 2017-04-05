@@ -96,19 +96,8 @@ public class LayoutRadioButtonGroupTabsAdapter implements TabsAdapter {
         return new TabHolder(button);
     }
 
-    // Will not actually remove tabs, just emulate
-    @Override
-    public void removeAllTabs() {
-        newTabIndex = 0;
-    }
-
     @Override
     public void selectTab(int index) {
         radioButtonGroup.setSelectedItemIndex(index);
-    }
-
-    @Override
-    public View getView() {
-        return (View) radioButtonGroup.getParent();
     }
 }

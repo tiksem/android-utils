@@ -1,27 +1,22 @@
 package com.utilsframework.android.navdrawer;
 
 import android.os.Bundle;
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
+import android.view.View;
+
 import com.utilsframework.android.R;
 
 /**
  * Created by CM on 12/26/2014.
  */
 public abstract class NavigationActivity extends AppCompatActivity
-        implements FragmentsNavigationInterface {
+        implements FragmentsNavigationInterface, NavigationHandlerProvider {
     private NavigationHandler navigationHandler;
     private boolean preventAutomaticInit = false;
     private FragmentFactory fragmentFactory;
-
-    public boolean preventAutomaticInit() {
-        return preventAutomaticInit;
-    }
-
-    public void setPreventAutomaticInit(boolean preventAutomaticInit) {
-        this.preventAutomaticInit = preventAutomaticInit;
-    }
 
     protected void onBeforeNavigationDrawerInit() {
 
@@ -46,8 +41,8 @@ public abstract class NavigationActivity extends AppCompatActivity
         navigationHandler = new NavigationHandler(this, fragmentFactory,
                 getCurrentSelectedNavigationItemId()) {
             @Override
-            protected DrawerLayoutAdapter createDrawerLayoutAdapter() {
-                return NavigationActivity.this.createDrawerLayoutAdapter();
+            protected MenuLayoutAdapter createDrawerLayoutAdapter() {
+                return NavigationActivity.this.createMenuLayoutAdapter();
             }
 
             @Override
@@ -56,27 +51,11 @@ public abstract class NavigationActivity extends AppCompatActivity
             }
 
             @Override
-            protected int getNavigationViewId() {
-                return R.id.navigation;
-            }
-
-            @Override
             protected String getActionBarTitle(int currentSelectedItem, int tabIndex, int navigationLevel) {
                 String title = NavigationActivity.this.getActionBarTitle(currentSelectedItem,
                         tabIndex, navigationLevel);
                 if(title == null){
                     title = super.getActionBarTitle(currentSelectedItem, tabIndex, navigationLevel);
-                }
-
-                return title;
-            }
-
-            @Override
-            protected String getActionBarTitleWhenNavigationIsShown(int currentSelectedItem) {
-                String title = NavigationActivity.this.
-                        getActionBarTitleWhenNavigationIsShown(currentSelectedItem);
-                if(title == null){
-                    title = super.getActionBarTitleWhenNavigationIsShown(currentSelectedItem);
                 }
 
                 return title;
@@ -93,18 +72,8 @@ public abstract class NavigationActivity extends AppCompatActivity
             }
 
             @Override
-            protected NavigationDrawerMenuAdapter createNavigationDrawerMenuAdapter(int navigationViewId) {
-                return NavigationActivity.this.createNavigationDrawerMenuAdapter(navigationViewId);
-            }
-
-            @Override
-            protected TabsAdapter createTabsAdapter() {
-                return NavigationActivity.this.createTabsAdapter();
-            }
-
-            @Override
-            protected void onTabsInit(int tabsCount, int navigationLevel) {
-                NavigationActivity.this.onTabsInit(tabsCount, navigationLevel);
+            protected TabsAdapter createTabsAdapter(View tabsView) {
+                return NavigationActivity.this.createTabsAdapter(tabsView);
             }
         };
         navigationHandler.init(getNavigationMode());
@@ -198,41 +167,38 @@ public abstract class NavigationActivity extends AppCompatActivity
         navigationHandler.selectTab(index);
     }
 
-    protected abstract NavigationDrawerMenuAdapter createNavigationDrawerMenuAdapter(int navigationViewId);
-
-    protected TabsAdapter createTabsAdapter() {
+    protected TabsAdapter createTabsAdapter(View tabsView) {
         if (fragmentFactory instanceof NoTabsFragmentFactory) {
             return new NoTabsAdapter();
         }
 
-        return TabLayoutAdapter.fromViewStub(this, getTabsStub(), getTabLayoutId());
+        return new TabLayoutAdapter((TabLayout) tabsView);
     }
 
     protected int getTabsStub() {
         return R.id.tabsStub;
     }
 
-    protected DrawerLayoutAdapter createDrawerLayoutAdapter() {
-        return new AndroidSupportDrawerLayoutAdapter(this, R.id.drawer_layout);
-    }
+    protected abstract MenuLayoutAdapter createMenuLayoutAdapter();
 
     public NavigationMode getNavigationMode() {
         return NavigationMode.SHOW_BACK_FOR_NESTED_LEVELS;
-    }
-
-    protected void onTabsInit(int tabsCount, int navigationLevel) {
-
     }
 
     protected int getToolBarStubId() {
         return R.id.toolbarStub;
     }
 
-    public void openDrawer() {
-        navigationHandler.show();
+    public void openMenuLayout() {
+        navigationHandler.showMenuLayout();
     }
 
-    public void closeDrawer() {
-        navigationHandler.hide();
+    public void closeMenuLayout() {
+        navigationHandler.hideMenuLayout();
+    }
+
+    @Override
+    public NavigationHandler getNavigationHandler() {
+        return navigationHandler;
     }
 }

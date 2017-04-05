@@ -14,10 +14,6 @@
                   android:layout_width="match_parent"
                   android:layout_height="wrap_content"/>
 
-        <ViewStub android:id="@+id/tabsStub"
-                  android:layout_width="match_parent"
-                  android:layout_height="wrap_content"/>
-
         <!-- Real content goes here -->
         <FrameLayout
                 android:id="@+id/content"

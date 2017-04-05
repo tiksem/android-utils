@@ -45,22 +45,8 @@ public class TabLayoutAdapter implements TabsAdapter {
         }
     }
 
-    private TabLayoutAdapter(Activity activity, int viewStubId, int tabLayoutId) {
-        ViewStub viewStub = (ViewStub) activity.findViewById(viewStubId);
-        viewStub.setLayoutResource(tabLayoutId);
-        tabLayout = (TabLayout) viewStub.inflate();
-    }
-
-    public static TabLayoutAdapter fromViewStub(Activity activity, int viewStubId, int tabLayoutId) {
-        return new TabLayoutAdapter(activity, viewStubId, tabLayoutId);
-    }
-
-    private TabLayoutAdapter(Context context, int tabLayoutId) {
-        tabLayout = (TabLayout) View.inflate(context, tabLayoutId, null);
-    }
-
-    public static TabLayoutAdapter fromLayoutId(Context context, int layoutId) {
-        return new TabLayoutAdapter(context, layoutId);
+    public TabLayoutAdapter(TabLayout tabLayout) {
+        this.tabLayout = tabLayout;
     }
 
     @Override
@@ -92,16 +78,6 @@ public class TabLayoutAdapter implements TabsAdapter {
         TabLayout.Tab tab = tabLayout.newTab();
         tabLayout.addTab(tab, isSelected);
         return new TabHolder(tab);
-    }
-
-    @Override
-    public void removeAllTabs() {
-        tabLayout.removeAllTabs();
-    }
-
-    @Override
-    public View getView() {
-        return tabLayout;
     }
 
     @Override

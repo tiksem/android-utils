@@ -24,15 +24,11 @@ public abstract class NavigationHandler {
     private FragmentFactory fragmentFactory;
     private int currentSelectedItem;
     private int navigationLevel = 0;
-    private int currentSelectedTabIndex;
     private NavigationMode navigationMode = NavigationMode.SHOW_BACK_FOR_NESTED_LEVELS;
     private Set<FragmentManager.OnBackStackChangedListener> backStackChangedListeners =
             Collections.newSetFromMap(new WeakHashMap<FragmentManager.OnBackStackChangedListener, Boolean>());
     private Stack<Fragment> backStack = new LinkedStack<>();
-    private NavigationDrawerMenuAdapter navigationDrawerMenuAdapter;
-    private View navigationView;
-    private TabsAdapter tabsAdapter;
-    private DrawerLayoutAdapter drawerLayoutAdapter;
+    private MenuLayoutAdapter menuLayoutAdapter;
     private Queue<Runnable> whenDrawableClosedQueue = new ArrayDeque<>();
 
     private void clearBackStack() {
@@ -47,7 +43,7 @@ public abstract class NavigationHandler {
     }
 
     private void executeWhenDrawerClosed(Runnable runnable) {
-        if (!drawerLayoutAdapter.isDrawerVisible(navigationView)) {
+        if (!menuLayoutAdapter.isVisible()) {
             runnable.run();
         } else {
             whenDrawableClosedQueue.add(runnable);
@@ -58,41 +54,29 @@ public abstract class NavigationHandler {
                                 final int navigationLevel,
                                 final int tabIndex,
                                 final boolean createFragment) {
-        hide();
+        hideMenuLayout();
 
         executeWhenDrawerClosed(new Runnable() {
             @Override
             public void run() {
-                if(menuItemId == currentSelectedItem && navigationLevel ==
-                        NavigationHandler.this.navigationLevel){
-                    return;
-                }
-
-                tabsAdapter.removeAllTabs();
-                int tabsCount = fragmentFactory.getTabsCount(menuItemId, navigationLevel);
-                onTabsInit(tabsCount, navigationLevel);
-                View tabsAdapterView = tabsAdapter.getView();
-                if (tabsCount <= 1) {
-                    if (createFragment) {
-                        clearBackStack();
-                        Fragments.removeFragmentWithId(activity.getSupportFragmentManager(),
-                                getContentId());
-                        Fragment fragment = fragmentFactory.createFragmentBySelectedItem(
-                                menuItemId, 0, navigationLevel);
-                        Fragments.replaceFragment(activity, getContentId(), fragment);
-                    }
-                    if (tabsAdapterView != null) {
-                        tabsAdapterView.setVisibility(View.GONE);
-                    }
-                } else {
-                    if (tabsAdapterView != null) {
-                        tabsAdapterView.setVisibility(View.VISIBLE);
-                    }
-                    initTabs(tabsCount, menuItemId, navigationLevel, createFragment, tabIndex);
-                }
-
                 NavigationHandler.this.currentSelectedItem = menuItemId;
                 NavigationHandler.this.navigationLevel = navigationLevel;
+
+                int tabsCount = fragmentFactory.getTabsCount(menuItemId, navigationLevel);
+                if (createFragment) {
+                    clearBackStack();
+                    Fragments.removeFragmentWithId(activity.getSupportFragmentManager(),
+                            getContentId());
+                    Fragment fragment;
+                    if (tabsCount <= 1) {
+                        fragment = fragmentFactory.createFragmentBySelectedItem(
+                                menuItemId, 0, navigationLevel);
+                    } else {
+                        fragment = TabsHolderFragment.create(tabIndex);
+                    }
+                    Fragments.replaceFragment(activity, getContentId(), fragment);
+                }
+
                 updateActionBarTitle();
 
                 ActionBar actionBar = activity.getSupportActionBar();
@@ -112,87 +96,52 @@ public abstract class NavigationHandler {
         });
     }
 
-    private void initTabs(int tabsCount,
-                          final int menuItemId,
-                          final int navigationLevel,
-                          final boolean createFragment,
-                          final int selectedTabIndex) {
-        tabsAdapter.removeAllTabs();
-        tabsAdapter.setOnTabSelected(new TabsAdapter.OnTabSelected() {
-            boolean shouldCreateFragment = createFragment;
-
-            @Override
-            public void onTabSelected(TabsAdapter.Tab tab) {
-                if (menuItemId != currentSelectedItem) {
-                    clearBackStack();
-                    Fragments.removeFragmentWithId(activity.getSupportFragmentManager(), getContentId());
-                }
-
-                int tabIndex = tab.getIndex();
-                if (shouldCreateFragment || selectedTabIndex != tabIndex) {
-                    Fragment fragment =
-                            fragmentFactory.createFragmentBySelectedItem(menuItemId, tabIndex,
-                                    navigationLevel);
-                    Fragments.replaceFragment(activity, getContentId(), fragment);
-                }
-
-                shouldCreateFragment = true;
-                currentSelectedTabIndex = tabIndex;
-            }
-        });
-
-        for (int i = 0; i < tabsCount; i++) {
-            TabsAdapter.Tab tab = tabsAdapter.newTab(i == selectedTabIndex);
-            fragmentFactory.initTab(menuItemId, i, navigationLevel, tab);
-        }
-
-        currentSelectedTabIndex = selectedTabIndex;
-    }
-
-    protected abstract void onTabsInit(int tabsCount, int navigationLevel);
-
     public void init(NavigationMode navigationMode) {
         this.navigationMode = navigationMode;
 
-        int tabsCount = fragmentFactory.getTabsCount(currentSelectedItem, navigationLevel);
-        onTabsInit(tabsCount, navigationLevel);
-        final View tabsAdapterView = tabsAdapter.getView();
-        if (tabsCount > 1) {
-            if (tabsAdapterView != null) {
-                tabsAdapterView.setVisibility(View.VISIBLE);
-            }
-            initTabs(tabsCount, currentSelectedItem, navigationLevel, true, 0);
-        } else {
-            if (tabsAdapterView != null) {
-                tabsAdapterView.setVisibility(View.GONE);
-            }
-            Fragments.replaceFragment(activity, getContentId(),
-                    fragmentFactory.createFragmentBySelectedItem(currentSelectedItem, 0, navigationLevel));
-        }
+        menuLayoutAdapter.setListener(new MenuLayoutAdapter.Listener() {
+            @Override
+            public void onOpened() {
 
-        navigationDrawerMenuAdapter = createNavigationDrawerMenuAdapter(getNavigationViewId());
-        navigationDrawerMenuAdapter.setOnItemSelectedListener(
-                new NavigationDrawerMenuAdapter.OnItemSelectedListener() {
+            }
+
+            @Override
+            public void onClosed() {
+                updateActionBarTitle();
+                Tasks.executeAndClearQueue(whenDrawableClosedQueue);
+            }
+
             @Override
             public void onItemSelected(int id) {
                 performMenuItemSelection(id);
             }
         });
 
-        navigationView = navigationDrawerMenuAdapter.getNavigationMenuView();
-        navigationDrawerMenuAdapter.applySelectItemVisualStyle(currentSelectedItem);
+        selectFragment(currentSelectedItem, navigationLevel, 0, true);
+
+        menuLayoutAdapter.applySelectItemVisualStyle(currentSelectedItem);
 
         updateActionBarTitle();
-        initDrawableToggle();
+
+        ActionBar actionBar = activity.getSupportActionBar();
+        if (actionBar != null && navigationMode != NavigationMode.NEVER_SHOW_NAVIGATION_TOGGLE) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setHomeAsUpIndicator(getToggleIconResourceId());
+        }
     }
 
     public void performMenuItemSelection(int id) {
-        navigationDrawerMenuAdapter.applySelectItemVisualStyle(currentSelectedItem);
         selectFragment(id, 0, 0, true);
     }
 
     public void selectTab(int index) {
-        tabsAdapter.selectTab(index);
+        Fragment currentFragment = getCurrentFragment();
+        if (currentFragment instanceof TabsHolderFragment) {
+            TabsHolderFragment tabsHolderFragment = (TabsHolderFragment) currentFragment;
+            tabsHolderFragment.selectTab(index);
+        } else if (index != 0) {
+            throw new IllegalStateException("No such tab");
+        }
     }
 
     public NavigationHandler(final AppCompatActivity activity,
@@ -202,8 +151,7 @@ public abstract class NavigationHandler {
         this.currentSelectedItem = currentSelectedItem;
         this.activity = activity;
 
-        drawerLayoutAdapter = createDrawerLayoutAdapter();
-        tabsAdapter = createTabsAdapter();
+        menuLayoutAdapter = createDrawerLayoutAdapter();
 
         ViewStub toolbarStub = (ViewStub) activity.findViewById(getToolBarStubId());
         toolbarStub.setLayoutResource(getToolbarLayoutId());
@@ -226,7 +174,8 @@ public abstract class NavigationHandler {
                     title = ((ActionBarTitleProvider) fragment).getActionBarTitle();
                 }
                 if (title == null) {
-                    title = getActionBarTitle(currentSelectedItem, currentSelectedTabIndex, navigationLevel);
+                    title = getActionBarTitle(currentSelectedItem, getCurrentSelectedTabIndex(),
+                            navigationLevel);
                 }
 
                 actionBar.setTitle(title);
@@ -234,52 +183,25 @@ public abstract class NavigationHandler {
         });
     }
 
-    private void initDrawableToggle() {
-        drawerLayoutAdapter.setListener(new DrawerLayoutAdapter.Listener() {
-            @Override
-            public void onDrawerClosed(View view) {
-                updateActionBarTitle();
-                Tasks.executeAndClearQueue(whenDrawableClosedQueue);
-            }
-
-            @Override
-            public void onDrawerOpened(View drawerView) {
-                ActionBar actionBar = activity.getSupportActionBar();
-                if (actionBar != null) {
-                    String title = getActionBarTitleWhenNavigationIsShown(currentSelectedItem);
-                    actionBar.setTitle(title);
-                }
-            }
-        });
-
-        ActionBar actionBar = activity.getSupportActionBar();
-        if (actionBar != null && navigationMode != NavigationMode.NEVER_SHOW_NAVIGATION_TOGGLE) {
-            actionBar.setDisplayHomeAsUpEnabled(true);
-            actionBar.setHomeAsUpIndicator(getToggleIconResourceId());
-        }
+    public void showMenuLayout() {
+        menuLayoutAdapter.open();
     }
 
-    public void show() {
-        drawerLayoutAdapter.openDrawer(navigationView);
-    }
-
-    public void hide() {
-        drawerLayoutAdapter.closeDrawer(navigationView);
+    public void hideMenuLayout() {
+        menuLayoutAdapter.close();
     }
 
     protected abstract int getContentId();
-    protected abstract int getNavigationViewId();
     protected abstract int getToolBarStubId();
     protected abstract int getToolbarLayoutId();
-    protected abstract NavigationDrawerMenuAdapter createNavigationDrawerMenuAdapter(int navigationViewId);
-    protected abstract TabsAdapter createTabsAdapter();
-    protected abstract DrawerLayoutAdapter createDrawerLayoutAdapter();
+    protected abstract TabsAdapter createTabsAdapter(View tabsView);
+    protected abstract MenuLayoutAdapter createDrawerLayoutAdapter();
 
-    protected String getActionBarTitle(int currentSelectedItem, int tabIndex, int navigationLevel) {
-        return GuiUtilities.getApplicationName(activity);
+    protected int getTabsLayout() {
+        return R.layout.tabs;
     }
 
-    protected String getActionBarTitleWhenNavigationIsShown(int currentSelectedItem) {
+    protected String getActionBarTitle(int currentSelectedItem, int tabIndex, int navigationLevel) {
         return GuiUtilities.getApplicationName(activity);
     }
 
@@ -312,7 +234,7 @@ public abstract class NavigationHandler {
 
     public void replaceFragment(Fragment newFragment, final int navigationLevel) {
         final int lastNavigationLevel = this.navigationLevel;
-        final int lastTabIndex = currentSelectedTabIndex;
+        final int lastTabIndex = getCurrentSelectedTabIndex();
 
         if (newFragment == null) {
             newFragment = fragmentFactory.createFragmentBySelectedItem(currentSelectedItem, 0, navigationLevel);
@@ -361,17 +283,17 @@ public abstract class NavigationHandler {
 
     public void handleHomeButtonClick() {
         if (navigationMode == NavigationMode.ALWAYS_SHOW_NAVIGATION_TOGGLE || navigationLevel == 0) {
-            toggleDrawer();
+            toggleMenu();
         } else {
             activity.onBackPressed();
         }
     }
 
-    public void toggleDrawer() {
-        if (drawerLayoutAdapter.isDrawerOpened(navigationView)) {
-            drawerLayoutAdapter.closeDrawer(navigationView);
+    public void toggleMenu() {
+        if (menuLayoutAdapter.isOpen()) {
+            menuLayoutAdapter.close();
         } else {
-            drawerLayoutAdapter.openDrawer(navigationView);
+            menuLayoutAdapter.open();
         }
     }
 
@@ -389,5 +311,23 @@ public abstract class NavigationHandler {
         }
 
         this.navigationMode = navigationMode;
+    }
+
+    public FragmentFactory getFragmentFactory() {
+        return fragmentFactory;
+    }
+
+    public int getNavigationLevel() {
+        return navigationLevel;
+    }
+
+    public int getCurrentSelectedTabIndex() {
+        Fragment currentFragment = getCurrentFragment();
+        if (currentFragment instanceof TabsHolderFragment) {
+            TabsHolderFragment tabsHolderFragment = (TabsHolderFragment) currentFragment;
+            return tabsHolderFragment.getCurrentSelectedTabIndex();
+        } else {
+            return 0;
+        }
     }
 }
