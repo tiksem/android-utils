@@ -3,6 +3,7 @@ package com.utilsframework.android.navdrawer;
 import android.app.Activity;
 import android.content.Context;
 import android.support.design.widget.TabLayout;
+import android.support.v4.view.ViewPager;
 import android.view.View;
 import android.view.ViewStub;
 
@@ -74,14 +75,17 @@ public class TabLayoutAdapter implements TabsAdapter {
     }
 
     @Override
-    public Tab newTab(boolean isSelected) {
-        TabLayout.Tab tab = tabLayout.newTab();
-        tabLayout.addTab(tab, isSelected);
-        return new TabHolder(tab);
+    public Tab getTab(int index) {
+        return new TabHolder(tabLayout.getTabAt(index));
     }
 
     @Override
     public void selectTab(int index) {
         tabLayout.getTabAt(index).select();
+    }
+
+    @Override
+    public void setupViewPager(ViewPager viewPager) {
+        tabLayout.setupWithViewPager(viewPager);
     }
 }

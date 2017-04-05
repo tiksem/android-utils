@@ -1,5 +1,6 @@
 package com.utilsframework.android.navdrawer;
 
+import android.support.v4.view.ViewPager;
 import android.view.View;
 
 /**
@@ -19,6 +20,7 @@ public interface TabsAdapter {
     }
 
     void setOnTabSelected(OnTabSelected listener);
-    Tab newTab(boolean isSelected);
+    Tab getTab(int index);
     void selectTab(int index);
+    void setupViewPager(ViewPager viewPager);
 }

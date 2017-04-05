@@ -2,6 +2,7 @@ package com.utilsframework.android.navdrawer;
 
 import android.app.Activity;
 import android.content.Context;
+import android.support.v4.view.ViewPager;
 import android.view.View;
 import android.view.ViewStub;
 import com.utilsframework.android.view.LayoutRadioButtonGroup;
@@ -87,17 +88,18 @@ public class LayoutRadioButtonGroupTabsAdapter implements TabsAdapter {
     }
 
     @Override
-    public Tab newTab(boolean isSelected) {
-        LayoutRadioButtonGroup.LayoutRadioButton button = radioButtonGroup.getItemByIndex(newTabIndex++);
-        if (isSelected) {
-            button.select();
-        }
-
-        return new TabHolder(button);
+    public Tab getTab(int index) {
+        return new TabHolder((LayoutRadioButtonGroup.LayoutRadioButton)
+                radioButtonGroup.getChildAt(index));
     }
 
     @Override
     public void selectTab(int index) {
         radioButtonGroup.setSelectedItemIndex(index);
+    }
+
+    @Override
+    public void setupViewPager(ViewPager viewPager) {
+        throw new UnsupportedOperationException("Not implemented, please implement");
     }
 }

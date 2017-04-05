@@ -64,15 +64,16 @@ public class TabsHolderFragment extends Fragment {
             @Override
             public void onTabSelected(TabsAdapter.Tab tab) {
                 tabIndex = tab.getIndex();
-                viewPager.setCurrentItem(tabIndex);
             }
         });
 
+        tabsAdapter.setupViewPager(viewPager);
         int tabIndex = getCurrentSelectedTabIndex();
         for (int i = 0; i < tabsCount; i++) {
-            TabsAdapter.Tab tab = tabsAdapter.newTab(i == tabIndex);
+            TabsAdapter.Tab tab = tabsAdapter.getTab(i);
             fragmentFactory.initTab(currentSelectedItem, i, navigationLevel, tab);
         }
+        tabsAdapter.selectTab(tabIndex);
     }
 
     private NavigationHandler getNavigationHandler() {
