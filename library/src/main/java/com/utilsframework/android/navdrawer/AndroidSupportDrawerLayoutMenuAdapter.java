@@ -7,10 +7,9 @@ import android.view.View;
 /**
  * Created by stykhonenko on 19.10.15.
  */
-public abstract class AndroidSupportDrawerLayoutMenuAdapter implements MenuLayoutAdapter {
+public abstract class AndroidSupportDrawerLayoutMenuAdapter extends BaseMenuLayoutAdapter {
     private View menuView;
     private DrawerLayout drawerLayout;
-    private Listener listener;
 
     public AndroidSupportDrawerLayoutMenuAdapter(Activity activity, int drawerLayoutId) {
         drawerLayout = (DrawerLayout) activity.findViewById(drawerLayoutId);
@@ -38,7 +37,7 @@ public abstract class AndroidSupportDrawerLayoutMenuAdapter implements MenuLayou
 
     @Override
     public void setListener(final Listener listener) {
-        this.listener = listener;
+        super.setListener(listener);
         if (listener == null) {
             drawerLayout.setDrawerListener(null);
         } else {
@@ -67,11 +66,6 @@ public abstract class AndroidSupportDrawerLayoutMenuAdapter implements MenuLayou
         }
     }
 
-    public Listener getListener() {
-        return listener;
-    }
-
-    @Override
     public View getMenuView() {
         return menuView;
     }

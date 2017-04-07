@@ -46,25 +46,6 @@ public class NavigationViewMenuAdapter extends AndroidSupportDrawerLayoutMenuAda
         }
     }
 
-    @Override
-    public NavigationView getMenuView() {
-        return navigationView;
-    }
-
-    public void registerItemAsSelectable(View item) {
-        final int id = item.getId();
-        if (id == View.NO_ID) {
-            throw new IllegalArgumentException("Item without id cannot be selectable");
-        }
-
-        item.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                getListener().onItemSelected(v.getId());
-            }
-        });
-    }
-
     public void registerHeaderItemAsSelectable(int headerItemId) {
         View item = navigationView.getHeaderView(0).findViewById(headerItemId);
         item.setOnClickListener(new View.OnClickListener() {
@@ -73,5 +54,9 @@ public class NavigationViewMenuAdapter extends AndroidSupportDrawerLayoutMenuAda
                 getListener().onItemSelected(v.getId());
             }
         });
+    }
+
+    public NavigationView getMenuView() {
+        return navigationView;
     }
 }

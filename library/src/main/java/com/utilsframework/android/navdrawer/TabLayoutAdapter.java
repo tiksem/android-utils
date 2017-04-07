@@ -81,7 +81,12 @@ public class TabLayoutAdapter implements TabsAdapter {
 
     @Override
     public void selectTab(int index) {
-        tabLayout.getTabAt(index).select();
+        TabLayout.Tab tab = tabLayout.getTabAt(index);
+        if (tab == null) {
+            throw new IllegalArgumentException("Wrong tab index " + index);
+        }
+
+        tab.select();
     }
 
     @Override

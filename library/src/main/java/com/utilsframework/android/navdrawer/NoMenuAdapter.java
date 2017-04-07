@@ -12,11 +12,6 @@ public class NoMenuAdapter implements MenuLayoutAdapter {
     }
 
     @Override
-    public View getMenuView() {
-        return null;
-    }
-
-    @Override
     public void open() {
 
     }

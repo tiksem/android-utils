@@ -13,7 +13,6 @@ public interface MenuLayoutAdapter {
     }
 
     void applySelectItemVisualStyle(int id);
-    View getMenuView();
 
     void open();
     void close();
