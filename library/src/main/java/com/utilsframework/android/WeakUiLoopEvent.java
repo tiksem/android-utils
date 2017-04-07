@@ -19,6 +19,7 @@ public class WeakUiLoopEvent<T> extends UiLoopEvent {
     }
 
     public WeakUiLoopEvent(long delay, T parent) {
+        super(delay);
         if (parent == null) {
             throw new IllegalArgumentException("parent == null");
         }
