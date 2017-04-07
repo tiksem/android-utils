@@ -2,7 +2,6 @@ package com.utilsframework.android.fragments;
 
 import android.os.Bundle;
 import android.os.Parcelable;
-import android.support.annotation.NonNull;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -263,9 +262,11 @@ public abstract class LazyLoadingListFragment<T>
         requestGetLazyLoadingList(lastFilter);
         elements.setOnPageLoadingFinished(new LazyLoadingList.OnPageLoadingFinished<T>() {
             @Override
-            public void onLoadingFinished(List<T> elements) {
-                updateAdapterAndViewsState();
-                swipeRefreshLayout.setRefreshing(false);
+            public void onLoadingFinished(List<T> elements, boolean isLastPage) {
+                if (!elements.isEmpty() || isLastPage) {
+                    updateAdapterAndViewsState();
+                    swipeRefreshLayout.setRefreshing(false);
+                }
             }
         });
 
@@ -383,7 +384,7 @@ public abstract class LazyLoadingListFragment<T>
 
         elements.setOnPageLoadingFinished(new LazyLoadingList.OnPageLoadingFinished<T>() {
             @Override
-            public void onLoadingFinished(List<T> page) {
+            public void onLoadingFinished(List<T> page, boolean isLastPage) {
                 if (elements.getElementsCount() > 0 || elements.isAllDataLoaded()) {
                     showListViewOrEmptyView();
                 }
